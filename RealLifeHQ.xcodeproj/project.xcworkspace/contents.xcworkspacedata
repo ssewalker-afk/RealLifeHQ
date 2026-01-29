@@ -4,4 +4,61 @@
    <FileRef
       location = "self:">
    </FileRef>
+   <FileRef
+      location = "group:PRIVACY_POLICY.md">
+   </FileRef>
+   <FileRef
+      location = "group:TERMS_OF_SERVICE.md">
+   </FileRef>
+   <FileRef
+      location = "group:APP_STORE_COMPLIANCE_GUIDE.md">
+   </FileRef>
+   <FileRef
+      location = "group:privacy-policy.html">
+   </FileRef>
+   <FileRef
+      location = "group:APP_STORE_SUBMISSION_CHECKLIST.md">
+   </FileRef>
+   <FileRef
+      location = "group:PRIVACY_QUICK_START.md">
+   </FileRef>
+   <FileRef
+      location = "group:PrivacyPolicyView.swift">
+   </FileRef>
+   <FileRef
+      location = "group:TermsOfServiceView.swift">
+   </FileRef>
+   <FileRef
+      location = "group:IN_APP_LEGAL_SCREENS_GUIDE.md">
+   </FileRef>
+   <FileRef
+      location = "group:privacy-policy 2.html">
+   </FileRef>
+   <FileRef
+      location = "group:BUILD_ERROR_FIX_GUIDE.md">
+   </FileRef>
+   <FileRef
+      location = "group:PAYWALL_ACCESS_GUIDE.md">
+   </FileRef>
+   <FileRef
+      location = "group:SUBSCRIPTION_REQUIRED_IMPLEMENTATION.md">
+   </FileRef>
+   <FileRef
+      location = "group:BUDGET_CARD_UPDATE_GUIDE.md">
+   </FileRef>
+   <FileRef
+      location = "group:APPLE_INTELLIGENCE_IMPLEMENTATION_GUIDE.md">
+   </FileRef>
+   <FileRef
+      location = "group:AI_PRODUCTION_READY_SUMMARY.md">
+   </FileRef>
+   <FileRef
+      location = "group:AI_QUICK_REFERENCE.md">
+   </FileRef>
+   <FileRef
+      location = "group:BUILD_FIXED_STATUS.md">
+   </FileRef>
+   <FileRef
+      location = "group:PAYWALL_STUCK_FIX.md">
+   </FileRef>
 </Workspace>
