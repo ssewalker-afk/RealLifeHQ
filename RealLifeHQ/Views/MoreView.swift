@@ -7,7 +7,7 @@ struct MoreView: View {
     @EnvironmentObject var themeManager: ThemeManager
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             List {
                 Section("Features") {
                     NavigationLink(destination: JournalView()) {
@@ -20,10 +20,11 @@ struct MoreView: View {
                             .foregroundColor(themeManager.currentTheme.primaryColor)
                     }
                     
-                    NavigationLink(destination: RecipesView()) {
-                        Label("Recipes", systemImage: "fork.knife")
-                            .foregroundColor(themeManager.currentTheme.primaryColor)
-                    }
+                    // Recipes temporarily hidden - work in progress
+                    // NavigationLink(destination: RecipesView()) {
+                    //     Label("Recipes", systemImage: "fork.knife")
+                    //         .foregroundColor(themeManager.currentTheme.primaryColor)
+                    // }
                     
                     NavigationLink(destination: VaultView()) {
                         Label("Vault", systemImage: "lock.shield.fill")

@@ -40,17 +40,16 @@ struct BudgetSetupWizard: View {
     @State private var currentPage = 0
     
     var body: some View {
-        NavigationView {
-            VStack(spacing: 24) {
-                // Progress indicator
-                HStack(spacing: 8) {
-                    ForEach(0..<3) { index in
-                        Circle()
-                            .fill(index == currentPage ? themeManager.currentTheme.primaryColor : Color.gray.opacity(0.3))
-                            .frame(width: 10, height: 10)
-                    }
+        VStack(spacing: 24) {
+            // Progress indicator
+            HStack(spacing: 8) {
+                ForEach(0..<3) { index in
+                    Circle()
+                        .fill(index == currentPage ? themeManager.currentTheme.primaryColor : Color.gray.opacity(0.3))
+                        .frame(width: 10, height: 10)
                 }
-                .padding(.top)
+            }
+            .padding(.top)
                 
                 TabView(selection: $currentPage) {
                     // Page 1: Income
@@ -180,7 +179,6 @@ struct BudgetSetupWizard: View {
             .navigationTitle("Budget Setup")
             .navigationBarTitleDisplayMode(.inline)
         }
-    }
     
     private func budgetRuleRow(title: String, percent: Binding<Double>, color: Color, description: String) -> some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -248,6 +246,7 @@ struct BudgetSetupWizard: View {
 struct BudgetDashboard: View {
     @EnvironmentObject var dataManager: DataManager
     @EnvironmentObject var themeManager: ThemeManager
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @State private var selectedMonth = Date()
     @State private var showingAddExpense = false
     @State private var showingCategories = false
@@ -266,31 +265,18 @@ struct BudgetDashboard: View {
     }
     
     var body: some View {
-        NavigationView {
-            ScrollView {
-                VStack(spacing: 20) {
-                    // Month selector
-                    monthSelector
-                    
-                    // Summary card
-                    budgetSummaryCard
-                    
-                    // Spending chart
-                    if !dataManager.expenses.isEmpty {
-                        spendingChartCard
-                    }
-                    
-                    // Categories breakdown
-                    categoriesBreakdownCard
-                    
-                    // Recent expenses
-                    recentExpensesCard
-                }
-                .padding()
+        ScrollView {
+            if horizontalSizeClass == .regular {
+                // iPad: Grid layout
+                iPadLayout
+            } else {
+                // iPhone: Vertical layout
+                iPhoneLayout
             }
-            .background(themeManager.currentTheme.backgroundColor.ignoresSafeArea())
-            .navigationTitle("Budget")
-            .toolbar {
+        }
+        .background(themeManager.currentTheme.backgroundColor.ignoresSafeArea())
+        .navigationTitle("Budget")
+        .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
                         Button {
@@ -337,6 +323,47 @@ struct BudgetDashboard: View {
             .sheet(isPresented: $showingAllExpenses) {
                 AllExpensesView(month: monthKey)
             }
+    }
+    
+    // iPhone Layout - Vertical Stack
+    private var iPhoneLayout: some View {
+        VStack(spacing: 20) {
+            monthSelector
+            budgetSummaryCard
+            
+            if !dataManager.expenses.isEmpty {
+                spendingChartCard
+            }
+            
+            categoriesBreakdownCard
+            recentExpensesCard
+        }
+        .padding()
+    }
+    
+    // iPad Layout - Two-Column Grid
+    private var iPadLayout: some View {
+        VStack(spacing: 20) {
+            monthSelector
+                .padding(.horizontal)
+            
+            LazyVGrid(columns: [
+                GridItem(.flexible(), spacing: 20),
+                GridItem(.flexible(), spacing: 20)
+            ], spacing: 20) {
+                budgetSummaryCard
+                
+                if !dataManager.expenses.isEmpty {
+                    spendingChartCard
+                }
+                
+                categoriesBreakdownCard
+                    .gridCellColumns(2)
+                
+                recentExpensesCard
+                    .gridCellColumns(2)
+            }
+            .padding()
         }
     }
     
@@ -1024,247 +1051,4 @@ struct AllExpensesView: View {
         }
     }
 }
-
-// MARK: - Edit Budget View
-
-struct EditBudgetView: View {
-    @Environment(\.dismiss) var dismiss
-    @EnvironmentObject var dataManager: DataManager
-    @EnvironmentObject var themeManager: ThemeManager
-    
-    @State private var monthlyIncome: String
-    @State private var needsPercent: Double
-    @State private var wantsPercent: Double
-    @State private var savingsPercent: Double
-    @State private var showingAlert = false
-    @State private var alertMessage = ""
-    
-    init() {
-        // Initialize with current values - we'll update in onAppear
-        _monthlyIncome = State(initialValue: "0")
-        _needsPercent = State(initialValue: 50)
-        _wantsPercent = State(initialValue: 30)
-        _savingsPercent = State(initialValue: 20)
-    }
-    
-    var body: some View {
-        NavigationView {
-            Form {
-                Section {
-                    Text("Monthly Take-Home Pay")
-                        .font(.headline)
-                    
-                    HStack {
-                        Text("$")
-                            .font(.title2)
-                            .foregroundColor(.secondary)
-                        
-                        TextField("0.00", text: $monthlyIncome)
-                            .keyboardType(.decimalPad)
-                            .font(.system(size: 32, weight: .bold))
-                            .multilineTextAlignment(.leading)
-                    }
-                    .padding(.vertical, 8)
-                } header: {
-                    Text("Income")
-                } footer: {
-                    Text("This is your monthly take-home pay after taxes and deductions")
-                        .font(.caption)
-                }
-                
-                Section {
-                    VStack(spacing: 20) {
-                        budgetSlider(
-                            title: "Needs",
-                            percent: $needsPercent,
-                            color: .blue,
-                            description: "Housing, food, utilities, insurance"
-                        )
-                        
-                        budgetSlider(
-                            title: "Wants",
-                            percent: $wantsPercent,
-                            color: .purple,
-                            description: "Entertainment, dining out, hobbies"
-                        )
-                        
-                        budgetSlider(
-                            title: "Savings",
-                            percent: $savingsPercent,
-                            color: .green,
-                            description: "Emergency fund, retirement, investments"
-                        )
-                    }
-                    .padding(.vertical, 8)
-                } header: {
-                    Text("Budget Allocation")
-                } footer: {
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack {
-                            Text("Total:")
-                                .fontWeight(.semibold)
-                            Text("\(Int(needsPercent + wantsPercent + savingsPercent))%")
-                                .foregroundColor(needsPercent + wantsPercent + savingsPercent == 100 ? .green : .red)
-                        }
-                        
-                        if needsPercent + wantsPercent + savingsPercent != 100 {
-                            Text("Percentages must add up to 100%")
-                                .foregroundColor(.red)
-                                .font(.caption)
-                        }
-                    }
-                }
-                
-                if let income = Double(monthlyIncome), income > 0 {
-                    Section("Budget Summary") {
-                        VStack(spacing: 12) {
-                            summaryRow(title: "Needs (\(Int(needsPercent))%)", amount: income * needsPercent / 100, color: .blue)
-                            summaryRow(title: "Wants (\(Int(wantsPercent))%)", amount: income * wantsPercent / 100, color: .purple)
-                            summaryRow(title: "Savings (\(Int(savingsPercent))%)", amount: income * savingsPercent / 100, color: .green)
-                            
-                            Divider()
-                            
-                            HStack {
-                                Text("Total Budget")
-                                    .fontWeight(.bold)
-                                Spacer()
-                                Text("$\(income, specifier: "%.2f")")
-                                    .fontWeight(.bold)
-                                    .foregroundColor(themeManager.currentTheme.primaryColor)
-                            }
-                        }
-                    }
-                }
-                
-                Section {
-                    Button(role: .destructive) {
-                        alertMessage = "This will reset your budget categories to match the new percentages. Your expense history will be preserved."
-                        showingAlert = true
-                    } label: {
-                        HStack {
-                            Image(systemName: "arrow.clockwise")
-                            Text("Reset Categories to Match Budget")
-                        }
-                    }
-                } footer: {
-                    Text("This will update your category limits based on the new budget percentages")
-                        .font(.caption)
-                }
-            }
-            .navigationTitle("Edit Budget")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Save") {
-                        saveBudget()
-                    }
-                    .disabled(!isValid)
-                }
-            }
-            .alert("Update Categories?", isPresented: $showingAlert) {
-                Button("Cancel", role: .cancel) { }
-                Button("Reset Categories", role: .destructive) {
-                    resetCategoriesToBudget()
-                }
-            } message: {
-                Text(alertMessage)
-            }
-            .onAppear {
-                // Load current values
-                let setup = dataManager.budgetSetup
-                monthlyIncome = String(format: "%.2f", setup.monthlyIncome)
-                needsPercent = setup.needsPercentage
-                wantsPercent = setup.wantsPercentage
-                savingsPercent = setup.savingsPercentage
-            }
-        }
-    }
-    
-    private var isValid: Bool {
-        guard let income = Double(monthlyIncome), income > 0 else { return false }
-        return needsPercent + wantsPercent + savingsPercent == 100
-    }
-    
-    private func budgetSlider(title: String, percent: Binding<Double>, color: Color, description: String) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text(title)
-                    .font(.headline)
-                Spacer()
-                Text("\(Int(percent.wrappedValue))%")
-                    .font(.headline)
-                    .foregroundColor(color)
-                    .frame(width: 50, alignment: .trailing)
-            }
-            
-            Slider(value: percent, in: 0...100, step: 5)
-                .tint(color)
-            
-            Text(description)
-                .font(.caption)
-                .foregroundColor(.secondary)
-        }
-    }
-    
-    private func summaryRow(title: String, amount: Double, color: Color) -> some View {
-        HStack {
-            Text(title)
-                .foregroundColor(color)
-            Spacer()
-            Text("$\(amount, specifier: "%.2f")")
-                .font(.subheadline)
-                .fontWeight(.semibold)
-        }
-    }
-    
-    private func saveBudget() {
-        guard let income = Double(monthlyIncome) else { return }
-        
-        var setup = dataManager.budgetSetup
-        setup.monthlyIncome = income
-        setup.needsPercentage = needsPercent
-        setup.wantsPercentage = wantsPercent
-        setup.savingsPercentage = savingsPercent
-        
-        dataManager.saveBudgetSetup(setup)
-        dismiss()
-    }
-    
-    private func resetCategoriesToBudget() {
-        guard let income = Double(monthlyIncome) else { return }
-        
-        let needsAmount = income * needsPercent / 100
-        let wantsAmount = income * wantsPercent / 100
-        let savingsAmount = income * savingsPercent / 100
-        
-        // Delete all existing categories
-        for category in dataManager.budgetCategories {
-            dataManager.deleteBudgetCategory(category)
-        }
-        
-        // Create new default categories
-        let categories = [
-            BudgetCategory(name: "Housing", icon: "house.fill", color: "blue", limit: needsAmount * 0.4, type: .needs),
-            BudgetCategory(name: "Food", icon: "cart.fill", color: "orange", limit: needsAmount * 0.3, type: .needs),
-            BudgetCategory(name: "Transportation", icon: "car.fill", color: "blue", limit: needsAmount * 0.3, type: .needs),
-            BudgetCategory(name: "Entertainment", icon: "film.fill", color: "purple", limit: wantsAmount * 0.5, type: .wants),
-            BudgetCategory(name: "Dining Out", icon: "fork.knife", color: "pink", limit: wantsAmount * 0.5, type: .wants),
-            BudgetCategory(name: "Emergency Fund", icon: "shield.fill", color: "green", limit: savingsAmount, type: .savings)
-        ]
-        
-        for category in categories {
-            dataManager.addBudgetCategory(category)
-        }
-        
-        // Save the new budget setup
-        saveBudget()
-    }
-}
-
 

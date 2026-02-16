@@ -5,60 +5,87 @@
       location = "self:">
    </FileRef>
    <FileRef
-      location = "group:PRIVACY_POLICY.md">
+      location = "group:BUILD_ERROR_FIX.md">
    </FileRef>
    <FileRef
-      location = "group:TERMS_OF_SERVICE.md">
+      location = "group:AI_BUILD_ERRORS_FIXED.md">
    </FileRef>
    <FileRef
-      location = "group:APP_STORE_COMPLIANCE_GUIDE.md">
+      location = "group:KEYCHAIN_BUILD_FIX.md">
    </FileRef>
    <FileRef
-      location = "group:privacy-policy.html">
+      location = "group:APPLE_CALENDAR_BUILD_FIXES.md">
    </FileRef>
    <FileRef
-      location = "group:APP_STORE_SUBMISSION_CHECKLIST.md">
+      location = "group:GoogleCalendarManager.swift">
    </FileRef>
    <FileRef
-      location = "group:PRIVACY_QUICK_START.md">
+      location = "group:GoogleCalendarSyncSettingsView.swift">
    </FileRef>
    <FileRef
-      location = "group:PrivacyPolicyView.swift">
+      location = "group:GOOGLE_CALENDAR_SETUP_GUIDE.md">
    </FileRef>
    <FileRef
-      location = "group:TermsOfServiceView.swift">
+      location = "group:GOOGLE_CALENDAR_QUICK_REFERENCE.md">
    </FileRef>
    <FileRef
-      location = "group:IN_APP_LEGAL_SCREENS_GUIDE.md">
+      location = "group:GOOGLE_CALENDAR_IMPLEMENTATION_SUMMARY.md">
    </FileRef>
    <FileRef
-      location = "group:privacy-policy 2.html">
+      location = "group:BUDGET_CATEGORY_EDITING_IMPROVEMENTS.md">
    </FileRef>
    <FileRef
-      location = "group:BUILD_ERROR_FIX_GUIDE.md">
+      location = "group:HabitCalendarManager.swift">
    </FileRef>
    <FileRef
-      location = "group:PAYWALL_ACCESS_GUIDE.md">
+      location = "group:HABIT_CALENDAR_INTEGRATION_GUIDE.md">
    </FileRef>
    <FileRef
-      location = "group:SUBSCRIPTION_REQUIRED_IMPLEMENTATION.md">
+      location = "group:HabitCalendarManager 2.swift">
    </FileRef>
    <FileRef
-      location = "group:BUDGET_CARD_UPDATE_GUIDE.md">
+      location = "group:BUILD_ERROR_FIX_CALENDAR.md">
    </FileRef>
    <FileRef
-      location = "group:APPLE_INTELLIGENCE_IMPLEMENTATION_GUIDE.md">
+      location = "group:TAB_BAR_REORGANIZATION.md">
    </FileRef>
    <FileRef
-      location = "group:AI_PRODUCTION_READY_SUMMARY.md">
+      location = "group:CALENDAR_ALERT_TERMINOLOGY_UPDATE.md">
    </FileRef>
    <FileRef
-      location = "group:AI_QUICK_REFERENCE.md">
+      location = "group:ReminderWizardModels.swift">
    </FileRef>
    <FileRef
-      location = "group:BUILD_FIXED_STATUS.md">
+      location = "group:ReminderWizardView.swift">
    </FileRef>
    <FileRef
-      location = "group:PAYWALL_STUCK_FIX.md">
+      location = "group:REMINDER_WIZARD_GUIDE.md">
+   </FileRef>
+   <FileRef
+      location = "group:PrivacyPolicyView 3.swift">
+   </FileRef>
+   <FileRef
+      location = "group:SupportView.swift">
+   </FileRef>
+   <FileRef
+      location = "group:privacy-policy 3.html">
+   </FileRef>
+   <FileRef
+      location = "group:support.html">
+   </FileRef>
+   <FileRef
+      location = "group:PRIVACY_SUPPORT_README.md">
+   </FileRef>
+   <FileRef
+      location = "group:APP_STORE_COPY.md">
+   </FileRef>
+   <FileRef
+      location = "group:SUBSCRIPTION_COMPLIANCE_CHECKLIST.md">
+   </FileRef>
+   <FileRef
+      location = "group:docsterms-of-service.html">
+   </FileRef>
+   <FileRef
+      location = "group:docsindex.html">
    </FileRef>
 </Workspace>

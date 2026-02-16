@@ -37,20 +37,21 @@ struct SettingsView: View {
                 }
             }
             
-            Section("Dashboard") {
-                NavigationLink(destination: WidgetSettingsView()) {
-                    Label("Manage Widgets", systemImage: "square.grid.2x2.fill")
+            Section("Integrations") {
+                NavigationLink(destination: CalendarSyncSettingsView()) {
+                    Label("Apple Calendar Sync", systemImage: "calendar.badge.clock")
                 }
-            }
-            
-            Section("Security") {
-                Toggle(isOn: $dataManager.settings.biometricEnabled) {
-                    Label("Face ID / Touch ID", systemImage: "faceid")
-                }
-                .onChange(of: dataManager.settings.biometricEnabled) { newValue in
-                    var settings = dataManager.settings
-                    settings.biometricEnabled = newValue
-                    dataManager.updateSettings(settings)
+                
+                NavigationLink(destination: GoogleCalendarSyncSettingsView()) {
+                    HStack {
+                        Label("Google Calendar Sync", systemImage: "g.circle.fill")
+                        Spacer()
+                        if GoogleCalendarManager.shared.isAuthenticated {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundColor(.green)
+                                .font(.caption)
+                        }
+                    }
                 }
             }
             
@@ -87,6 +88,10 @@ struct SettingsView: View {
                 
                 NavigationLink(destination: TermsOfServiceView()) {
                     Label("Terms of Service", systemImage: "doc.text.fill")
+                }
+                
+                NavigationLink(destination: SupportView()) {
+                    Label("Support & Help", systemImage: "lifepreserver.fill")
                 }
             }
             

@@ -39,6 +39,10 @@ class DataManager: ObservableObject {
     private let recurringExpensesKey = "recurringExpenses"
     
     init() {
+        // Migrate existing vault data to Keychain if needed
+        VaultMigrationHelper.migrateVaultDataIfNeeded()
+        
+        // Load all data
         loadAllData()
     }
     
@@ -47,16 +51,74 @@ class DataManager: ObservableObject {
     func addEvent(_ event: Event) {
         events.append(event)
         saveEvents()
+        
+        // Sync to Apple Calendar if enabled
+        Task {
+            let appleCalendarManager = await AppleCalendarManager.shared
+            try? await appleCalendarManager.syncEventToAppleCalendar(event)
+            
+            // Sync to Google Calendar if enabled
+            let googleCalendarManager = await GoogleCalendarManager.shared
+            if googleCalendarManager.isAuthenticated && googleCalendarManager.syncEnabled {
+                if let googleEventId = try? await googleCalendarManager.createEvent(event) {
+                    // Update event with Google Calendar ID
+                    await MainActor.run {
+                        if let index = self.events.firstIndex(where: { $0.id == event.id }) {
+                            self.events[index].googleCalendarEventId = googleEventId
+                            self.saveEvents()
+                        }
+                    }
+                }
+            }
+        }
     }
     
     func updateEvent(_ event: Event) {
         if let index = events.firstIndex(where: { $0.id == event.id }) {
             events[index] = event
             saveEvents()
+            
+            // Sync to Apple Calendar if enabled
+            Task {
+                let appleCalendarManager = await AppleCalendarManager.shared
+                try? await appleCalendarManager.syncEventToAppleCalendar(event)
+                
+                // Sync to Google Calendar if enabled
+                let googleCalendarManager = await GoogleCalendarManager.shared
+                if googleCalendarManager.isAuthenticated && googleCalendarManager.syncEnabled {
+                    if let googleEventId = event.googleCalendarEventId {
+                        try? await googleCalendarManager.updateEvent(event, googleEventId: googleEventId)
+                    } else {
+                        // Create new event if no ID exists
+                        if let googleEventId = try? await googleCalendarManager.createEvent(event) {
+                            await MainActor.run {
+                                if let idx = self.events.firstIndex(where: { $0.id == event.id }) {
+                                    self.events[idx].googleCalendarEventId = googleEventId
+                                    self.saveEvents()
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
     
     func deleteEvent(_ event: Event) {
+        // Sync deletion to Apple Calendar if enabled
+        Task {
+            let appleCalendarManager = await AppleCalendarManager.shared
+            try? await appleCalendarManager.deleteEventFromAppleCalendar(event)
+            
+            // Sync deletion to Google Calendar if enabled
+            let googleCalendarManager = await GoogleCalendarManager.shared
+            if googleCalendarManager.isAuthenticated && googleCalendarManager.syncEnabled {
+                if let googleEventId = event.googleCalendarEventId {
+                    try? await googleCalendarManager.deleteEvent(googleEventId: googleEventId)
+                }
+            }
+        }
+        
         events.removeAll { $0.id == event.id }
         saveEvents()
     }
@@ -71,8 +133,59 @@ class DataManager: ObservableObject {
     // MARK: - Habits Methods
     
     func addHabit(_ habit: Habit) {
-        habits.append(habit)
-        saveHabits()
+        var habitWithNotifications = habit
+        habits.append(habitWithNotifications)
+        
+        // Schedule notifications if enabled
+        if habit.reminderEnabled {
+            Task {
+                let identifiers = await NotificationManager.shared.scheduleHabitReminders(for: habitWithNotifications)
+                await MainActor.run {
+                    if let index = habits.firstIndex(where: { $0.id == habitWithNotifications.id }) {
+                        habits[index].notificationIdentifiers = identifiers
+                        saveHabits()
+                    }
+                }
+            }
+        } else {
+            saveHabits()
+        }
+    }
+    
+    func updateHabit(_ habit: Habit) {
+        if let index = habits.firstIndex(where: { $0.id == habit.id }) {
+            // Cancel old notifications
+            let oldIdentifiers = habits[index].notificationIdentifiers
+            NotificationManager.shared.cancelHabitReminders(identifiers: oldIdentifiers)
+            
+            // Update habit
+            habits[index] = habit
+            
+            // Schedule new notifications if enabled
+            if habit.reminderEnabled {
+                Task {
+                    let identifiers = await NotificationManager.shared.scheduleHabitReminders(for: habit)
+                    await MainActor.run {
+                        if let idx = habits.firstIndex(where: { $0.id == habit.id }) {
+                            habits[idx].notificationIdentifiers = identifiers
+                            saveHabits()
+                        }
+                    }
+                }
+            } else {
+                saveHabits()
+            }
+        }
+    }
+    
+    private func scheduleHabitNotifications(habit: Habit) async {
+        if let index = habits.firstIndex(where: { $0.id == habit.id }) {
+            let identifiers = await NotificationManager.shared.scheduleHabitReminders(for: habits[index])
+            await MainActor.run {
+                habits[index].notificationIdentifiers = identifiers
+                saveHabits()
+            }
+        }
     }
     
     func toggleHabit(_ habit: Habit) {
@@ -90,6 +203,9 @@ class DataManager: ObservableObject {
     }
     
     func deleteHabit(_ habit: Habit) {
+        // Cancel notifications
+        NotificationManager.shared.cancelHabitReminders(identifiers: habit.notificationIdentifiers)
+        
         habits.removeAll { $0.id == habit.id }
         saveHabits()
     }
@@ -168,6 +284,13 @@ class DataManager: ObservableObject {
     func addMealPlan(_ mealPlan: MealPlan) {
         mealPlans.append(mealPlan)
         saveMealPlans()
+    }
+    
+    func updateMealPlan(_ mealPlan: MealPlan) {
+        if let index = mealPlans.firstIndex(where: { $0.id == mealPlan.id }) {
+            mealPlans[index] = mealPlan
+            saveMealPlans()
+        }
     }
     
     func deleteMealPlan(_ mealPlan: MealPlan) {
@@ -411,7 +534,22 @@ class DataManager: ObservableObject {
     }
     
     func deleteVaultItem(_ item: VaultItem) {
+        // Delete Keychain data first
+        item.deleteKeychainData()
+        
+        // Then remove from array
         vaultItems.removeAll { $0.id == item.id }
+        saveVault()
+    }
+    
+    func clearAllVaultData() {
+        // Delete all Keychain data for all vault items
+        for item in vaultItems {
+            item.deleteKeychainData()
+        }
+        
+        // Clear the array
+        vaultItems.removeAll()
         saveVault()
     }
     

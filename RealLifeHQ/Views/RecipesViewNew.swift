@@ -1,7 +1,5 @@
 import SwiftUI
 
-import SwiftUI
-
 // MARK: - Recipes Main View with Top Segment Control
 
 struct RecipesView: View {
@@ -53,8 +51,8 @@ struct RecipesView: View {
 struct RecipesTabView: View {
     @EnvironmentObject var dataManager: DataManager
     @EnvironmentObject var themeManager: ThemeManager
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @State private var showingAddRecipe = false
-    @State private var showingAIGenerator = false
     @State private var searchText = ""
     @State private var showFavoritesOnly = false
     
@@ -63,7 +61,13 @@ struct RecipesTabView: View {
             if filteredRecipes.isEmpty {
                 emptyStateView
             } else {
-                recipesList
+                if horizontalSizeClass == .regular {
+                    // iPad: Grid layout
+                    iPadGridLayout
+                } else {
+                    // iPhone: List layout
+                    recipesList
+                }
             }
         }
         .background(themeManager.currentTheme.backgroundColor.ignoresSafeArea())
@@ -71,14 +75,6 @@ struct RecipesTabView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Menu {
-                    Button {
-                        showingAIGenerator = true
-                    } label: {
-                        Label("AI Recipe Generator", systemImage: "sparkles")
-                    }
-                    
-                    Divider()
-                    
                     Button {
                         showingAddRecipe = true
                     } label: {
@@ -100,10 +96,9 @@ struct RecipesTabView: View {
             }
         }
         .sheet(isPresented: $showingAddRecipe) {
-            AddRecipeView()
-        }
-        .sheet(isPresented: $showingAIGenerator) {
-            AIGenerateRecipeView()
+            NavigationStack {
+                AddRecipeView()
+            }
         }
     }
     
@@ -117,25 +112,36 @@ struct RecipesTabView: View {
                 .font(.title2)
                 .fontWeight(.semibold)
             
-            Text("Create recipes manually or use AI to generate them")
+            Text("Create your first recipe to get started")
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
             
-            HStack(spacing: 12) {
-                Button("Generate with AI") {
-                    showingAIGenerator = true
-                }
-                .buttonStyle(.borderedProminent)
-                .tint(themeManager.currentTheme.accentColor)
-                
-                Button("Add Manually") {
-                    showingAddRecipe = true
-                }
-                .buttonStyle(.bordered)
-                .tint(themeManager.currentTheme.primaryColor)
+            Button("Add Recipe") {
+                showingAddRecipe = true
             }
+            .buttonStyle(.borderedProminent)
+            .tint(themeManager.currentTheme.primaryColor)
         }
         .padding()
+    }
+    
+    // iPad Grid Layout
+    private var iPadGridLayout: some View {
+        ScrollView {
+            LazyVGrid(columns: [
+                GridItem(.flexible(), spacing: 20),
+                GridItem(.flexible(), spacing: 20),
+                GridItem(.flexible(), spacing: 20)
+            ], spacing: 20) {
+                ForEach(filteredRecipes) { recipe in
+                    NavigationLink(destination: RecipeDetailView(recipe: recipe)) {
+                        RecipeCardView(recipe: recipe)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                }
+            }
+            .padding()
+        }
     }
     
     private var recipesList: some View {
@@ -235,13 +241,102 @@ struct RecipeRow: View {
     }
 }
 
+// MARK: - Recipe Card View (iPad Grid)
+
+struct RecipeCardView: View {
+    let recipe: Recipe
+    @EnvironmentObject var dataManager: DataManager
+    @EnvironmentObject var themeManager: ThemeManager
+    @State private var showDeleteAlert = false
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            // Favorite indicator
+            HStack {
+                if recipe.isFavorite {
+                    Image(systemName: "star.fill")
+                        .foregroundColor(.yellow)
+                        .font(.title3)
+                }
+                
+                Spacer()
+                
+                Button {
+                    dataManager.toggleFavorite(recipe)
+                } label: {
+                    Image(systemName: recipe.isFavorite ? "star.fill" : "star")
+                        .font(.title3)
+                        .foregroundColor(recipe.isFavorite ? .yellow : .gray.opacity(0.5))
+                }
+                .buttonStyle(.plain)
+            }
+            
+            // Recipe name
+            Text(recipe.name)
+                .font(.headline)
+                .foregroundColor(.primary)
+                .lineLimit(2)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            
+            // Category
+            Label(recipe.category, systemImage: "tag.fill")
+                .font(.caption)
+                .foregroundColor(.secondary)
+            
+            Spacer()
+            
+            // Stats
+            HStack(spacing: 12) {
+                Label(recipe.totalTimeString, systemImage: "clock.fill")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                
+                Label("\(recipe.servings)", systemImage: "person.2.fill")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            
+            // Delete button
+            Button(role: .destructive) {
+                showDeleteAlert = true
+            } label: {
+                Label("Delete", systemImage: "trash")
+                    .font(.caption)
+                    .foregroundColor(.red)
+            }
+            .frame(maxWidth: .infinity, alignment: .trailing)
+        }
+        .padding()
+        .frame(height: 200)
+        .background(themeManager.currentTheme.cardColor)
+        .cornerRadius(16)
+        .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+        .alert("Delete Recipe", isPresented: $showDeleteAlert) {
+            Button("Cancel", role: .cancel) { }
+            Button("Delete", role: .destructive) {
+                dataManager.deleteRecipe(recipe)
+            }
+        } message: {
+            Text("Are you sure you want to delete '\(recipe.name)'? This action cannot be undone.")
+        }
+    }
+}
+
 // MARK: - Recipe Detail View
 
 struct RecipeDetailView: View {
     let recipe: Recipe
     @EnvironmentObject var dataManager: DataManager
     @EnvironmentObject var themeManager: ThemeManager
+    @Environment(\.dismiss) var dismiss
     @State private var showingAddToShoppingList = false
+    @State private var showingEditRecipe = false
+    @State private var showingDeleteAlert = false
+    
+    // Get current favorite status from dataManager
+    private var currentRecipe: Recipe? {
+        dataManager.recipes.first(where: { $0.id == recipe.id })
+    }
     
     var body: some View {
         ScrollView {
@@ -255,7 +350,7 @@ struct RecipeDetailView: View {
                         
                         Spacer()
                         
-                        if recipe.isFavorite {
+                        if currentRecipe?.isFavorite == true {
                             Image(systemName: "star.fill")
                                 .foregroundColor(.yellow)
                                 .font(.title2)
@@ -355,22 +450,249 @@ struct RecipeDetailView: View {
             .padding()
         }
         .background(themeManager.currentTheme.backgroundColor.ignoresSafeArea())
+        .navigationTitle(recipe.name)
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(false)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button {
-                    dataManager.toggleFavorite(recipe)
+                Menu {
+                    Button {
+                        var updatedRecipe = recipe
+                        updatedRecipe.isFavorite.toggle()
+                        dataManager.updateRecipe(updatedRecipe)
+                    } label: {
+                        Label((currentRecipe?.isFavorite ?? recipe.isFavorite) ? "Unfavorite" : "Favorite", 
+                              systemImage: (currentRecipe?.isFavorite ?? recipe.isFavorite) ? "star.slash.fill" : "star.fill")
+                    }
+                    
+                    Divider()
+                    
+                    Button {
+                        showingEditRecipe = true
+                    } label: {
+                        Label("Edit Recipe", systemImage: "pencil")
+                    }
+                    
+                    Divider()
+                    
+                    Button(role: .destructive) {
+                        showingDeleteAlert = true
+                    } label: {
+                        Label("Delete Recipe", systemImage: "trash")
+                    }
                 } label: {
-                    Image(systemName: recipe.isFavorite ? "star.fill" : "star")
-                        .foregroundColor(recipe.isFavorite ? .yellow : themeManager.currentTheme.primaryColor)
+                    Image(systemName: "ellipsis.circle")
+                        .foregroundColor(themeManager.currentTheme.primaryColor)
                 }
             }
+        }
+        .sheet(isPresented: $showingEditRecipe) {
+            NavigationStack {
+                EditRecipeView(recipe: recipe)
+            }
+        }
+        .alert("Delete Recipe", isPresented: $showingDeleteAlert) {
+            Button("Cancel", role: .cancel) { }
+            Button("Delete", role: .destructive) {
+                dataManager.deleteRecipe(recipe)
+                dismiss()
+            }
+        } message: {
+            Text("Are you sure you want to delete '\(recipe.name)'? This action cannot be undone.")
         }
         .alert("Added to Shopping List", isPresented: $showingAddToShoppingList) {
             Button("OK", role: .cancel) { }
         } message: {
             Text("All ingredients have been added to your shopping list")
         }
+    }
+}
+
+// MARK: - Edit Recipe View
+
+struct EditRecipeView: View {
+    let recipe: Recipe
+    @Environment(\.dismiss) var dismiss
+    @EnvironmentObject var dataManager: DataManager
+    @EnvironmentObject var themeManager: ThemeManager
+    
+    @State private var name = ""
+    @State private var category = ""
+    @State private var prepTime = ""
+    @State private var cookTime = ""
+    @State private var servings = ""
+    @State private var ingredientText = ""
+    @State private var ingredients: [String] = []
+    @State private var instructionText = ""
+    @State private var instructions: [String] = []
+    @State private var notes = ""
+    
+    var body: some View {
+        Form {
+            Section("Basic Info") {
+                TextField("Recipe Name", text: $name)
+                TextField("Category (e.g., Dinner, Dessert)", text: $category)
+                
+                HStack {
+                    TextField("Prep Time", text: $prepTime)
+                        .keyboardType(.numberPad)
+                    Text("min")
+                        .foregroundColor(.secondary)
+                }
+                
+                HStack {
+                    TextField("Cook Time", text: $cookTime)
+                        .keyboardType(.numberPad)
+                    Text("min")
+                        .foregroundColor(.secondary)
+                }
+                
+                HStack {
+                    TextField("Servings", text: $servings)
+                        .keyboardType(.numberPad)
+                    Text("servings")
+                        .foregroundColor(.secondary)
+                }
+            }
+            
+            Section("Ingredients") {
+                HStack {
+                    TextField("Add ingredient", text: $ingredientText)
+                    
+                    Button {
+                        addIngredient()
+                    } label: {
+                        Image(systemName: "plus.circle.fill")
+                            .foregroundColor(themeManager.currentTheme.primaryColor)
+                    }
+                    .disabled(ingredientText.isEmpty)
+                }
+                
+                ForEach(Array(ingredients.enumerated()), id: \.offset) { index, ingredient in
+                    HStack {
+                        Text(ingredient)
+                        Spacer()
+                        Button {
+                            ingredients.remove(at: index)
+                        } label: {
+                            Image(systemName: "minus.circle.fill")
+                                .foregroundColor(.red)
+                        }
+                    }
+                }
+            }
+            
+            Section("Instructions") {
+                HStack {
+                    TextField("Add step", text: $instructionText)
+                    
+                    Button {
+                        addInstruction()
+                    } label: {
+                        Image(systemName: "plus.circle.fill")
+                            .foregroundColor(themeManager.currentTheme.primaryColor)
+                    }
+                    .disabled(instructionText.isEmpty)
+                }
+                
+                ForEach(Array(instructions.enumerated()), id: \.offset) { index, instruction in
+                    HStack(alignment: .top) {
+                        Text("\(index + 1).")
+                            .fontWeight(.semibold)
+                        Text(instruction)
+                        Spacer()
+                        Button {
+                            instructions.remove(at: index)
+                        } label: {
+                            Image(systemName: "minus.circle.fill")
+                                .foregroundColor(.red)
+                        }
+                    }
+                }
+            }
+            
+            Section("Notes (Optional)") {
+                TextEditor(text: $notes)
+                    .frame(minHeight: 80)
+            }
+        }
+        .navigationTitle("Edit Recipe")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button("Cancel") {
+                    dismiss()
+                }
+            }
+            
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button("Save") {
+                    saveRecipe()
+                }
+                .disabled(!canSave)
+            }
+        }
+        .onAppear {
+            // Initialize with existing recipe data
+            name = recipe.name
+            category = recipe.category
+            prepTime = "\(recipe.prepTime)"
+            cookTime = "\(recipe.cookTime)"
+            servings = "\(recipe.servings)"
+            ingredients = recipe.ingredients
+            instructions = recipe.instructions
+            notes = recipe.notes ?? ""
+        }
+    }
+    
+    private var canSave: Bool {
+        !name.isEmpty &&
+        !category.isEmpty &&
+        !prepTime.isEmpty &&
+        !cookTime.isEmpty &&
+        !servings.isEmpty &&
+        !ingredients.isEmpty &&
+        !instructions.isEmpty
+    }
+    
+    private func addIngredient() {
+        let trimmed = ingredientText.trimmingCharacters(in: .whitespaces)
+        if !trimmed.isEmpty {
+            ingredients.append(trimmed)
+            ingredientText = ""
+        }
+    }
+    
+    private func addInstruction() {
+        let trimmed = instructionText.trimmingCharacters(in: .whitespaces)
+        if !trimmed.isEmpty {
+            instructions.append(trimmed)
+            instructionText = ""
+        }
+    }
+    
+    private func saveRecipe() {
+        guard let prep = Int(prepTime),
+              let cook = Int(cookTime),
+              let servs = Int(servings) else {
+            return
+        }
+        
+        var updatedRecipe = Recipe(
+            id: recipe.id,  // Keep the same ID
+            name: name,
+            category: category,
+            prepTime: prep,
+            cookTime: cook,
+            servings: servs,
+            ingredients: ingredients,
+            instructions: instructions,
+            notes: notes.isEmpty ? nil : notes,
+            isFavorite: recipe.isFavorite  // Preserve favorite status
+        )
+        
+        dataManager.updateRecipe(updatedRecipe)
+        dismiss()
     }
 }
 

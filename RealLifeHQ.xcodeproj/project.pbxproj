@@ -10,6 +10,29 @@
 		9C334B742F26A83D00A503AF /* Products.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 9C334B732F26A83D00A503AF /* Products.storekit */; };
 		9C334B822F284CC300A503AF /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9C334B812F284CC300A503AF /* Launch Screen.storyboard */; };
 		9C485D762F12FF3900416600 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C485D752F12FF3900416600 /* StoreKit.framework */; };
+		9C723E472F40433500A7110B /* AppleCalendarManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C723E462F40433500A7110B /* AppleCalendarManager.swift */; };
+		9C723E492F40435A00A7110B /* CalendarSyncSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C723E482F40435A00A7110B /* CalendarSyncSettingsView.swift */; };
+		9C723E4B2F40438700A7110B /* APPLE_CALENDAR_SETUP_GUIDE.md in Resources */ = {isa = PBXBuildFile; fileRef = 9C723E4A2F40438700A7110B /* APPLE_CALENDAR_SETUP_GUIDE.md */; };
+		9C723E4D2F4043B500A7110B /* APPLE_CALENDAR_QUICK_REFERENCE.md in Resources */ = {isa = PBXBuildFile; fileRef = 9C723E4C2F4043B500A7110B /* APPLE_CALENDAR_QUICK_REFERENCE.md */; };
+		9C723E4F2F4043F100A7110B /* APPLE_CALENDAR_INTEGRATION_SUMMARY.md in Resources */ = {isa = PBXBuildFile; fileRef = 9C723E4E2F4043F100A7110B /* APPLE_CALENDAR_INTEGRATION_SUMMARY.md */; };
+		9C723E512F4043FC00A7110B /* CalendarSyncPromptBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C723E502F4043FC00A7110B /* CalendarSyncPromptBanner.swift */; };
+		9C723E532F4112CC00A7110B /* GoogleCalendarManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C723E522F4112CC00A7110B /* GoogleCalendarManager.swift */; };
+		9C723E552F4112E500A7110B /* GoogleCalendarSyncSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C723E542F4112E500A7110B /* GoogleCalendarSyncSettingsView.swift */; };
+		9C723E612F41206400A7110B /* LaunchScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C723E602F41206400A7110B /* LaunchScreenView.swift */; };
+		9C723E632F41209500A7110B /* STORYBOARD_ERROR_FIX_GUIDE.md in Resources */ = {isa = PBXBuildFile; fileRef = 9C723E622F41209500A7110B /* STORYBOARD_ERROR_FIX_GUIDE.md */; };
+		9C723E652F412E6800A7110B /* HabitCalendarManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C723E642F412E6800A7110B /* HabitCalendarManager.swift */; };
+		9C723E6A2F415B2F00A7110B /* ReminderWizardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C723E692F415B2F00A7110B /* ReminderWizardView.swift */; };
+		9C723E6B2F415B2F00A7110B /* ReminderWizardModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C723E682F415B2F00A7110B /* ReminderWizardModels.swift */; };
+		9C723E6D2F4175B200A7110B /* SupportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C723E6C2F4175B200A7110B /* SupportView.swift */; };
+		9C723E6F2F417A4000A7110B /* docsprivacy-policy.html in Resources */ = {isa = PBXBuildFile; fileRef = 9C723E6E2F417A4000A7110B /* docsprivacy-policy.html */; };
+		9C723E712F417A8100A7110B /* docssupport.html in Resources */ = {isa = PBXBuildFile; fileRef = 9C723E702F417A8100A7110B /* docssupport.html */; };
+		9C723E732F417A9300A7110B /* CONTACT_INFO_UPDATED.md in Resources */ = {isa = PBXBuildFile; fileRef = 9C723E722F417A9300A7110B /* CONTACT_INFO_UPDATED.md */; };
+		9C723E752F4181A000A7110B /* STOREKIT_PRICING_SETUP.md in Resources */ = {isa = PBXBuildFile; fileRef = 9C723E742F4181A000A7110B /* STOREKIT_PRICING_SETUP.md */; };
+		9C723E772F4181C100A7110B /* PRICING_UPDATE_COMPLETE.md in Resources */ = {isa = PBXBuildFile; fileRef = 9C723E762F4181C100A7110B /* PRICING_UPDATE_COMPLETE.md */; };
+		9C723E7B2F4273C900A7110B /* CUSTOM_GREETING_GRAPHICS_GUIDE.md in Resources */ = {isa = PBXBuildFile; fileRef = 9C723E7A2F4273C900A7110B /* CUSTOM_GREETING_GRAPHICS_GUIDE.md */; };
+		9C723E7D2F42779C00A7110B /* SF_SYMBOLS_ANIMATED_GUIDE.md in Resources */ = {isa = PBXBuildFile; fileRef = 9C723E7C2F42779C00A7110B /* SF_SYMBOLS_ANIMATED_GUIDE.md */; };
+		9C723E7F2F427AF100A7110B /* SUPPORT_SCROLL_NAVIGATION_COMPLETE.md in Resources */ = {isa = PBXBuildFile; fileRef = 9C723E7E2F427AF100A7110B /* SUPPORT_SCROLL_NAVIGATION_COMPLETE.md */; };
+		9C723E812F427BD700A7110B /* SETTINGS_CLEANUP_COMPLETE.md in Resources */ = {isa = PBXBuildFile; fileRef = 9C723E802F427BD700A7110B /* SETTINGS_CLEANUP_COMPLETE.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -17,13 +40,40 @@
 		9C334B812F284CC300A503AF /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
 		9C485D642F12FDEA00416600 /* RealLifeHQ.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RealLifeHQ.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9C485D752F12FF3900416600 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		9C723E462F40433500A7110B /* AppleCalendarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleCalendarManager.swift; sourceTree = "<group>"; };
+		9C723E482F40435A00A7110B /* CalendarSyncSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarSyncSettingsView.swift; sourceTree = "<group>"; };
+		9C723E4A2F40438700A7110B /* APPLE_CALENDAR_SETUP_GUIDE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = APPLE_CALENDAR_SETUP_GUIDE.md; sourceTree = "<group>"; };
+		9C723E4C2F4043B500A7110B /* APPLE_CALENDAR_QUICK_REFERENCE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = APPLE_CALENDAR_QUICK_REFERENCE.md; sourceTree = "<group>"; };
+		9C723E4E2F4043F100A7110B /* APPLE_CALENDAR_INTEGRATION_SUMMARY.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = APPLE_CALENDAR_INTEGRATION_SUMMARY.md; sourceTree = "<group>"; };
+		9C723E502F4043FC00A7110B /* CalendarSyncPromptBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarSyncPromptBanner.swift; sourceTree = "<group>"; };
+		9C723E522F4112CC00A7110B /* GoogleCalendarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleCalendarManager.swift; sourceTree = "<group>"; };
+		9C723E542F4112E500A7110B /* GoogleCalendarSyncSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleCalendarSyncSettingsView.swift; sourceTree = "<group>"; };
+		9C723E602F41206400A7110B /* LaunchScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchScreenView.swift; sourceTree = "<group>"; };
+		9C723E622F41209500A7110B /* STORYBOARD_ERROR_FIX_GUIDE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = STORYBOARD_ERROR_FIX_GUIDE.md; sourceTree = "<group>"; };
+		9C723E642F412E6800A7110B /* HabitCalendarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitCalendarManager.swift; sourceTree = "<group>"; };
+		9C723E682F415B2F00A7110B /* ReminderWizardModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderWizardModels.swift; sourceTree = "<group>"; };
+		9C723E692F415B2F00A7110B /* ReminderWizardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderWizardView.swift; sourceTree = "<group>"; };
+		9C723E6C2F4175B200A7110B /* SupportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportView.swift; sourceTree = "<group>"; };
+		9C723E6E2F417A4000A7110B /* docsprivacy-policy.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = "docsprivacy-policy.html"; sourceTree = "<group>"; };
+		9C723E702F417A8100A7110B /* docssupport.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = docssupport.html; sourceTree = "<group>"; };
+		9C723E722F417A9300A7110B /* CONTACT_INFO_UPDATED.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CONTACT_INFO_UPDATED.md; sourceTree = "<group>"; };
+		9C723E742F4181A000A7110B /* STOREKIT_PRICING_SETUP.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = STOREKIT_PRICING_SETUP.md; sourceTree = "<group>"; };
+		9C723E762F4181C100A7110B /* PRICING_UPDATE_COMPLETE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = PRICING_UPDATE_COMPLETE.md; sourceTree = "<group>"; };
+		9C723E7A2F4273C900A7110B /* CUSTOM_GREETING_GRAPHICS_GUIDE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CUSTOM_GREETING_GRAPHICS_GUIDE.md; sourceTree = "<group>"; };
+		9C723E7C2F42779C00A7110B /* SF_SYMBOLS_ANIMATED_GUIDE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = SF_SYMBOLS_ANIMATED_GUIDE.md; sourceTree = "<group>"; };
+		9C723E7E2F427AF100A7110B /* SUPPORT_SCROLL_NAVIGATION_COMPLETE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = SUPPORT_SCROLL_NAVIGATION_COMPLETE.md; sourceTree = "<group>"; };
+		9C723E802F427BD700A7110B /* SETTINGS_CLEANUP_COMPLETE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = SETTINGS_CLEANUP_COMPLETE.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		9C334AF72F2585C500A503AF /* Exceptions for "RealLifeHQ" folder in "RealLifeHQ" target */ = {
+		9C1491092F397D9C00CAB940 /* Exceptions for "RealLifeHQ" folder in "RealLifeHQ" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+				Views/AIMealPlanGeneratorView.swift,
+				Views/AIRecipeGeneratorView.swift,
+				Views/AIServiceManager.swift,
+				Views/AISettingsView.swift,
 			);
 			target = 9C485D632F12FDEA00416600 /* RealLifeHQ */;
 		};
@@ -33,7 +83,7 @@
 		9C485D662F12FDEA00416600 /* RealLifeHQ */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				9C334AF72F2585C500A503AF /* Exceptions for "RealLifeHQ" folder in "RealLifeHQ" target */,
+				9C1491092F397D9C00CAB940 /* Exceptions for "RealLifeHQ" folder in "RealLifeHQ" target */,
 			);
 			path = RealLifeHQ;
 			sourceTree = "<group>";
@@ -60,6 +110,29 @@
 				9C485D662F12FDEA00416600 /* RealLifeHQ */,
 				9C485D742F12FF3900416600 /* Frameworks */,
 				9C485D652F12FDEA00416600 /* Products */,
+				9C723E462F40433500A7110B /* AppleCalendarManager.swift */,
+				9C723E482F40435A00A7110B /* CalendarSyncSettingsView.swift */,
+				9C723E4A2F40438700A7110B /* APPLE_CALENDAR_SETUP_GUIDE.md */,
+				9C723E4C2F4043B500A7110B /* APPLE_CALENDAR_QUICK_REFERENCE.md */,
+				9C723E4E2F4043F100A7110B /* APPLE_CALENDAR_INTEGRATION_SUMMARY.md */,
+				9C723E502F4043FC00A7110B /* CalendarSyncPromptBanner.swift */,
+				9C723E522F4112CC00A7110B /* GoogleCalendarManager.swift */,
+				9C723E542F4112E500A7110B /* GoogleCalendarSyncSettingsView.swift */,
+				9C723E602F41206400A7110B /* LaunchScreenView.swift */,
+				9C723E642F412E6800A7110B /* HabitCalendarManager.swift */,
+				9C723E682F415B2F00A7110B /* ReminderWizardModels.swift */,
+				9C723E692F415B2F00A7110B /* ReminderWizardView.swift */,
+				9C723E6C2F4175B200A7110B /* SupportView.swift */,
+				9C723E622F41209500A7110B /* STORYBOARD_ERROR_FIX_GUIDE.md */,
+				9C723E6E2F417A4000A7110B /* docsprivacy-policy.html */,
+				9C723E702F417A8100A7110B /* docssupport.html */,
+				9C723E722F417A9300A7110B /* CONTACT_INFO_UPDATED.md */,
+				9C723E742F4181A000A7110B /* STOREKIT_PRICING_SETUP.md */,
+				9C723E762F4181C100A7110B /* PRICING_UPDATE_COMPLETE.md */,
+				9C723E7A2F4273C900A7110B /* CUSTOM_GREETING_GRAPHICS_GUIDE.md */,
+				9C723E7C2F42779C00A7110B /* SF_SYMBOLS_ANIMATED_GUIDE.md */,
+				9C723E7E2F427AF100A7110B /* SUPPORT_SCROLL_NAVIGATION_COMPLETE.md */,
+				9C723E802F427BD700A7110B /* SETTINGS_CLEANUP_COMPLETE.md */,
 			);
 			sourceTree = "<group>";
 		};
@@ -143,6 +216,19 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9C723E7B2F4273C900A7110B /* CUSTOM_GREETING_GRAPHICS_GUIDE.md in Resources */,
+				9C723E6F2F417A4000A7110B /* docsprivacy-policy.html in Resources */,
+				9C723E712F417A8100A7110B /* docssupport.html in Resources */,
+				9C723E812F427BD700A7110B /* SETTINGS_CLEANUP_COMPLETE.md in Resources */,
+				9C723E772F4181C100A7110B /* PRICING_UPDATE_COMPLETE.md in Resources */,
+				9C723E7F2F427AF100A7110B /* SUPPORT_SCROLL_NAVIGATION_COMPLETE.md in Resources */,
+				9C723E7D2F42779C00A7110B /* SF_SYMBOLS_ANIMATED_GUIDE.md in Resources */,
+				9C723E4F2F4043F100A7110B /* APPLE_CALENDAR_INTEGRATION_SUMMARY.md in Resources */,
+				9C723E632F41209500A7110B /* STORYBOARD_ERROR_FIX_GUIDE.md in Resources */,
+				9C723E732F417A9300A7110B /* CONTACT_INFO_UPDATED.md in Resources */,
+				9C723E752F4181A000A7110B /* STOREKIT_PRICING_SETUP.md in Resources */,
+				9C723E4D2F4043B500A7110B /* APPLE_CALENDAR_QUICK_REFERENCE.md in Resources */,
+				9C723E4B2F40438700A7110B /* APPLE_CALENDAR_SETUP_GUIDE.md in Resources */,
 				9C334B742F26A83D00A503AF /* Products.storekit in Resources */,
 				9C334B822F284CC300A503AF /* Launch Screen.storyboard in Resources */,
 			);
@@ -155,6 +241,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9C723E492F40435A00A7110B /* CalendarSyncSettingsView.swift in Sources */,
+				9C723E512F4043FC00A7110B /* CalendarSyncPromptBanner.swift in Sources */,
+				9C723E612F41206400A7110B /* LaunchScreenView.swift in Sources */,
+				9C723E472F40433500A7110B /* AppleCalendarManager.swift in Sources */,
+				9C723E532F4112CC00A7110B /* GoogleCalendarManager.swift in Sources */,
+				9C723E6D2F4175B200A7110B /* SupportView.swift in Sources */,
+				9C723E6A2F415B2F00A7110B /* ReminderWizardView.swift in Sources */,
+				9C723E6B2F415B2F00A7110B /* ReminderWizardModels.swift in Sources */,
+				9C723E652F412E6800A7110B /* HabitCalendarManager.swift in Sources */,
+				9C723E552F4112E500A7110B /* GoogleCalendarSyncSettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -289,15 +385,18 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = Q79FHUWC44;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RealLifeHQ/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = RealLifeHQ;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "RealLifeHQ needs full calendar access to create, edit, and delete synced events";
+				INFOPLIST_KEY_NSCameraUsageDescription = "RealLife HQ needs access to your camera to capture receipts and photos. ";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "This app needs to save photos to your library.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app needs access to upload photos.\nThis app needs access to upload photos.\n";
+				INFOPLIST_KEY_NSRemindersUsageDescription = "RealLife HQ needs access to reminders to help you manage tasks. ";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -308,7 +407,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4;
+				MARKETING_VERSION = 6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sarahwalker.reallifehq.RealLifeHQ;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -328,15 +427,18 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = Q79FHUWC44;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RealLifeHQ/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = RealLifeHQ;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "RealLifeHQ needs full calendar access to create, edit, and delete synced events";
+				INFOPLIST_KEY_NSCameraUsageDescription = "RealLife HQ needs access to your camera to capture receipts and photos. ";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "This app needs to save photos to your library.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app needs access to upload photos.\nThis app needs access to upload photos.\n";
+				INFOPLIST_KEY_NSRemindersUsageDescription = "RealLife HQ needs access to reminders to help you manage tasks. ";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -347,7 +449,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 4;
+				MARKETING_VERSION = 6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sarahwalker.reallifehq.RealLifeHQ;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;

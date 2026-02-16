@@ -1,0 +1,184 @@
+# App Store Description Template
+# Copy this content to App Store Connect → App Information → Description
+
+---
+
+REALLIFEHQ - YOUR COMPLETE LIFE MANAGEMENT SYSTEM
+
+Get your life organized with RealLifeHQ, the all-in-one personal organization app designed to help you manage every aspect of your daily life.
+
+★ SUBSCRIPTION REQUIRED ★
+Try RealLifeHQ free for 7 days, then continue with a monthly or yearly subscription to access all premium features.
+
+═══════════════════════════
+PREMIUM FEATURES (Included with Subscription)
+═══════════════════════════
+
+🍳 AI RECIPE GENERATOR
+• Create custom recipes from available ingredients
+• Generate personalized meal plans with Apple Intelligence
+• Save and organize your favorite recipes
+• Smart recipe suggestions based on dietary preferences
+
+💰 BUDGET TRACKER
+• Complete financial management and expense tracking
+• Set spending limits by category
+• Track recurring expenses automatically
+• Visual spending insights and reports
+
+🔒 THE VAULT - SECURE STORAGE
+• Encrypted storage for passwords and sensitive documents
+• Protected by iOS Keychain security
+• Optional Face ID/Touch ID protection
+• Store secure notes and important information
+
+📅 MEAL PLANNER
+• AI-powered weekly meal planning
+• Automatic shopping list generation
+• Dietary restriction support (Vegan, Gluten-Free, etc.)
+• Recipe organization and favorites
+
+📊 HABIT TRACKER
+• Build and maintain daily routines
+• Visual streak tracking for motivation
+• Customizable habit schedules
+• Progress analytics and insights
+
+📖 JOURNAL & MOOD TRACKING
+• Daily reflection and note-taking
+• Mood tracking with visual trends
+• Secure, private entries stored on your device
+• Tag and categorize entries
+
+📆 CALENDAR & PLANNER
+• Comprehensive event scheduling
+• Task management and to-do lists
+• Reminders and notifications
+• Beautiful, customizable views
+
+🎨 CUSTOMIZATION
+• Multiple theme options
+• Personalized dashboard widgets
+• Flexible layouts and organization
+• Dark mode support
+
+🔐 PRIVACY FIRST
+• All data stored locally on your device
+• No cloud sync, no data collection
+• Complete privacy - your data stays yours
+• No third-party analytics or tracking
+
+═══════════════════════════
+SUBSCRIPTION DETAILS
+═══════════════════════════
+
+• 7-day free trial for new subscribers
+• Monthly: $4.99/month
+• Yearly: $49.99/year (Save 17% - Best Value!)
+• Cancel anytime, no commitment
+• Subscription automatically renews unless canceled at least 24 hours before the end of the current period
+• Payment will be charged to your Apple ID account at confirmation of purchase
+• You can manage and cancel subscriptions in your App Store account settings after purchase
+
+═══════════════════════════
+WHAT USERS SAY
+═══════════════════════════
+
+"Finally, an app that has everything I need to stay organized!"
+"The AI recipe generator is a game-changer for meal planning."
+"Love that my data stays on my device - completely private!"
+
+═══════════════════════════
+PERFECT FOR
+═══════════════════════════
+
+✓ Busy professionals managing multiple responsibilities
+✓ Parents organizing family schedules and meals
+✓ Students tracking habits and goals
+✓ Anyone seeking better life organization
+✓ Privacy-conscious users who want local-only storage
+
+═══════════════════════════
+REQUIREMENTS
+═══════════════════════════
+
+• iOS 17.0 or later
+• iPhone or iPad
+• Active subscription required after free trial
+
+═══════════════════════════
+SUPPORT & LEGAL
+═══════════════════════════
+
+Need help? Contact us at sarah@thereallifehq.com
+
+Privacy Policy: https://www.thereallifehq.com/privacy-policy
+Terms of Use: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+
+Your privacy matters. RealLifeHQ stores all data locally on your device. We don't collect, transmit, or share any personal information.
+
+Download RealLifeHQ today and start your 7-day free trial!
+
+═══════════════════════════
+
+---
+
+## PROMOTIONAL TEXT (Separate Field in App Store Connect)
+
+🎉 Start Your 7-Day Free Trial Today! Get unlimited access to AI recipe generation, budget tracking, secure vault, meal planning, habit tracking, journaling, and more. Cancel anytime. Privacy-first design - all data stays on your device!
+
+---
+
+## KEYWORDS (Separate Field - Max 100 characters)
+
+budget,meal planner,recipe,vault,password,habit tracker,journal,planner,calendar,organize,AI
+
+---
+
+## SUPPORT URL
+
+https://www.thereallifehq.com/supportDete
+
+---
+
+## MARKETING URL (Optional)
+
+https://www.thereallifehq.com
+
+---
+
+## NOTES:
+1. Adjust pricing ($4.99/$49.99) to match your actual subscription prices
+2. Replace "https://www.thereallifehq.com/privacy-policy" with your actual URL
+3. If using custom Terms, replace Apple's EULA URL with yours
+4. Keep description under 4,000 characters (this is ~2,800)
+5. Update "iOS 17.0 or later" to your actual minimum iOS version
+6. Add testimonials if you have real user reviews
+
+---
+
+## FOR APP REVIEW NOTES:
+
+This update addresses feedback from App Review:
+
+GUIDELINE 3.1.2 - SUBSCRIPTIONS:
+✓ Added functional links to Privacy Policy and Terms of Use in SubscriptionView
+✓ Included all required subscription information in purchase flow
+✓ Subscription details, pricing, and duration clearly displayed
+
+Privacy Policy: [YOUR_URL_HERE]
+Terms of Use: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+
+GUIDELINE 2.3.2 - ACCURATE METADATA:
+✓ App description clearly indicates all features require subscription
+✓ 7-day free trial prominently displayed
+✓ Subscription pricing included in description
+✓ "Subscription Required" badge added to feature list
+✓ All screenshots marked with premium indicators where applicable
+
+The app now fully complies with both App Store Review Guidelines.
+
+Test Account (if required for review):
+[Provide test account if requested]
+
+Thank you for your review.

@@ -101,4 +101,99 @@ class NotificationManager {
     func getPendingNotifications() async -> [UNNotificationRequest] {
         return await UNUserNotificationCenter.current().pendingNotificationRequests()
     }
+    
+    // MARK: - Habit Reminders
+    
+    func scheduleHabitReminders(for habit: Habit) async -> [String] {
+        // First, cancel any existing reminders for this habit
+        cancelHabitReminders(identifiers: habit.notificationIdentifiers)
+        
+        guard habit.reminderEnabled, let reminderTime = habit.reminderTime else {
+            return []
+        }
+        
+        let calendar = Calendar.current
+        let timeComponents = calendar.dateComponents([.hour, .minute], from: reminderTime)
+        
+        var newIdentifiers: [String] = []
+        
+        // Schedule based on frequency
+        switch habit.frequency {
+        case .daily:
+            // Schedule for every day
+            for weekday in 1...7 {
+                let identifier = await scheduleHabitNotification(
+                    habitName: habit.name,
+                    hour: timeComponents.hour ?? 9,
+                    minute: timeComponents.minute ?? 0,
+                    weekday: weekday
+                )
+                if let identifier = identifier {
+                    newIdentifiers.append(identifier)
+                }
+            }
+            
+        case .specificDays:
+            // Schedule only for selected days
+            for weekday in habit.selectedDays {
+                let identifier = await scheduleHabitNotification(
+                    habitName: habit.name,
+                    hour: timeComponents.hour ?? 9,
+                    minute: timeComponents.minute ?? 0,
+                    weekday: weekday
+                )
+                if let identifier = identifier {
+                    newIdentifiers.append(identifier)
+                }
+            }
+            
+        case .weekly:
+            // Schedule for first selected day (or Sunday if none selected)
+            let weekday = habit.selectedDays.min() ?? 1
+            let identifier = await scheduleHabitNotification(
+                habitName: habit.name,
+                hour: timeComponents.hour ?? 9,
+                minute: timeComponents.minute ?? 0,
+                weekday: weekday
+            )
+            if let identifier = identifier {
+                newIdentifiers.append(identifier)
+            }
+        }
+        
+        print("✅ Scheduled \(newIdentifiers.count) reminders for '\(habit.name)'")
+        return newIdentifiers
+    }
+    
+    private func scheduleHabitNotification(habitName: String, hour: Int, minute: Int, weekday: Int) async -> String? {
+        let content = UNMutableNotificationContent()
+        content.title = "Habit Reminder"
+        content.body = "Time to do: \(habitName)"
+        content.sound = .default
+        content.categoryIdentifier = "HABIT_REMINDER"
+        
+        var dateComponents = DateComponents()
+        dateComponents.hour = hour
+        dateComponents.minute = minute
+        dateComponents.weekday = weekday
+        
+        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: true)
+        
+        let identifier = "habit_\(UUID().uuidString)"
+        let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
+        
+        do {
+            try await UNUserNotificationCenter.current().add(request)
+            return identifier
+        } catch {
+            print("❌ Failed to schedule habit notification: \(error)")
+            return nil
+        }
+    }
+    
+    func cancelHabitReminders(identifiers: [String]) {
+        guard !identifiers.isEmpty else { return }
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
+        print("🗑️ Cancelled \(identifiers.count) habit reminders")
+    }
 }

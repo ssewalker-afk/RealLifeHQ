@@ -19,9 +19,8 @@ struct AddRecipeView: View {
     @State private var notes = ""
     
     var body: some View {
-        NavigationView {
-            Form {
-                Section("Basic Info") {
+        Form {
+            Section("Basic Info") {
                     TextField("Recipe Name", text: $name)
                     TextField("Category (e.g., Dinner, Dessert)", text: $category)
                     
@@ -124,7 +123,6 @@ struct AddRecipeView: View {
                     .disabled(!canSave)
                 }
             }
-        }
     }
     
     private var canSave: Bool {
@@ -180,7 +178,6 @@ struct MealPlansTabView: View {
     @EnvironmentObject var dataManager: DataManager
     @EnvironmentObject var themeManager: ThemeManager
     @State private var showingCreateMealPlan = false
-    @State private var showingAIMealPlan = false
     
     var body: some View {
         ZStack {
@@ -193,31 +190,17 @@ struct MealPlansTabView: View {
         .background(themeManager.currentTheme.backgroundColor.ignoresSafeArea())
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Menu {
-                    Button {
-                        showingAIMealPlan = true
-                    } label: {
-                        Label("AI Meal Planner", systemImage: "sparkles")
-                    }
-                    
-                    Divider()
-                    
-                    Button {
-                        showingCreateMealPlan = true
-                    } label: {
-                        Label("Manual Meal Plan", systemImage: "plus")
-                    }
+                Button {
+                    showingCreateMealPlan = true
                 } label: {
-                    Image(systemName: "ellipsis.circle.fill")
-                        .foregroundColor(themeManager.currentTheme.primaryColor)
+                    Image(systemName: "plus")
                 }
             }
         }
         .sheet(isPresented: $showingCreateMealPlan) {
-            CreateMealPlanView()
-        }
-        .sheet(isPresented: $showingAIMealPlan) {
-            AIMealPlanGeneratorView()
+            NavigationStack {
+                CreateMealPlanView()
+            }
         }
     }
     
@@ -231,23 +214,15 @@ struct MealPlansTabView: View {
                 .font(.title2)
                 .fontWeight(.semibold)
             
-            Text("Let AI create an intelligent meal plan for you")
+            Text("Create a meal plan to organize your recipes")
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
             
-            HStack(spacing: 12) {
-                Button("AI Meal Plan") {
-                    showingAIMealPlan = true
-                }
-                .buttonStyle(.borderedProminent)
-                .tint(themeManager.currentTheme.accentColor)
-                
-                Button("Manual Plan") {
-                    showingCreateMealPlan = true
-                }
-                .buttonStyle(.bordered)
-                .tint(themeManager.currentTheme.primaryColor)
+            Button("Create Meal Plan") {
+                showingCreateMealPlan = true
             }
+            .buttonStyle(.borderedProminent)
+            .tint(themeManager.currentTheme.primaryColor)
         }
         .padding()
     }
@@ -300,7 +275,11 @@ struct MealPlanRow: View {
 
 struct MealPlanDetailView: View {
     let mealPlan: MealPlan
+    @EnvironmentObject var dataManager: DataManager
     @EnvironmentObject var themeManager: ThemeManager
+    @Environment(\.dismiss) var dismiss
+    @State private var showingEditMealPlan = false
+    @State private var showingDeleteAlert = false
     
     var body: some View {
         ScrollView {
@@ -332,6 +311,44 @@ struct MealPlanDetailView: View {
             .padding()
         }
         .background(themeManager.currentTheme.backgroundColor.ignoresSafeArea())
+        .navigationTitle(mealPlan.name)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Menu {
+                    Button {
+                        showingEditMealPlan = true
+                    } label: {
+                        Label("Edit Meal Plan", systemImage: "pencil")
+                    }
+                    
+                    Divider()
+                    
+                    Button(role: .destructive) {
+                        showingDeleteAlert = true
+                    } label: {
+                        Label("Delete Meal Plan", systemImage: "trash")
+                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                        .foregroundColor(themeManager.currentTheme.primaryColor)
+                }
+            }
+        }
+        .sheet(isPresented: $showingEditMealPlan) {
+            NavigationStack {
+                EditMealPlanView(mealPlan: mealPlan)
+            }
+        }
+        .alert("Delete Meal Plan", isPresented: $showingDeleteAlert) {
+            Button("Cancel", role: .cancel) { }
+            Button("Delete", role: .destructive) {
+                dataManager.deleteMealPlan(mealPlan)
+                dismiss()
+            }
+        } message: {
+            Text("Are you sure you want to delete '\(mealPlan.name)'? This action cannot be undone.")
+        }
     }
 }
 
@@ -407,6 +424,109 @@ struct MealCardView: View {
             }
             .padding(.vertical, 4)
         }
+    }
+}
+
+// MARK: - Edit Meal Plan View
+
+struct EditMealPlanView: View {
+    let mealPlan: MealPlan
+    @Environment(\.dismiss) var dismiss
+    @EnvironmentObject var dataManager: DataManager
+    @EnvironmentObject var themeManager: ThemeManager
+    
+    @State private var name = ""
+    @State private var numberOfDays = 7
+    @State private var startDate = Date()
+    
+    let dayOptions = [1, 3, 5, 7, 10, 14]
+    
+    var body: some View {
+        Form {
+            Section("Meal Plan Details") {
+                TextField("Plan Name", text: $name)
+                DatePicker("Start Date", selection: $startDate, displayedComponents: .date)
+                
+                Picker("Number of Days", selection: $numberOfDays) {
+                    ForEach(dayOptions, id: \.self) { days in
+                        Text("\(days) days").tag(days)
+                    }
+                }
+            }
+            
+            Section {
+                Text("Note: Changing the number of days or start date will regenerate the meal schedule using your existing recipes.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .navigationTitle("Edit Meal Plan")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button("Cancel") {
+                    dismiss()
+                }
+            }
+            
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button("Save") {
+                    saveMealPlan()
+                }
+                .disabled(name.isEmpty)
+            }
+        }
+        .onAppear {
+            // Initialize with existing meal plan data
+            name = mealPlan.name
+            numberOfDays = mealPlan.numberOfDays
+            startDate = mealPlan.startDate
+        }
+    }
+    
+    private func saveMealPlan() {
+        // If days or start date changed, regenerate meal schedule
+        if numberOfDays != mealPlan.numberOfDays || !Calendar.current.isDate(startDate, inSameDayAs: mealPlan.startDate) {
+            // Regenerate meals for new schedule
+            var newMeals: [Date: MealPlan.DayMeals] = [:]
+            let availableRecipes = dataManager.recipes
+            
+            for dayIndex in 0..<numberOfDays {
+                let date = Calendar.current.date(byAdding: .day, value: dayIndex, to: startDate) ?? startDate
+                
+                // Try to preserve existing meals where possible, or assign random recipes
+                let oldDate = Calendar.current.date(byAdding: .day, value: dayIndex, to: mealPlan.startDate)
+                let existingMeals = oldDate.flatMap { mealPlan.meals[$0] }
+                
+                let breakfast = existingMeals?.breakfast ?? availableRecipes.randomElement()
+                let lunch = existingMeals?.lunch ?? availableRecipes.randomElement()
+                let dinner = existingMeals?.dinner ?? availableRecipes.randomElement()
+                
+                newMeals[date] = MealPlan.DayMeals(
+                    breakfast: breakfast,
+                    lunch: lunch,
+                    dinner: dinner
+                )
+            }
+            
+            let updatedPlan = MealPlan(
+                id: mealPlan.id,
+                name: name,
+                startDate: startDate,
+                numberOfDays: numberOfDays,
+                meals: newMeals,
+                createdDate: mealPlan.createdDate
+            )
+            
+            dataManager.updateMealPlan(updatedPlan)
+        } else {
+            // Just update the name
+            var updatedPlan = mealPlan
+            updatedPlan.name = name
+            dataManager.updateMealPlan(updatedPlan)
+        }
+        
+        dismiss()
     }
 }
 

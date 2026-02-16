@@ -16,6 +16,19 @@ struct Event: Identifiable, Codable {
     var isCompleted: Bool = false
     var reminderMinutesBefore: Int? // Minutes before event to remind (nil = no reminder)
     var notificationIdentifier: String? // For canceling notifications
+    var recurrenceRule: RecurrenceRule? // Recurring event pattern
+    var recurrenceEndDate: Date? // When to stop recurring (nil = forever)
+    var googleCalendarEventId: String? // Google Calendar event ID for syncing
+    
+    enum RecurrenceRule: String, Codable, CaseIterable {
+        case daily = "Daily"
+        case weekly = "Weekly"
+        case biweekly = "Every 2 Weeks"
+        case monthly = "Monthly"
+        case yearly = "Yearly"
+        
+        var displayName: String { rawValue }
+    }
     
     // For displaying in lists
     var dateString: String {
@@ -83,6 +96,14 @@ struct Habit: Identifiable, Codable {
     var frequency: Frequency // How often to do it
     var selectedDays: Set<Int> = Set([1, 2, 3, 4, 5, 6, 7]) // Days of week (1=Sunday, 7=Saturday)
     var completedDates: [Date] = []  // Dates when completed
+    var reminderEnabled: Bool = false  // Whether notifications are enabled
+    var reminderTime: Date?  // Time of day for reminder
+    var notificationIdentifiers: [String] = []  // IDs for scheduled notifications
+    
+    // Calendar Integration
+    var addToCalendar: Bool = false  // Whether to add to system calendar
+    var calendarEventIdentifiers: [String] = []  // Calendar event IDs for removal
+    var calendarDuration: Int = 30  // Duration in minutes (default 30 min)
     
     enum Frequency: String, Codable, CaseIterable {
         case daily = "Daily"
@@ -249,6 +270,56 @@ struct MealPlan: Identifiable, Codable {
         let endDate = Calendar.current.date(byAdding: .day, value: numberOfDays - 1, to: startDate) ?? startDate
         return "\(formatter.string(from: startDate)) - \(formatter.string(from: endDate))"
     }
+    
+    // MARK: - Custom Codable Implementation
+    enum CodingKeys: String, CodingKey {
+        case id, name, startDate, numberOfDays, meals, createdDate
+    }
+    
+    init(id: UUID = UUID(), name: String, startDate: Date, numberOfDays: Int, meals: [Date: DayMeals], createdDate: Date) {
+        self.id = id
+        self.name = name
+        self.startDate = startDate
+        self.numberOfDays = numberOfDays
+        self.meals = meals
+        self.createdDate = createdDate
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        startDate = try container.decode(Date.self, forKey: .startDate)
+        numberOfDays = try container.decode(Int.self, forKey: .numberOfDays)
+        createdDate = try container.decode(Date.self, forKey: .createdDate)
+        
+        // Decode meals dictionary with Date keys
+        let mealsArray = try container.decode([[String: DayMeals]].self, forKey: .meals)
+        meals = [:]
+        for dict in mealsArray {
+            for (dateString, dayMeals) in dict {
+                if let date = ISO8601DateFormatter().date(from: dateString) {
+                    meals[date] = dayMeals
+                }
+            }
+        }
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(name, forKey: .name)
+        try container.encode(startDate, forKey: .startDate)
+        try container.encode(numberOfDays, forKey: .numberOfDays)
+        try container.encode(createdDate, forKey: .createdDate)
+        
+        // Encode meals dictionary with Date keys as strings
+        let formatter = ISO8601DateFormatter()
+        let mealsArray = meals.map { date, dayMeals in
+            [formatter.string(from: date): dayMeals]
+        }
+        try container.encode(mealsArray, forKey: .meals)
+    }
 }
 
 // Shopping List Item
@@ -292,17 +363,23 @@ struct VaultItem: Identifiable, Codable {
     var id = UUID()
     var title: String
     var username: String?
-    var password: String?    // Will be encrypted
+    // Note: password is stored separately in Keychain (not here)
     var url: String?
-    var notes: String?
+    // Note: notes are stored separately in Keychain (not here)
     var category: VaultCategory
     var imageData: Data?     // Store attached photo as Data
+    var hasPassword: Bool = false  // Flag to indicate password exists in Keychain
+    var hasNotes: Bool = false     // Flag to indicate notes exist in Keychain
     
     enum VaultCategory: String, Codable, CaseIterable {
         case login = "Login"
         case card = "Card"
         case note = "Secure Note"
         case identity = "Identity"
+        case insurance = "Insurance"
+        case pets = "Pets"
+        case family = "Family"
+        case other = "Other"
         
         var icon: String {
             switch self {
@@ -310,8 +387,58 @@ struct VaultItem: Identifiable, Codable {
             case .card: return "creditcard.fill"
             case .note: return "doc.text.fill"
             case .identity: return "person.text.rectangle.fill"
+            case .insurance: return "shield.checkered"
+            case .pets: return "pawprint.fill"
+            case .family: return "person.3.fill"
+            case .other: return "folder.fill"
             }
         }
+    }
+    
+    // MARK: - Keychain Integration
+    
+    /// Retrieve password from Keychain
+    var password: String? {
+        get {
+            guard hasPassword else { return nil }
+            return KeychainManager.shared.retrieveVaultPassword(forItemId: id)
+        }
+    }
+    
+    /// Retrieve notes from Keychain
+    var notes: String? {
+        get {
+            guard hasNotes else { return nil }
+            return KeychainManager.shared.retrieveVaultNotes(forItemId: id)
+        }
+    }
+    
+    /// Save password to Keychain
+    mutating func setPassword(_ password: String?) {
+        if let password = password, !password.isEmpty {
+            KeychainManager.shared.saveVaultPassword(password, forItemId: id)
+            hasPassword = true
+        } else {
+            KeychainManager.shared.deleteVaultPassword(forItemId: id)
+            hasPassword = false
+        }
+    }
+    
+    /// Save notes to Keychain
+    mutating func setNotes(_ notes: String?) {
+        if let notes = notes, !notes.isEmpty {
+            KeychainManager.shared.saveVaultNotes(notes, forItemId: id)
+            hasNotes = true
+        } else {
+            KeychainManager.shared.deleteVaultNotes(forItemId: id)
+            hasNotes = false
+        }
+    }
+    
+    /// Delete all Keychain data for this item
+    func deleteKeychainData() {
+        KeychainManager.shared.deleteVaultPassword(forItemId: id)
+        KeychainManager.shared.deleteVaultNotes(forItemId: id)
     }
 }
 

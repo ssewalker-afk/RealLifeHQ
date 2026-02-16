@@ -1,7 +1,6 @@
 {
   "images" : [
     {
-      "filename" : "ChatGPT Image Jan 26, 2026 at 03_32_51 PM.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
@@ -10,6 +9,7 @@
       "scale" : "2x"
     },
     {
+      "filename" : "ChatGPT Image Jan 26, 2026 at 03_28_31 PM.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

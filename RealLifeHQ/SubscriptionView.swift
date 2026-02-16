@@ -90,14 +90,25 @@ struct SubscriptionView: View {
             // App icon or logo
             Image(systemName: "checkmark.seal.fill")
                 .font(.system(size: 60))
-                .foregroundStyle(.blue)
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [.blue, .purple],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
             
-            Text("Get Your Life Organized")
+            Text("Organize Your Entire Life")
                 .font(.largeTitle.bold())
                 .multilineTextAlignment(.center)
             
             Text("Start your 7-day free trial")
                 .font(.title3)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+            
+            Text("Then $1.99/month or $19.99/year")
+                .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
         }
@@ -109,39 +120,45 @@ struct SubscriptionView: View {
     private var featuresView: some View {
         VStack(alignment: .leading, spacing: 16) {
             FeatureRow(
-                icon: "dollarsign.circle.fill",
-                title: "Budget Tracker",
-                description: "Take control of your finances"
-            )
-            
-            FeatureRow(
-                icon: "fork.knife.circle.fill",
-                title: "Meal Planner",
-                description: "Plan meals and save money"
-            )
-            
-            FeatureRow(
-                icon: "lock.shield.fill",
-                title: "The Vault",
-                description: "Store important documents securely"
-            )
-            
-            FeatureRow(
                 icon: "calendar.circle.fill",
-                title: "Planner & Calendar",
-                description: "Stay organized and on track"
+                title: "Smart Calendar",
+                description: "Sync with Apple & Google Calendar, set reminders"
             )
             
             FeatureRow(
                 icon: "chart.line.uptrend.xyaxis.circle.fill",
                 title: "Habit Tracker",
-                description: "Build better routines"
+                description: "Build streaks and stay consistent"
             )
             
             FeatureRow(
                 icon: "book.circle.fill",
-                title: "Journal",
-                description: "Reflect and grow daily"
+                title: "Daily Journal",
+                description: "Reflect with guided prompts"
+            )
+            
+            FeatureRow(
+                icon: "dollarsign.circle.fill",
+                title: "Budget Tracker",
+                description: "Track expenses and stay on budget"
+            )
+            
+            FeatureRow(
+                icon: "lock.shield.fill",
+                title: "Secure Vault",
+                description: "Encrypted storage with Face ID protection"
+            )
+            
+            FeatureRow(
+                icon: "sparkles",
+                title: "Life Reminder Wizard",
+                description: "Never forget important tasks"
+            )
+            
+            FeatureRow(
+                icon: "icloud.fill",
+                title: "Cloud Sync",
+                description: "Access your data on all devices"
             )
         }
         .padding()
@@ -307,11 +324,44 @@ struct SubscriptionView: View {
             .font(.subheadline)
             .foregroundStyle(.secondary)
             
+            // Required subscription information
             Text("Cancel anytime. Subscription automatically renews unless auto-renew is turned off at least 24 hours before the end of the current period.")
                 .font(.caption2)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
+            
+            // REQUIRED: Links to Privacy Policy and Terms of Use
+            VStack(spacing: 8) {
+                HStack(spacing: 16) {
+                    NavigationLink(destination: PrivacyPolicyView()) {
+                        Text("Privacy Policy")
+                            .font(.caption)
+                            .underline()
+                            .foregroundStyle(.secondary)
+                    }
+                    
+                    Text("•")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    
+                    NavigationLink(destination: TermsOfServiceView()) {
+                        Text("Terms of Use")
+                            .font(.caption)
+                            .underline()
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                
+                // Additional subscription terms
+                Text("Payment will be charged to your Apple ID account at confirmation of purchase. Subscription automatically renews unless canceled at least 24 hours before the end of the current period. Your account will be charged for renewal within 24 hours prior to the end of the current period. You can manage and cancel your subscriptions in your App Store account settings.")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+                    .padding(.top, 4)
+            }
+            .padding(.top, 8)
         }
         .padding(.vertical)
     }

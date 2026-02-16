@@ -6,6 +6,7 @@ import SwiftUI
 struct JournalView: View {
     @EnvironmentObject var dataManager: DataManager
     @EnvironmentObject var themeManager: ThemeManager
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @State private var showingAddEntry = false
     
     var body: some View {
@@ -14,7 +15,13 @@ struct JournalView: View {
                 if dataManager.journalEntries.isEmpty {
                     emptyStateView
                 } else {
-                    journalList
+                    if horizontalSizeClass == .regular {
+                        // iPad: Grid layout
+                        iPadGridLayout
+                    } else {
+                        // iPhone: List layout
+                        journalList
+                    }
                 }
             }
             .background(themeManager.currentTheme.backgroundColor.ignoresSafeArea())
@@ -32,6 +39,25 @@ struct JournalView: View {
             .sheet(isPresented: $showingAddEntry) {
                 AddJournalEntryView()
             }
+        }
+        .navigationViewStyle(.stack)
+    }
+    
+    // iPad Grid Layout
+    private var iPadGridLayout: some View {
+        ScrollView {
+            LazyVGrid(columns: [
+                GridItem(.flexible(), spacing: 20),
+                GridItem(.flexible(), spacing: 20)
+            ], spacing: 20) {
+                ForEach(sortedEntries) { entry in
+                    NavigationLink(destination: JournalDetailView(entry: entry)) {
+                        JournalCardView(entry: entry)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                }
+            }
+            .padding()
         }
     }
     
@@ -78,6 +104,80 @@ struct JournalView: View {
     
     private var sortedEntries: [JournalEntry] {
         dataManager.journalEntries.sorted { $0.date > $1.date }
+    }
+}
+
+// MARK: - Journal Card View (iPad Grid)
+
+struct JournalCardView: View {
+    let entry: JournalEntry
+    @EnvironmentObject var dataManager: DataManager
+    @EnvironmentObject var themeManager: ThemeManager
+    @State private var showDeleteAlert = false
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            // Date and mood
+            HStack {
+                Text(entry.dateString)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                
+                Spacer()
+                
+                if let mood = entry.mood {
+                    Text(mood.rawValue)
+                        .font(.title3)
+                }
+            }
+            
+            // Content preview
+            Text(entry.content)
+                .font(.body)
+                .foregroundColor(.primary)
+                .lineLimit(4)
+                .multilineTextAlignment(.leading)
+            
+            // Tags
+            if !entry.tags.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack {
+                        ForEach(entry.tags.prefix(5), id: \.self) { tag in
+                            Text("#\(tag)")
+                                .font(.caption)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(themeManager.currentTheme.primaryColor.opacity(0.2))
+                                .foregroundColor(themeManager.currentTheme.primaryColor)
+                                .cornerRadius(6)
+                        }
+                    }
+                }
+            }
+            
+            // Delete button
+            Button(role: .destructive) {
+                showDeleteAlert = true
+            } label: {
+                Label("Delete", systemImage: "trash")
+                    .font(.caption)
+                    .foregroundColor(.red)
+            }
+            .frame(maxWidth: .infinity, alignment: .trailing)
+        }
+        .padding()
+        .frame(height: 220)
+        .background(themeManager.currentTheme.cardColor)
+        .cornerRadius(16)
+        .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+        .alert("Delete Entry", isPresented: $showDeleteAlert) {
+            Button("Cancel", role: .cancel) { }
+            Button("Delete", role: .destructive) {
+                dataManager.deleteJournalEntry(entry)
+            }
+        } message: {
+            Text("Are you sure you want to delete this journal entry? This action cannot be undone.")
+        }
     }
 }
 

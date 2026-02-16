@@ -18,9 +18,8 @@ struct CreateMealPlanView: View {
     let dayOptions = [1, 3, 5, 7, 10, 14]
     
     var body: some View {
-        NavigationView {
-            Form {
-                Section("Meal Plan Details") {
+        Form {
+            Section("Meal Plan Details") {
                     TextField("Plan Name (e.g., Week of Jan 24)", text: $name)
                     
                     DatePicker("Start Date", selection: $startDate, displayedComponents: .date)
@@ -130,7 +129,6 @@ struct CreateMealPlanView: View {
             } message: {
                 Text("Generated \(generatedMealCount) meals for your \(numberOfDays)-day plan")
             }
-        }
     }
     
     private func addSampleRecipes() {
@@ -294,7 +292,9 @@ struct ShoppingListTabView: View {
             }
         }
         .sheet(isPresented: $showingAddItem) {
-            AddShoppingItemView()
+            NavigationStack {
+                AddShoppingItemView()
+            }
         }
         .alert("Copied to Clipboard", isPresented: $showingCopyConfirmation) {
             Button("OK", role: .cancel) { }
@@ -484,7 +484,9 @@ struct ShoppingItemRow: View {
             }
         }
         .sheet(isPresented: $showingEditSheet) {
-            EditShoppingItemView(item: item)
+            NavigationStack {
+                EditShoppingItemView(item: item)
+            }
         }
     }
 }
@@ -501,37 +503,35 @@ struct AddShoppingItemView: View {
     @State private var category: ShoppingItem.ShoppingCategory = .other
     
     var body: some View {
-        NavigationView {
-            Form {
-                Section("Item Details") {
-                    TextField("Item Name", text: $name)
-                        .textInputAutocapitalization(.words)
-                    
-                    TextField("Quantity", text: $quantity)
-                    
-                    Picker("Category", selection: $category) {
-                        ForEach(ShoppingItem.ShoppingCategory.allCases, id: \.self) { cat in
-                            Label(cat.rawValue, systemImage: cat.icon)
-                                .tag(cat)
-                        }
+        Form {
+            Section("Item Details") {
+                TextField("Item Name", text: $name)
+                    .textInputAutocapitalization(.words)
+                
+                TextField("Quantity", text: $quantity)
+                
+                Picker("Category", selection: $category) {
+                    ForEach(ShoppingItem.ShoppingCategory.allCases, id: \.self) { cat in
+                        Label(cat.rawValue, systemImage: cat.icon)
+                            .tag(cat)
                     }
                 }
             }
-            .navigationTitle("Add Item")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
+        }
+        .navigationTitle("Add Item")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button("Cancel") {
+                    dismiss()
                 }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Add") {
-                        saveItem()
-                    }
-                    .disabled(name.isEmpty)
+            }
+            
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button("Add") {
+                    saveItem()
                 }
+                .disabled(name.isEmpty)
             }
         }
     }
@@ -568,37 +568,35 @@ struct EditShoppingItemView: View {
     }
     
     var body: some View {
-        NavigationView {
-            Form {
-                Section("Item Details") {
-                    TextField("Item Name", text: $name)
-                        .textInputAutocapitalization(.words)
-                    
-                    TextField("Quantity", text: $quantity)
-                    
-                    Picker("Category", selection: $category) {
-                        ForEach(ShoppingItem.ShoppingCategory.allCases, id: \.self) { cat in
-                            Label(cat.rawValue, systemImage: cat.icon)
-                                .tag(cat)
-                        }
+        Form {
+            Section("Item Details") {
+                TextField("Item Name", text: $name)
+                    .textInputAutocapitalization(.words)
+                
+                TextField("Quantity", text: $quantity)
+                
+                Picker("Category", selection: $category) {
+                    ForEach(ShoppingItem.ShoppingCategory.allCases, id: \.self) { cat in
+                        Label(cat.rawValue, systemImage: cat.icon)
+                            .tag(cat)
                     }
                 }
             }
-            .navigationTitle("Edit Item")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
+        }
+        .navigationTitle("Edit Item")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button("Cancel") {
+                    dismiss()
                 }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Save") {
-                        saveChanges()
-                    }
-                    .disabled(name.isEmpty)
+            }
+            
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button("Save") {
+                    saveChanges()
                 }
+                .disabled(name.isEmpty)
             }
         }
     }

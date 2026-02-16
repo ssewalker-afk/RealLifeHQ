@@ -6,7 +6,7 @@ import Combine
 
 class ThemeManager: ObservableObject {
     // @Published means the UI updates automatically when this changes
-    @Published var currentTheme: AppTheme = .tealAmber
+    @Published var currentTheme: AppTheme = .emeraldViolet
     
     // Available color themes (all gender-neutral, no browns!)
     enum AppTheme: String, CaseIterable, Identifiable {

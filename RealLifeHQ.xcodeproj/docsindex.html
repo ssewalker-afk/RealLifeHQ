@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RealLifeHQ - Your All-in-One Life Organizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .hero {
+            background: linear-gradient(135deg, #10b981 0%, #8b5cf6 100%);
+            padding: 60px 40px;
+            text-align: center;
+            color: white;
+        }
+        
+        .hero h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .hero .tagline {
+            font-size: 1.5em;
+            opacity: 0.95;
+            margin-bottom: 10px;
+        }
+        
+        .hero .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        h2 {
+            color: #10b981;
+            font-size: 2em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #10b981;
+        }
+        
+        h3 {
+            color: #8b5cf6;
+            font-size: 1.4em;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .feature-card {
+            background: #f9fafb;
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 4px solid #10b981;
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .feature-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .feature-title {
+            font-weight: bold;
+            color: #10b981;
+            margin-bottom: 8px;
+            font-size: 1.2em;
+        }
+        
+        .feature-desc {
+            color: #666;
+            font-size: 0.95em;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dbeafe 100%);
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 5px solid #10b981;
+            margin: 25px 0;
+        }
+        
+        .pricing {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .pricing h3 {
+            color: #f59e0b;
+            margin-top: 0;
+        }
+        
+        .price-tag {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #f59e0b;
+            margin: 15px 0;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 30px 0;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            padding: 15px 35px;
+            background: #10b981;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(16,185,129,0.3);
+        }
+        
+        .cta-button:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16,185,129,0.4);
+        }
+        
+        .cta-button.secondary {
+            background: #8b5cf6;
+            box-shadow: 0 4px 15px rgba(139,92,246,0.3);
+        }
+        
+        .cta-button.secondary:hover {
+            background: #7c3aed;
+            box-shadow: 0 6px 20px rgba(139,92,246,0.4);
+        }
+        
+        ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        li {
+            margin-bottom: 10px;
+            color: #444;
+        }
+        
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .tech-badge {
+            background: #e0e7ff;
+            color: #4f46e5;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+        
+        .footer {
+            background: #1f2937;
+            color: white;
+            padding: 30px 40px;
+            text-align: center;
+        }
+        
+        .footer a {
+            color: #10b981;
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .screenshot-placeholder {
+            background: #e5e7eb;
+            height: 400px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            font-size: 1.2em;
+            margin: 20px 0;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+            background: #f0fdf4;
+            border-radius: 10px;
+        }
+        
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #10b981;
+        }
+        
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero">
+            <h1>🌟 RealLifeHQ</h1>
+            <p class="tagline">Your All-in-One Life Organizer</p>
+            <p class="subtitle">Stop juggling multiple apps. Organize your entire life in one beautiful place.</p>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="content">
+            
+            <!-- Quick Links -->
+            <div class="cta-buttons">
+                <a href="#features" class="cta-button">📱 Features</a>
+                <a href="#download" class="cta-button secondary">⬇️ Download</a>
+                <a href="privacy-policy.html" class="cta-button secondary">🔒 Privacy</a>
+                <a href="support.html" class="cta-button secondary">💬 Support</a>
+            </div>
+            
+            <!-- About Section -->
+            <div class="section">
+                <h2>✨ About RealLifeHQ</h2>
+                <p>RealLifeHQ is a comprehensive life organization app designed to help you manage everything in one place. From tracking habits and managing your budget to keeping a daily journal and storing sensitive information securely—RealLifeHQ has you covered.</p>
+                
+                <div class="highlight-box">
+                    <p><strong>🎯 Our Mission:</strong> To help you organize your life without compromising your privacy or breaking the bank.</p>
+                    <p><strong>💰 Pricing:</strong> Just $1.99/month or $19.99/year with a 7-day free trial!</p>
+                    <p><strong>🔒 Privacy:</strong> Your data stays on YOUR device. No tracking, no ads, no data mining.</p>
+                </div>
+            </div>
+            
+            <!-- Stats -->
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number">5</div>
+                    <div class="stat-label">Core Features</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">4</div>
+                    <div class="stat-label">Color Themes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Private</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">$1.99</div>
+                    <div class="stat-label">Per Month</div>
+                </div>
+            </div>
+            
+            <!-- Features Section -->
+            <div class="section" id="features">
+                <h2>🚀 Key Features</h2>
+                
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">📅</div>
+                        <div class="feature-title">Smart Calendar</div>
+                        <div class="feature-desc">
+                            Life Reminder Wizard suggests important tasks you might forget. Sync with Apple & Google Calendar.
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">🎯</div>
+                        <div class="feature-title">Habit Tracker</div>
+                        <div class="feature-desc">
+                            Build better routines with streak tracking. Visual progress keeps you motivated.
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">📖</div>
+                        <div class="feature-title">Daily Journal</div>
+                        <div class="feature-desc">
+                            Reflect and grow with guided prompts. Private, secure, and ad-free.
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">💰</div>
+                        <div class="feature-title">Budget Tracker</div>
+                        <div class="feature-desc">
+                            Track expenses, set budgets, and monitor spending patterns with ease.
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">🔒</div>
+                        <div class="feature-title">Secure Vault</div>
+                        <div class="feature-desc">
+                            AES-256 encryption with Face ID/Touch ID protection for sensitive data.
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">☁️</div>
+                        <div class="feature-title">iCloud Sync</div>
+                        <div class="feature-desc">
+                            Optional sync across all your Apple devices. Works offline too!
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- What Makes Us Different -->
+            <div class="section">
+                <h2>💎 What Makes Us Different</h2>
+                
+                <h3>🔐 Privacy First</h3>
+                <ul>
+                    <li>All data stored locally on your device</li>
+                    <li>No tracking or analytics</li>
+                    <li>No ads, ever</li>
+                    <li>No data sold to third parties</li>
+                    <li>Optional iCloud sync controlled by you</li>
+                </ul>
+                
+                <h3>✨ Unique Features</h3>
+                <ul>
+                    <li><strong>Life Reminder Wizard:</strong> Personalized suggestions for important recurring tasks (oil changes, vet visits, tax deadlines, etc.)</li>
+                    <li><strong>All-in-One:</strong> Replace multiple apps with one beautiful solution</li>
+                    <li><strong>Beautiful Design:</strong> 4 color themes, native iOS design, dark mode support</li>
+                </ul>
+                
+                <h3>💰 Budget-Friendly</h3>
+                <ul>
+                    <li>Just $1.99/month (less than a coffee!)</li>
+                    <li>Or $19.99/year (save 17%)</li>
+                    <li>7-day free trial for new users</li>
+                    <li>Cancel anytime, no commitment</li>
+                </ul>
+            </div>
+            
+            <!-- Pricing Section -->
+            <div class="pricing">
+                <h3>💎 Simple, Affordable Pricing</h3>
+                <div class="price-tag">$1.99/month</div>
+                <p><strong>Or save 17% with annual plan: $19.99/year</strong></p>
+                <p>✨ 7-day free trial • Cancel anytime • No commitment</p>
+                <div style="margin-top: 20px;">
+                    <a href="#download" class="cta-button">Start Free Trial</a>
+                </div>
+            </div>
+            
+            <!-- Tech Stack -->
+            <div class="section">
+                <h2>🛠️ Built With</h2>
+                <div class="tech-stack">
+                    <span class="tech-badge">SwiftUI</span>
+                    <span class="tech-badge">Swift 6</span>
+                    <span class="tech-badge">StoreKit 2</span>
+                    <span class="tech-badge">EventKit</span>
+                    <span class="tech-badge">CloudKit</span>
+                    <span class="tech-badge">LocalAuthentication</span>
+                    <span class="tech-badge">CryptoKit</span>
+                    <span class="tech-badge">Combine</span>
+                </div>
+                <p>Built with modern Apple technologies for the best iOS experience.</p>
+            </div>
+            
+            <!-- Perfect For -->
+            <div class="section">
+                <h2>👥 Perfect For</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">💼</div>
+                        <div class="feature-title">Professionals</div>
+                        <div class="feature-desc">Juggling multiple responsibilities and need one place for everything</div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">🎓</div>
+                        <div class="feature-title">Students</div>
+                        <div class="feature-desc">Managing classes, habits, and finances on a budget</div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">👨‍👩‍👧‍👦</div>
+                        <div class="feature-title">Parents</div>
+                        <div class="feature-desc">Tracking family schedules and household budgets</div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">🔒</div>
+                        <div class="feature-title">Privacy-Conscious</div>
+                        <div class="feature-desc">Value security and don't want data tracked or sold</div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">📈</div>
+                        <div class="feature-title">Self-Improvers</div>
+                        <div class="feature-desc">Building better habits and tracking personal growth</div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">💡</div>
+                        <div class="feature-title">Anyone!</div>
+                        <div class="feature-desc">If you want to be more organized, this app is for you</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Download Section -->
+            <div class="section" id="download">
+                <h2>📱 Download RealLifeHQ</h2>
+                <div class="highlight-box" style="text-align: center;">
+                    <h3>Available on the App Store</h3>
+                    <p style="margin: 20px 0;">Download for iPhone and iPad</p>
+                    <a href="https://apps.apple.com/app/reallifehq" class="cta-button">
+                        Download on App Store
+                    </a>
+                    <p style="margin-top: 20px; font-size: 0.9em; color: #666;">
+                        Requires iOS 17.0 or later • Works on iPhone and iPad
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Requirements -->
+            <div class="section">
+                <h2>📋 Requirements</h2>
+                <ul>
+                    <li><strong>Platform:</strong> iOS 17.0 or later</li>
+                    <li><strong>Devices:</strong> iPhone, iPad</li>
+                    <li><strong>Size:</strong> Approximately 50 MB</li>
+                    <li><strong>Languages:</strong> English</li>
+                    <li><strong>Subscription:</strong> Required for full access</li>
+                </ul>
+            </div>
+            
+            <!-- Support -->
+            <div class="section">
+                <h2>💬 Support & Contact</h2>
+                <div class="highlight-box">
+                    <p><strong>📧 Email:</strong> <a href="mailto:sarah@thereallifehq.com">sarah@thereallifehq.com</a></p>
+                    <p><strong>🌐 Website:</strong> <a href="https://www.thereallifehq.com">www.thereallifehq.com</a></p>
+                    <p><strong>📖 Documentation:</strong> <a href="support.html">Support Center</a></p>
+                    <p><strong>🔒 Privacy:</strong> <a href="privacy-policy.html">Privacy Policy</a></p>
+                    <p><strong>📜 Terms:</strong> <a href="terms-of-service.html">Terms of Service</a></p>
+                </div>
+                <p>We aim to respond to all inquiries within 48 hours.</p>
+            </div>
+            
+            <!-- Contributing -->
+            <div class="section">
+                <h2>🤝 Feedback & Suggestions</h2>
+                <p>We love hearing from our users! If you have feedback, suggestions, or found a bug, please reach out:</p>
+                <ul>
+                    <li>📧 Email us at <a href="mailto:sarah@thereallifehq.com">sarah@thereallifehq.com</a></li>
+                    <li>⭐ Leave a review on the App Store</li>
+                    <li>💬 Use the in-app Support feature</li>
+                </ul>
+            </div>
+            
+            <!-- Roadmap -->
+            <div class="section">
+                <h2>🗺️ Roadmap</h2>
+                <h3>Coming Soon:</h3>
+                <ul>
+                    <li>📊 Advanced analytics and insights</li>
+                    <li>🌍 Multiple language support</li>
+                    <li>🔗 More calendar integrations</li>
+                    <li>📱 Widget support for Home Screen</li>
+                    <li>🎨 More theme options</li>
+                    <li>👥 Family sharing features</li>
+                </ul>
+            </div>
+            
+            <!-- License -->
+            <div class="section">
+                <h2>📄 License</h2>
+                <p>RealLifeHQ is proprietary software. All rights reserved.</p>
+                <p>By using this app, you agree to our <a href="terms-of-service.html">Terms of Service</a> and <a href="privacy-policy.html">Privacy Policy</a>.</p>
+            </div>
+            
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <h3 style="color: white; margin-bottom: 15px;">RealLifeHQ</h3>
+            <p>Organize Your Life in One Beautiful App</p>
+            <p style="margin-top: 20px;">
+                <a href="privacy-policy.html">Privacy Policy</a> • 
+                <a href="terms-of-service.html">Terms of Service</a> • 
+                <a href="support.html">Support</a> • 
+                <a href="mailto:sarah@thereallifehq.com">Contact</a>
+            </p>
+            <p style="margin-top: 20px; font-size: 0.9em; opacity: 0.8;">
+                &copy; 2026 RealLifeHQ. All rights reserved.
+            </p>
+            <p style="margin-top: 10px; font-size: 0.85em; opacity: 0.7;">
+                Made with ❤️ for people who want to get organized
+            </p>
+        </div>
+    </div>
+</body>
+</html>

@@ -8,6 +8,7 @@ struct ContentView: View {
     @EnvironmentObject var dataManager: DataManager
     @State private var storeManager = StoreManager.shared
     @State private var showPaywall = false
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
     
     var body: some View {
         Group {
@@ -15,8 +16,14 @@ struct ContentView: View {
                 // Show paywall if not subscribed or first launch
                 SubscriptionView()
             } else {
-                // Show main app content
-                mainAppContent
+                // Show main app content - different layout for iPad vs iPhone
+                if horizontalSizeClass == .regular {
+                    // iPad: Use sidebar navigation
+                    iPadLayout
+                } else {
+                    // iPhone: Use tab bar
+                    mainAppContent
+                }
             }
         }
         .onAppear {
@@ -35,6 +42,58 @@ struct ContentView: View {
         }
     }
     
+    // iPad Layout with Sidebar Navigation
+    private var iPadLayout: some View {
+        NavigationSplitView {
+            // Sidebar
+            List {
+                Section {
+                    NavigationLink(destination: HomeView()) {
+                        Label("Home", systemImage: "house.fill")
+                    }
+                    NavigationLink(destination: CalendarView()) {
+                        Label("Calendar", systemImage: "calendar")
+                    }
+                    NavigationLink(destination: HabitsView()) {
+                        Label("Habits", systemImage: "target")
+                    }
+                }
+                
+                Section("Productivity") {
+                    NavigationLink(destination: JournalView()) {
+                        Label("Journal", systemImage: "book.closed.fill")
+                    }
+                    NavigationLink(destination: BudgetView()) {
+                        Label("Budget", systemImage: "dollarsign.circle.fill")
+                    }
+                }
+                
+                Section("Lifestyle") {
+                    // Recipes temporarily hidden - work in progress
+                    // NavigationLink(destination: RecipesView()) {
+                    //     Label("Recipes", systemImage: "fork.knife")
+                    // }
+                    NavigationLink(destination: VaultView()) {
+                        Label("Vault", systemImage: "lock.shield.fill")
+                    }
+                }
+                
+                Section {
+                    NavigationLink(destination: SettingsView()) {
+                        Label("Settings", systemImage: "gear")
+                    }
+                }
+            }
+            .navigationTitle("RealLifeHQ")
+            .listStyle(.sidebar)
+        } detail: {
+            // Default detail view
+            HomeView()
+        }
+        .accentColor(themeManager.currentTheme.primaryColor)
+    }
+    
+    // iPhone Layout with Tab Bar
     private var mainAppContent: some View {
         TabView {
             // Home Dashboard Tab
@@ -44,10 +103,12 @@ struct ContentView: View {
                 }
             
             // Calendar Tab
-            CalendarView()
-                .tabItem {
-                    Label("Calendar", systemImage: "calendar")
-                }
+            NavigationStack {
+                CalendarView()
+            }
+            .tabItem {
+                Label("Calendar", systemImage: "calendar")
+            }
             
             // Habits Tab
             HabitsView()
@@ -55,11 +116,29 @@ struct ContentView: View {
                     Label("Habits", systemImage: "target")
                 }
             
-            // More Tab (Journal, Budget, Recipes, Vault, Settings)
-            MoreView()
-                .tabItem {
-                    Label("More", systemImage: "ellipsis.circle.fill")
-                }
+            // Budget Tab
+            NavigationStack {
+                BudgetView()
+            }
+            .tabItem {
+                Label("Budget", systemImage: "dollarsign.circle.fill")
+            }
+            
+            // Journal Tab
+            NavigationStack {
+                JournalView()
+            }
+            .tabItem {
+                Label("Journal", systemImage: "book.fill")
+            }
+            
+            // Vault Tab
+            NavigationStack {
+                VaultView()
+            }
+            .tabItem {
+                Label("Vault", systemImage: "lock.shield.fill")
+            }
         }
         .accentColor(themeManager.currentTheme.primaryColor)
     }
@@ -71,22 +150,27 @@ struct ContentView: View {
 struct HomeView: View {
     @EnvironmentObject var themeManager: ThemeManager
     @EnvironmentObject var dataManager: DataManager
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    
+    // State for showing add screens
+    @State private var showingAddExpense = false
+    @State private var showingAddJournalEntry = false
+    // Removed selectedRecipesTab and navigateToShoppingList - recipes temporarily hidden
+    
+    // Animation state for greeting icon
+    @State private var isAnimating = false
     
     var body: some View {
         NavigationView {
             ScrollView {
-                VStack(spacing: 20) {
-                    // Greeting Header
-                    greetingHeader
-                    
-                    // Today's Events Widget
-                    todaysEventsWidget
-                    
-                    // Habits Widget
-                    habitsWidget
-                    
-                    // Quick Stats
-                    quickStatsWidget
+                Group {
+                    if horizontalSizeClass == .regular {
+                        // iPad layout with grid
+                        iPadLayout
+                    } else {
+                        // iPhone layout with vertical stack
+                        iPhoneLayout
+                    }
                 }
                 .padding()
             }
@@ -100,6 +184,42 @@ struct HomeView: View {
                     }
                 }
             }
+        }
+        .navigationViewStyle(.stack) // Prevents unwanted split view behavior
+    }
+    
+    // iPhone Layout - Vertical Stack
+    private var iPhoneLayout: some View {
+        VStack(spacing: 20) {
+            greetingHeader
+            todaysEventsWidget
+            habitsWidget
+            journalPromptWidget
+            budgetWidget
+            
+            // Vault Quick Link at bottom
+            vaultQuickLink
+        }
+    }
+    
+    // iPad Layout - Two-Column Grid
+    private var iPadLayout: some View {
+        VStack(spacing: 20) {
+            greetingHeader
+                .padding(.horizontal)
+            
+            LazyVGrid(columns: [
+                GridItem(.flexible(), spacing: 20),
+                GridItem(.flexible(), spacing: 20)
+            ], spacing: 20) {
+                todaysEventsWidget
+                habitsWidget
+                journalPromptWidget
+                budgetWidget
+            }
+            
+            // Vault Quick Link at bottom
+            vaultQuickLink
         }
     }
     
@@ -116,13 +236,44 @@ struct HomeView: View {
                     .foregroundColor(.secondary)
             }
             Spacer()
+            
+            // SF Symbol with gradient background and pulse animation
             Circle()
-                .fill(themeManager.currentTheme.primaryColor.opacity(0.2))
-                .frame(width: 60, height: 60)
-                .overlay(
-                    Text(greetingEmoji)
-                        .font(.largeTitle)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            greetingColor.opacity(0.3),
+                            greetingColor.opacity(0.1)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
                 )
+                .frame(width: 70, height: 70)
+                .overlay(
+                    Image(systemName: greetingSFSymbol)
+                        .font(.system(size: 32))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [
+                                    greetingColor,
+                                    greetingColor.opacity(0.7)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .scaleEffect(isAnimating ? 1.1 : 1.0)
+                        .animation(
+                            .easeInOut(duration: 1.5)
+                                .repeatForever(autoreverses: true),
+                            value: isAnimating
+                        )
+                )
+                .shadow(color: greetingColor.opacity(0.3), radius: 8, x: 0, y: 4)
+                .onAppear {
+                    isAnimating = true
+                }
         }
     }
     
@@ -135,6 +286,37 @@ struct HomeView: View {
         }
     }
     
+    // SF Symbol name based on time of day
+    private var greetingSFSymbol: String {
+        let hour = Calendar.current.component(.hour, from: Date())
+        switch hour {
+        case 0..<12: return "sun.max.fill"
+        case 12..<17: return "cloud.sun.fill"
+        default: return "moon.stars.fill"
+        }
+    }
+    
+    // Color based on time of day
+    private var greetingColor: Color {
+        let hour = Calendar.current.component(.hour, from: Date())
+        switch hour {
+        case 0..<12: return .orange
+        case 12..<17: return .blue
+        default: return .purple
+        }
+    }
+    
+    // Image name based on time of day
+    private var greetingImageName: String {
+        let hour = Calendar.current.component(.hour, from: Date())
+        switch hour {
+        case 0..<12: return "morning-icon"
+        case 12..<17: return "afternoon-icon"
+        default: return "evening-icon"
+        }
+    }
+    
+    // Keep this if you want to fall back to emojis
     private var greetingEmoji: String {
         let hour = Calendar.current.component(.hour, from: Date())
         switch hour {
@@ -153,11 +335,12 @@ struct HomeView: View {
                     .foregroundColor(themeManager.currentTheme.primaryColor)
                 Text("Today's Events")
                     .font(.headline)
+                    .foregroundColor(themeManager.currentTheme.primaryColor)
                 Spacer()
                 NavigationLink(destination: CalendarView()) {
                     Text("View All")
                         .font(.caption)
-                        .foregroundColor(themeManager.currentTheme.accentColor)
+                        .foregroundColor(themeManager.currentTheme.primaryColor)
                 }
             }
             
@@ -184,9 +367,10 @@ struct HomeView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Image(systemName: "target")
-                    .foregroundColor(themeManager.currentTheme.primaryColor)
+                    .foregroundColor(themeManager.currentTheme.accentColor)
                 Text("Today's Habits")
                     .font(.headline)
+                    .foregroundColor(themeManager.currentTheme.accentColor)
                 Spacer()
                 NavigationLink(destination: HabitsView()) {
                     Text("View All")
@@ -212,48 +396,194 @@ struct HomeView: View {
         .cornerRadius(12)
     }
     
-    // MARK: - Quick Stats Widget
+    // MARK: - Journal Prompt Widget
     
-    private var quickStatsWidget: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Quick Stats")
-                .font(.headline)
-            
-            HStack(spacing: 15) {
-                NavigationLink(destination: BudgetView()) {
-                    StatCard(
-                        icon: "dollarsign.circle.fill",
-                        value: budgetRemainingText,
-                        label: "Budget",
-                        color: .green
-                    )
+    private var journalPromptWidget: some View {
+        Button {
+            showingAddJournalEntry = true
+        } label: {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Image(systemName: "book.closed.fill")
+                        .foregroundColor(themeManager.currentTheme.primaryColor)
+                    Text("Journal")
+                        .font(.headline)
+                        .foregroundColor(themeManager.currentTheme.primaryColor)
+                    Spacer()
                 }
-                .buttonStyle(PlainButtonStyle())
                 
-                NavigationLink(destination: JournalView()) {
-                    StatCard(
-                        icon: "book.closed.fill",
-                        value: "\(dataManager.journalEntries.count)",
-                        label: "Entries",
-                        color: themeManager.currentTheme.accentColor
-                    )
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Today's Prompt")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .textCase(.uppercase)
+                    
+                    Text(todaysJournalPrompt)
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                        .foregroundColor(.primary)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.leading)
                 }
-                .buttonStyle(PlainButtonStyle())
+                .padding(.top, 4)
                 
-                NavigationLink(destination: RecipesView()) {
-                    StatCard(
-                        icon: "fork.knife",
-                        value: "\(dataManager.recipes.count)",
-                        label: "Recipes",
-                        color: themeManager.currentTheme.primaryColor
-                    )
+                HStack {
+                    Spacer()
+                    Text("Tap to write")
+                        .font(.caption)
+                        .foregroundColor(themeManager.currentTheme.primaryColor)
+                    Image(systemName: "arrow.right.circle.fill")
+                        .font(.caption)
+                        .foregroundColor(themeManager.currentTheme.primaryColor)
                 }
-                .buttonStyle(PlainButtonStyle())
+            }
+            .padding()
+            .background(themeManager.currentTheme.cardColor)
+            .cornerRadius(12)
+        }
+        .buttonStyle(PlainButtonStyle())
+        .sheet(isPresented: $showingAddJournalEntry) {
+            AddJournalEntryView()
+        }
+    }
+    
+    // MARK: - Budget Widget
+    
+    private var budgetWidget: some View {
+        Button {
+            showingAddExpense = true
+        } label: {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Image(systemName: "dollarsign.circle.fill")
+                        .foregroundColor(themeManager.currentTheme.accentColor)
+                    Text("Budget")
+                        .font(.headline)
+                        .foregroundColor(themeManager.currentTheme.accentColor)
+                    Spacer()
+                }
+                
+                HStack(spacing: 20) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Remaining This Month")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .textCase(.uppercase)
+                        
+                        Text(budgetRemainingText)
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundColor(budgetRemainingColor)
+                    }
+                    
+                    Spacer()
+                    
+                    VStack(alignment: .trailing, spacing: 4) {
+                        HStack(spacing: 4) {
+                            Image(systemName: "plus.circle.fill")
+                                .font(.title3)
+                                .foregroundColor(themeManager.currentTheme.accentColor)
+                            Text("Add Expense")
+                                .font(.caption)
+                                .foregroundColor(themeManager.currentTheme.accentColor)
+                                .fontWeight(.medium)
+                        }
+                    }
+                }
+            }
+            .padding()
+            .background(themeManager.currentTheme.cardColor)
+            .cornerRadius(12)
+        }
+        .buttonStyle(PlainButtonStyle())
+        .sheet(isPresented: $showingAddExpense) {
+            NavigationStack {
+                AddExpenseView()
             }
         }
-        .padding()
-        .background(themeManager.currentTheme.cardColor)
-        .cornerRadius(12)
+    }
+    
+    // Get color based on budget status
+    private var budgetRemainingColor: Color {
+        let currentMonth = getCurrentMonthKey()
+        let monthBudget = dataManager.getMonthlyBudget(for: currentMonth)
+        let remaining = monthBudget.remaining
+        
+        if remaining >= monthBudget.totalBudget * 0.5 {
+            return .green
+        } else if remaining >= 0 {
+            return .orange
+        } else {
+            return .red
+        }
+    }
+    
+    // Generate a journal prompt based on the day of the year
+    private var todaysJournalPrompt: String {
+        let prompts = [
+            "What are you grateful for today?",
+            "What's one thing you learned recently?",
+            "What made you smile today?",
+            "What's your biggest goal right now?",
+            "What would your ideal day look like?",
+            "What's something you're proud of?",
+            "What challenge are you facing?",
+            "Who made a positive impact on you today?",
+            "What do you want to remember about today?",
+            "What's one thing you want to improve?",
+            "What's bringing you joy lately?",
+            "What are you looking forward to?",
+            "What's a recent accomplishment?",
+            "How did you take care of yourself today?",
+            "What's something new you want to try?",
+            "What's a happy memory from this week?",
+            "What values are most important to you?",
+            "What's one way you helped someone?",
+            "What's something you love about yourself?",
+            "What would you tell your younger self?",
+            "What makes you feel most alive?",
+            "What's your favorite part of your routine?",
+            "What's a dream you have for your future?",
+            "What surprised you today?",
+            "What's something you're curious about?",
+            "How did you show kindness today?",
+            "What's a lesson you've learned the hard way?",
+            "What energizes you?",
+            "What peaceful moment did you experience?",
+            "What's something you want to let go of?"
+        ]
+        
+        // Use day of year to get consistent prompt for the day
+        let dayOfYear = Calendar.current.ordinality(of: .day, in: .year, for: Date()) ?? 1
+        return prompts[dayOfYear % prompts.count]
+    }
+    
+    // MARK: - Vault Quick Link
+    
+    private var vaultQuickLink: some View {
+        NavigationLink(destination: VaultView()) {
+            HStack {
+                Spacer()
+                
+                VStack(spacing: 8) {
+                    Image(systemName: "lock.shield.fill")
+                        .font(.system(size: 32))
+                        .foregroundColor(themeManager.currentTheme.primaryColor)
+                    
+                    Text("Vault")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                        .foregroundColor(themeManager.currentTheme.primaryColor)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 20)
+                .background(themeManager.currentTheme.cardColor)
+                .cornerRadius(12)
+                
+                Spacer()
+            }
+        }
+        .buttonStyle(PlainButtonStyle())
     }
     
     // Calculate budget remaining for current month
@@ -266,10 +596,22 @@ struct HomeView: View {
         }
         
         let remaining = monthBudget.remaining
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = 0
+        
         if remaining >= 0 {
-            return "$\(Int(remaining))" // Positive - money left
+            // Positive - money left
+            if let formattedNumber = formatter.string(from: NSNumber(value: remaining)) {
+                return "$\(formattedNumber)"
+            }
+            return "$\(Int(remaining))"
         } else {
-            return "-$\(Int(abs(remaining)))" // Negative - over budget
+            // Negative - over budget
+            if let formattedNumber = formatter.string(from: NSNumber(value: abs(remaining))) {
+                return "-$\(formattedNumber)"
+            }
+            return "-$\(Int(abs(remaining)))"
         }
     }
     
@@ -365,6 +707,8 @@ struct StatCard: View {
             Text(value)
                 .font(.title3)
                 .fontWeight(.bold)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
             Text(label)
                 .font(.caption)
                 .foregroundColor(.secondary)
@@ -375,3 +719,36 @@ struct StatCard: View {
         .cornerRadius(10)
     }
 }
+// MARK: - Action Card (for Quick Actions)
+
+struct ActionCard: View {
+    let icon: String
+    let title: String
+    let subtitle: String
+    let color: Color
+    
+    var body: some View {
+        VStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.title2)
+                .foregroundColor(color)
+            
+            Text(title)
+                .font(.subheadline)
+                .fontWeight(.semibold)
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .minimumScaleFactor(0.8)
+            
+            Text(subtitle)
+                .font(.caption2)
+                .foregroundColor(.secondary)
+                .lineLimit(1)
+        }
+        .frame(maxWidth: .infinity)
+        .padding()
+        .background(color.opacity(0.1))
+        .cornerRadius(10)
+    }
+}
+
