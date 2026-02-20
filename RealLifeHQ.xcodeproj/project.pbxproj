@@ -24,6 +24,8 @@
 		9C723E6A2F415B2F00A7110B /* ReminderWizardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C723E692F415B2F00A7110B /* ReminderWizardView.swift */; };
 		9C723E6B2F415B2F00A7110B /* ReminderWizardModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C723E682F415B2F00A7110B /* ReminderWizardModels.swift */; };
 		9C723E6D2F4175B200A7110B /* SupportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C723E6C2F4175B200A7110B /* SupportView.swift */; };
+		9C723E6F2F417A4000A7110B /* docsprivacy-policy.html in Resources */ = {isa = PBXBuildFile; fileRef = 9C723E6E2F417A4000A7110B /* docsprivacy-policy.html */; };
+		9C723E712F417A8100A7110B /* docssupport.html in Resources */ = {isa = PBXBuildFile; fileRef = 9C723E702F417A8100A7110B /* docssupport.html */; };
 		9C723E732F417A9300A7110B /* CONTACT_INFO_UPDATED.md in Resources */ = {isa = PBXBuildFile; fileRef = 9C723E722F417A9300A7110B /* CONTACT_INFO_UPDATED.md */; };
 		9C723E752F4181A000A7110B /* STOREKIT_PRICING_SETUP.md in Resources */ = {isa = PBXBuildFile; fileRef = 9C723E742F4181A000A7110B /* STOREKIT_PRICING_SETUP.md */; };
 		9C723E772F4181C100A7110B /* PRICING_UPDATE_COMPLETE.md in Resources */ = {isa = PBXBuildFile; fileRef = 9C723E762F4181C100A7110B /* PRICING_UPDATE_COMPLETE.md */; };
@@ -31,10 +33,11 @@
 		9C723E7D2F42779C00A7110B /* SF_SYMBOLS_ANIMATED_GUIDE.md in Resources */ = {isa = PBXBuildFile; fileRef = 9C723E7C2F42779C00A7110B /* SF_SYMBOLS_ANIMATED_GUIDE.md */; };
 		9C723E7F2F427AF100A7110B /* SUPPORT_SCROLL_NAVIGATION_COMPLETE.md in Resources */ = {isa = PBXBuildFile; fileRef = 9C723E7E2F427AF100A7110B /* SUPPORT_SCROLL_NAVIGATION_COMPLETE.md */; };
 		9C723E812F427BD700A7110B /* SETTINGS_CLEANUP_COMPLETE.md in Resources */ = {isa = PBXBuildFile; fileRef = 9C723E802F427BD700A7110B /* SETTINGS_CLEANUP_COMPLETE.md */; };
+		9C723E832F42C9A000A7110B /* terms-of-service.html in Resources */ = {isa = PBXBuildFile; fileRef = 9C723E822F42C9A000A7110B /* terms-of-service.html */; };
+		9C723E852F42C9B600A7110B /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = 9C723E842F42C9B600A7110B /* index.html */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		9C2D4F7B2F47FA00008F418A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9C334B732F26A83D00A503AF /* Products.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = Products.storekit; sourceTree = "<group>"; };
 		9C334B812F284CC300A503AF /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
 		9C485D642F12FDEA00416600 /* RealLifeHQ.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RealLifeHQ.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -53,6 +56,8 @@
 		9C723E682F415B2F00A7110B /* ReminderWizardModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderWizardModels.swift; sourceTree = "<group>"; };
 		9C723E692F415B2F00A7110B /* ReminderWizardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderWizardView.swift; sourceTree = "<group>"; };
 		9C723E6C2F4175B200A7110B /* SupportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportView.swift; sourceTree = "<group>"; };
+		9C723E6E2F417A4000A7110B /* docsprivacy-policy.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = "docsprivacy-policy.html"; sourceTree = "<group>"; };
+		9C723E702F417A8100A7110B /* docssupport.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = docssupport.html; sourceTree = "<group>"; };
 		9C723E722F417A9300A7110B /* CONTACT_INFO_UPDATED.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CONTACT_INFO_UPDATED.md; sourceTree = "<group>"; };
 		9C723E742F4181A000A7110B /* STOREKIT_PRICING_SETUP.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = STOREKIT_PRICING_SETUP.md; sourceTree = "<group>"; };
 		9C723E762F4181C100A7110B /* PRICING_UPDATE_COMPLETE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = PRICING_UPDATE_COMPLETE.md; sourceTree = "<group>"; };
@@ -60,6 +65,8 @@
 		9C723E7C2F42779C00A7110B /* SF_SYMBOLS_ANIMATED_GUIDE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = SF_SYMBOLS_ANIMATED_GUIDE.md; sourceTree = "<group>"; };
 		9C723E7E2F427AF100A7110B /* SUPPORT_SCROLL_NAVIGATION_COMPLETE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = SUPPORT_SCROLL_NAVIGATION_COMPLETE.md; sourceTree = "<group>"; };
 		9C723E802F427BD700A7110B /* SETTINGS_CLEANUP_COMPLETE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = SETTINGS_CLEANUP_COMPLETE.md; sourceTree = "<group>"; };
+		9C723E822F42C9A000A7110B /* terms-of-service.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = "terms-of-service.html"; sourceTree = "<group>"; };
+		9C723E842F42C9B600A7110B /* index.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -102,7 +109,6 @@
 		9C485D5B2F12FDEA00416600 = {
 			isa = PBXGroup;
 			children = (
-				9C2D4F7B2F47FA00008F418A /* Info.plist */,
 				9C334B812F284CC300A503AF /* Launch Screen.storyboard */,
 				9C334B732F26A83D00A503AF /* Products.storekit */,
 				9C485D662F12FDEA00416600 /* RealLifeHQ */,
@@ -122,6 +128,8 @@
 				9C723E692F415B2F00A7110B /* ReminderWizardView.swift */,
 				9C723E6C2F4175B200A7110B /* SupportView.swift */,
 				9C723E622F41209500A7110B /* STORYBOARD_ERROR_FIX_GUIDE.md */,
+				9C723E6E2F417A4000A7110B /* docsprivacy-policy.html */,
+				9C723E702F417A8100A7110B /* docssupport.html */,
 				9C723E722F417A9300A7110B /* CONTACT_INFO_UPDATED.md */,
 				9C723E742F4181A000A7110B /* STOREKIT_PRICING_SETUP.md */,
 				9C723E762F4181C100A7110B /* PRICING_UPDATE_COMPLETE.md */,
@@ -129,6 +137,8 @@
 				9C723E7C2F42779C00A7110B /* SF_SYMBOLS_ANIMATED_GUIDE.md */,
 				9C723E7E2F427AF100A7110B /* SUPPORT_SCROLL_NAVIGATION_COMPLETE.md */,
 				9C723E802F427BD700A7110B /* SETTINGS_CLEANUP_COMPLETE.md */,
+				9C723E822F42C9A000A7110B /* terms-of-service.html */,
+				9C723E842F42C9B600A7110B /* index.html */,
 			);
 			sourceTree = "<group>";
 		};
@@ -213,11 +223,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				9C723E7B2F4273C900A7110B /* CUSTOM_GREETING_GRAPHICS_GUIDE.md in Resources */,
+				9C723E6F2F417A4000A7110B /* docsprivacy-policy.html in Resources */,
+				9C723E712F417A8100A7110B /* docssupport.html in Resources */,
 				9C723E812F427BD700A7110B /* SETTINGS_CLEANUP_COMPLETE.md in Resources */,
 				9C723E772F4181C100A7110B /* PRICING_UPDATE_COMPLETE.md in Resources */,
+				9C723E832F42C9A000A7110B /* terms-of-service.html in Resources */,
 				9C723E7F2F427AF100A7110B /* SUPPORT_SCROLL_NAVIGATION_COMPLETE.md in Resources */,
 				9C723E7D2F42779C00A7110B /* SF_SYMBOLS_ANIMATED_GUIDE.md in Resources */,
 				9C723E4F2F4043F100A7110B /* APPLE_CALENDAR_INTEGRATION_SUMMARY.md in Resources */,
+				9C723E852F42C9B600A7110B /* index.html in Resources */,
 				9C723E632F41209500A7110B /* STORYBOARD_ERROR_FIX_GUIDE.md in Resources */,
 				9C723E732F417A9300A7110B /* CONTACT_INFO_UPDATED.md in Resources */,
 				9C723E752F4181A000A7110B /* STOREKIT_PRICING_SETUP.md in Resources */,
@@ -379,10 +393,10 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = Q79FHUWC44;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = NO;
+				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RealLifeHQ/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = RealLifeHQ;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
@@ -396,7 +410,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -421,10 +435,10 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = Q79FHUWC44;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = NO;
+				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RealLifeHQ/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = RealLifeHQ;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
@@ -438,7 +452,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

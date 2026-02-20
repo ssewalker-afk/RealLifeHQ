@@ -334,7 +334,7 @@ struct SubscriptionView: View {
             // REQUIRED: Links to Privacy Policy and Terms of Use
             VStack(spacing: 8) {
                 HStack(spacing: 16) {
-                    Link(destination: URL(string: "https://ssewalker-afk.github.io/RealLifeHQ/docsprivacy-policy.html")!) {
+                    NavigationLink(destination: PrivacyPolicyView()) {
                         Text("Privacy Policy")
                             .font(.caption)
                             .underline()
@@ -345,7 +345,7 @@ struct SubscriptionView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     
-                    Link(destination: URL(string: "https://ssewalker-afk.github.io/RealLifeHQ/terms-of-service.html")!) {
+                    NavigationLink(destination: TermsOfServiceView()) {
                         Text("Terms of Use")
                             .font(.caption)
                             .underline()
