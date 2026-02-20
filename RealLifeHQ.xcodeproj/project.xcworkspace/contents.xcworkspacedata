@@ -71,6 +71,9 @@
       location = "group:privacy-policy 3.html">
    </FileRef>
    <FileRef
+      location = "group:Untitled.swift">
+   </FileRef>
+   <FileRef
       location = "group:support.html">
    </FileRef>
    <FileRef
