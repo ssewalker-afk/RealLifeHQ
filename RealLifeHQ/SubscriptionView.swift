@@ -11,9 +11,11 @@ import StoreKit
 struct SubscriptionView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var dataManager: DataManager
-    @State private var storeManager = StoreManager.shared
     @State private var selectedProduct: Product?
     @State private var showError = false
+    
+    // Use @State with the shared instance for @Observable objects
+    private let storeManager = StoreManager.shared
     
     var isOnboarding: Bool {
         !dataManager.settings.hasCompletedOnboarding
@@ -37,6 +39,9 @@ struct SubscriptionView: View {
                         
                         // Features
                         featuresView
+                        
+                        // Trial information
+                        trialInfoView
                         
                         // Subscription options
                         subscriptionOptionsView
@@ -102,13 +107,8 @@ struct SubscriptionView: View {
                 .font(.largeTitle.bold())
                 .multilineTextAlignment(.center)
             
-            Text("Start your 7-day free trial")
+            Text("Calendar, habits, journal, budget, vault & reminders — all in one place.")
                 .font(.title3)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-            
-            Text("Then $1.99/month or $19.99/year")
-                .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
         }
@@ -160,6 +160,30 @@ struct SubscriptionView: View {
                 title: "Cloud Sync",
                 description: "Access your data on all devices"
             )
+        }
+        .padding()
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+    }
+    
+    // MARK: - Trial Info View
+    
+    private var trialInfoView: some View {
+        VStack(spacing: 12) {
+            Text("Start your 7-day free trial")
+                .font(.title2.bold())
+                .multilineTextAlignment(.center)
+            
+            Text("Your free trial applies to either subscription plan. After the 7-day trial ends, you will be charged the price of the plan you select unless you cancel at least 24 hours before the trial ends.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+            
+            // Extra clarity statement
+            Text("Cancel anytime during the 7-day trial to avoid being charged.")
+                .font(.subheadline.bold())
+                .foregroundStyle(.blue)
+                .multilineTextAlignment(.center)
+                .padding(.top, 4)
         }
         .padding()
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
@@ -224,22 +248,32 @@ struct SubscriptionView: View {
                 .frame(maxWidth: .infinity)
                 .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
             } else {
-                // Yearly subscription (show first as best value)
-                if let yearly = storeManager.yearlySubscription {
-                    SubscriptionCard(
-                        product: yearly,
-                        isSelected: selectedProduct?.id == yearly.id,
-                        badge: "Save 17%",
-                        onTap: { selectedProduct = yearly }
-                    )
-                }
-                
                 // Monthly subscription
                 if let monthly = storeManager.monthlySubscription {
                     SubscriptionCard(
                         product: monthly,
                         isSelected: selectedProduct?.id == monthly.id,
-                        onTap: { selectedProduct = monthly }
+                        planName: "Monthly Plan",
+                        onTap: {
+                            print("📱 Monthly plan tapped")
+                            selectedProduct = monthly
+                            print("📱 Selected product updated to: \(selectedProduct?.id ?? "none")")
+                        }
+                    )
+                }
+                
+                // Yearly subscription (show as best value)
+                if let yearly = storeManager.yearlySubscription {
+                    SubscriptionCard(
+                        product: yearly,
+                        isSelected: selectedProduct?.id == yearly.id,
+                        planName: "Yearly Plan",
+                        badge: "Save 16%",
+                        onTap: {
+                            print("📱 Yearly plan tapped")
+                            selectedProduct = yearly
+                            print("📱 Selected product updated to: \(selectedProduct?.id ?? "none")")
+                        }
                     )
                 }
             }
@@ -251,22 +285,41 @@ struct SubscriptionView: View {
     
     private var subscribeButton: some View {
         Button {
+            print("🔵 Subscribe button tapped")
+            print("🔵 Selected product: \(selectedProduct?.id ?? "none")")
+            print("🔵 isPurchasing: \(storeManager.isPurchasing)")
+            
             Task {
-                guard let product = selectedProduct else { return }
+                guard let product = selectedProduct else {
+                    print("❌ No product selected")
+                    return
+                }
+                
+                print("🔄 Starting purchase for: \(product.id)")
+                
                 do {
                     try await storeManager.purchase(product)
+                    
+                    print("✅ Purchase completed")
+                    print("✅ isSubscribed: \(storeManager.isSubscribed)")
+                    
                     if storeManager.isSubscribed {
                         // Mark onboarding as complete
                         var settings = dataManager.settings
                         settings.hasCompletedOnboarding = true
                         dataManager.updateSettings(settings)
                         
+                        print("✅ Onboarding marked as complete")
+                        
                         // Close if not onboarding, otherwise ContentView will update
                         if !isOnboarding {
                             dismiss()
                         }
+                    } else {
+                        print("⚠️ Purchase succeeded but not subscribed - possible user cancellation")
                     }
                 } catch {
+                    print("❌ Purchase error: \(error.localizedDescription)")
                     showError = true
                 }
             }
@@ -276,8 +329,18 @@ struct SubscriptionView: View {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle(tint: .white))
                 } else {
-                    Text("Start 7-Day Free Trial")
-                        .font(.headline)
+                    // Dynamic button text based on selected plan
+                    if let product = selectedProduct, let subscription = product.subscription {
+                        VStack(spacing: 4) {
+                            Text("Start Free Trial")
+                                .font(.headline)
+                            Text("\(product.displayPrice)/\(periodString(for: subscription.subscriptionPeriod)) after")
+                                .font(.caption)
+                        }
+                    } else {
+                        Text("Start Free Trial")
+                            .font(.headline)
+                    }
                 }
             }
             .frame(maxWidth: .infinity)
@@ -292,19 +355,8 @@ struct SubscriptionView: View {
     // MARK: - Bottom View
     
     private var bottomView: some View {
-        VStack(spacing: 12) {
-            // Trial and pricing info
-            if let selected = selectedProduct {
-                if let subscription = selected.subscription,
-                   let introOffer = subscription.introductoryOffer,
-                   introOffer.paymentMode == .freeTrial {
-                    Text("7 days free, then \(selected.displayPrice)/\(periodString(for: subscription.subscriptionPeriod))")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
-                }
-            }
-            
+        VStack(spacing: 16) {
+            // Restore Purchases button
             Button("Restore Purchases") {
                 Task {
                     await storeManager.restorePurchases()
@@ -322,46 +374,53 @@ struct SubscriptionView: View {
                 }
             }
             .font(.subheadline)
-            .foregroundStyle(.secondary)
+            .foregroundStyle(.blue)
             
-            // Required subscription information
-            Text("Cancel anytime. Subscription automatically renews unless auto-renew is turned off at least 24 hours before the end of the current period.")
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
-            
-            // REQUIRED: Links to Privacy Policy and Terms of Use
-            VStack(spacing: 8) {
-                HStack(spacing: 16) {
-                    NavigationLink(destination: PrivacyPolicyView()) {
-                        Text("Privacy Policy")
-                            .font(.caption)
-                            .underline()
-                            .foregroundStyle(.secondary)
-                    }
-                    
-                    Text("•")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    
-                    NavigationLink(destination: TermsOfServiceView()) {
-                        Text("Terms of Use")
-                            .font(.caption)
-                            .underline()
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                
-                // Additional subscription terms
-                Text("Payment will be charged to your Apple ID account at confirmation of purchase. Subscription automatically renews unless canceled at least 24 hours before the end of the current period. Your account will be charged for renewal within 24 hours prior to the end of the current period. You can manage and cancel your subscriptions in your App Store account settings.")
+            // Complete legal disclosure
+            VStack(spacing: 12) {
+                Text("Payment will be charged to your Apple ID account at confirmation of purchase.")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
-                    .padding(.horizontal)
-                    .padding(.top, 4)
+                
+                Text("Your subscription includes a 7-day free trial and automatically renews at the selected plan price unless cancelled at least 24 hours before the end of the trial or current billing period.")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                
+                Text("Your account will be charged for renewal within 24 hours prior to the end of the current period.")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                
+                Text("You can manage or cancel your subscription anytime in your App Store account settings.")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
             }
-            .padding(.top, 8)
+            .padding(.horizontal)
+            
+            // REQUIRED: Links to Privacy Policy and Terms of Use
+            HStack(spacing: 16) {
+                NavigationLink(destination: PrivacyPolicyView()) {
+                    Text("Privacy Policy")
+                        .font(.caption)
+                        .underline()
+                        .foregroundStyle(.secondary)
+                }
+                
+                Text("•")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                
+                NavigationLink(destination: TermsOfServiceView()) {
+                    Text("Terms of Use")
+                        .font(.caption)
+                        .underline()
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .padding(.top, 4)
         }
         .padding(.vertical)
     }
@@ -413,17 +472,22 @@ struct FeatureRow: View {
 struct SubscriptionCard: View {
     let product: Product
     let isSelected: Bool
+    var planName: String?
     var badge: String?
     let onTap: () -> Void
     
     var body: some View {
-        Button(action: onTap) {
+        Button(action: {
+            print("🎯 SubscriptionCard button action fired for: \(product.id)")
+            onTap()
+        }) {
             HStack {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
-                        // Show simplified name
-                        Text(product.displayName.replacingOccurrences(of: "RealLife HQ ", with: ""))
+                        // Show plan name if provided, otherwise use product name
+                        Text(planName ?? product.displayName.replacingOccurrences(of: "RealLife HQ ", with: ""))
                             .font(.headline)
+                            .foregroundColor(.primary)
                         
                         if let badge = badge {
                             Text(badge)
@@ -437,11 +501,9 @@ struct SubscriptionCard: View {
                     }
                     
                     // Show pricing clearly
-                    if let subscription = product.subscription {
-                        Text("\(product.displayPrice)/\(periodString(for: subscription.subscriptionPeriod))")
-                            .font(.subheadline)
-                            .foregroundStyle(.primary)
-                    }
+                    Text(product.displayPrice + " per " + periodName(for: product.subscription?.subscriptionPeriod))
+                        .font(.subheadline)
+                        .foregroundColor(.primary)
                 }
                 
                 Spacer()
@@ -451,6 +513,10 @@ struct SubscriptionCard: View {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.title2)
                         .foregroundStyle(.blue)
+                } else {
+                    Image(systemName: "circle")
+                        .font(.title2)
+                        .foregroundStyle(.gray.opacity(0.3))
                 }
             }
             .padding()
@@ -463,11 +529,30 @@ struct SubscriptionCard: View {
             }
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
-                    .stroke(isSelected ? Color.blue : Color.clear, lineWidth: 2)
+                    .stroke(isSelected ? Color.blue : Color.gray.opacity(0.3), lineWidth: 2)
             )
             .cornerRadius(12)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PlainButtonStyle())
+        .contentShape(Rectangle()) // Make entire card tappable
+    }
+    }
+    
+    private func periodName(for period: Product.SubscriptionPeriod?) -> String {
+        guard let period = period else { return "period" }
+        
+        switch period.unit {
+        case .day:
+            return period.value == 1 ? "day" : "\(period.value) days"
+        case .week:
+            return period.value == 1 ? "week" : "\(period.value) weeks"
+        case .month:
+            return period.value == 1 ? "month" : "\(period.value) months"
+        case .year:
+            return period.value == 1 ? "year" : "\(period.value) years"
+        @unknown default:
+            return "period"
+        }
     }
     
     private func periodString(for period: Product.SubscriptionPeriod) -> String {
@@ -484,7 +569,7 @@ struct SubscriptionCard: View {
             return "period"
         }
     }
-}
+
 
 #Preview {
     SubscriptionView()

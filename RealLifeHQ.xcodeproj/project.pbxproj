@@ -24,6 +24,7 @@
 		9C723E712F417A8100A7110B /* docssupport.html in Resources */ = {isa = PBXBuildFile; fileRef = 9C723E702F417A8100A7110B /* docssupport.html */; };
 		9C723E852F42C9B600A7110B /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = 9C723E842F42C9B600A7110B /* index.html */; };
 		9C85B6E12F491DEB00D124DE /* terms-of-service.html in Resources */ = {isa = PBXBuildFile; fileRef = 9C723E822F42C9A000A7110B /* terms-of-service.html */; };
+		9C85B72C2F49719700D124DE /* SETTINGS_DATA_MANAGEMENT_UPDATES.md in Resources */ = {isa = PBXBuildFile; fileRef = 9C85B72B2F49719700D124DE /* SETTINGS_DATA_MANAGEMENT_UPDATES.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -45,6 +46,7 @@
 		9C723E702F417A8100A7110B /* docssupport.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = docssupport.html; sourceTree = "<group>"; };
 		9C723E822F42C9A000A7110B /* terms-of-service.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = "terms-of-service.html"; sourceTree = "<group>"; };
 		9C723E842F42C9B600A7110B /* index.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
+		9C85B72B2F49719700D124DE /* SETTINGS_DATA_MANAGEMENT_UPDATES.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = SETTINGS_DATA_MANAGEMENT_UPDATES.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -106,6 +108,7 @@
 				9C723E702F417A8100A7110B /* docssupport.html */,
 				9C723E822F42C9A000A7110B /* terms-of-service.html */,
 				9C723E842F42C9B600A7110B /* index.html */,
+				9C85B72B2F49719700D124DE /* SETTINGS_DATA_MANAGEMENT_UPDATES.md */,
 			);
 			sourceTree = "<group>";
 		};
@@ -193,6 +196,7 @@
 				9C723E6F2F417A4000A7110B /* docsprivacy-policy.html in Resources */,
 				9C723E712F417A8100A7110B /* docssupport.html in Resources */,
 				9C723E852F42C9B600A7110B /* index.html in Resources */,
+				9C85B72C2F49719700D124DE /* SETTINGS_DATA_MANAGEMENT_UPDATES.md in Resources */,
 				9C334B742F26A83D00A503AF /* Products.storekit in Resources */,
 				9C334B822F284CC300A503AF /* Launch Screen.storyboard in Resources */,
 			);
@@ -355,17 +359,20 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RealLifeHQ/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = RealLifeHQ;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "RealLifeHQ needs full calendar access to create, edit, and delete synced events";
 				INFOPLIST_KEY_NSCameraUsageDescription = "RealLife HQ needs access to your camera to capture receipts and photos. ";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "We use Face ID to protect your sensitive information in the Vault";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "This app needs to save photos to your library.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app needs access to upload photos.\nThis app needs access to upload photos.\n";
 				INFOPLIST_KEY_NSRemindersUsageDescription = "RealLife HQ needs access to reminders to help you manage tasks. ";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIRequiredDeviceCapabilities = armv7;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -397,17 +404,20 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RealLifeHQ/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = RealLifeHQ;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "RealLifeHQ needs full calendar access to create, edit, and delete synced events";
 				INFOPLIST_KEY_NSCameraUsageDescription = "RealLife HQ needs access to your camera to capture receipts and photos. ";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "We use Face ID to protect your sensitive information in the Vault";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "This app needs to save photos to your library.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app needs access to upload photos.\nThis app needs access to upload photos.\n";
 				INFOPLIST_KEY_NSRemindersUsageDescription = "RealLife HQ needs access to reminders to help you manage tasks. ";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIRequiredDeviceCapabilities = armv7;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

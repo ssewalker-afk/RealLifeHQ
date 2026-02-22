@@ -17,8 +17,11 @@ class GoogleCalendarManager: NSObject, ObservableObject {
     
     // Google OAuth Configuration
     // NOTE: You'll need to set these up in Google Cloud Console
-    private let clientID = "657493089268-qmc643b5jlhet355mg2ktnu0o6b0a404.apps.googleusercontent.com" // Replace with your Google OAuth Client ID
-    private let redirectURI = "com.googleusercontent.apps.657493089268:/oauth2redirect/google"
+    // IMPORTANT: The redirect URI below MUST match exactly what's in Google Cloud Console
+    // Go to: console.cloud.google.com → APIs & Services → Credentials → Your OAuth Client
+    // Add this EXACT redirect URI: com.googleusercontent.apps.657493089268-qmc643b5jlhet355mg2ktnu0o6b0a404:/oauth2redirect
+    private let clientID = "657493089268-qmc643b5jlhet355mg2ktnu0o6b0a404.apps.googleusercontent.com"
+    private let redirectURI = "com.googleusercontent.apps.657493089268-qmc643b5jlhet355mg2ktnu0o6b0a404:/oauth2redirect"
     
     // Key for storing tokens
     private let accessTokenKey = "googleCalendarAccessToken"

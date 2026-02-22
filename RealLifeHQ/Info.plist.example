@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Add this section to your existing Info.plist -->
+    <!-- This allows Google OAuth to redirect back to your app -->
+    
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>CFBundleURLName</key>
+            <string>com.googleusercontent.apps.657493089268-qmc643b5jlhet355mg2ktnu0o6b0a404</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>com.googleusercontent.apps.657493089268-qmc643b5jlhet355mg2ktnu0o6b0a404</string>
+            </array>
+        </dict>
+    </array>
+    
+    <!-- 
+    INSTRUCTIONS:
+    
+    1. Open your Info.plist file in Xcode
+    2. If you already have CFBundleURLTypes, add the new dict to the existing array
+    3. If you don't have CFBundleURLTypes, copy the entire section above
+    4. Make sure the URL scheme matches your Google OAuth Client ID
+    
+    OR use the Xcode UI:
+    
+    1. Select your project → Target → Info tab
+    2. Expand "URL Types"
+    3. Click "+" to add new URL Type
+    4. Identifier: com.googleusercontent.apps.657493089268-qmc643b5jlhet355mg2ktnu0o6b0a404
+    5. URL Schemes: com.googleusercontent.apps.657493089268-qmc643b5jlhet355mg2ktnu0o6b0a404
+    6. Role: Editor
+    -->
+    
+</dict>
+</plist>

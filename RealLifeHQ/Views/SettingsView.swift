@@ -7,6 +7,8 @@ struct SettingsView: View {
     @EnvironmentObject var dataManager: DataManager
     @EnvironmentObject var themeManager: ThemeManager
     @State private var showThemeSelector = false
+    @State private var showDeleteConfirmation = false
+    @State private var showDeleteSuccess = false
     
     var body: some View {
         Form {
@@ -68,13 +70,7 @@ struct SettingsView: View {
             
             Section("Data") {
                 Button(role: .destructive) {
-                    // Implement data export
-                } label: {
-                    Label("Export Data", systemImage: "square.and.arrow.up")
-                }
-                
-                Button(role: .destructive) {
-                    // Implement data clear with confirmation
+                    showDeleteConfirmation = true
                 } label: {
                     Label("Clear All Data", systemImage: "trash.fill")
                         .foregroundColor(.red)
@@ -115,6 +111,75 @@ struct SettingsView: View {
         .sheet(isPresented: $showThemeSelector) {
             ThemeSelectorView()
         }
+        .confirmationDialog(
+            "Clear All Data",
+            isPresented: $showDeleteConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Clear All Data", role: .destructive) {
+                clearAllData()
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("This will permanently delete all your events, habits, journal entries, recipes, meal plans, budget data, vault items, and reset all settings. This action cannot be undone.")
+        }
+        .alert("All Data Cleared", isPresented: $showDeleteSuccess) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("All your data has been permanently deleted and settings have been reset.")
+        }
+    }
+    
+    private func clearAllData() {
+        // Cancel all habit notifications before clearing data
+        for habit in dataManager.habits {
+            NotificationManager.shared.cancelHabitReminders(identifiers: habit.notificationIdentifiers)
+        }
+        
+        // Clear all data arrays
+        dataManager.events.removeAll()
+        dataManager.habits.removeAll()
+        dataManager.journalEntries.removeAll()
+        dataManager.transactions.removeAll()
+        dataManager.recipes.removeAll()
+        dataManager.mealPlans.removeAll()
+        dataManager.shoppingItems.removeAll()
+        dataManager.budgetCategories.removeAll()
+        dataManager.expenses.removeAll()
+        dataManager.recurringExpenses.removeAll()
+        
+        // Clear vault items (including Keychain data)
+        dataManager.clearAllVaultData()
+        
+        // Reset budget setup
+        dataManager.budgetSetup = BudgetSetup(monthlyIncome: 0)
+        
+        // Reset settings to defaults (but keep onboarding completed)
+        let wasOnboardingCompleted = dataManager.settings.hasCompletedOnboarding
+        dataManager.settings = UserSettings()
+        dataManager.settings.hasCompletedOnboarding = wasOnboardingCompleted
+        
+        // Force save all cleared data by removing UserDefaults keys
+        UserDefaults.standard.removeObject(forKey: "events")
+        UserDefaults.standard.removeObject(forKey: "habits")
+        UserDefaults.standard.removeObject(forKey: "journal")
+        UserDefaults.standard.removeObject(forKey: "transactions")
+        UserDefaults.standard.removeObject(forKey: "recipes")
+        UserDefaults.standard.removeObject(forKey: "mealPlans")
+        UserDefaults.standard.removeObject(forKey: "shoppingItems")
+        UserDefaults.standard.removeObject(forKey: "vault")
+        UserDefaults.standard.removeObject(forKey: "budgetSetup")
+        UserDefaults.standard.removeObject(forKey: "budgetCategories")
+        UserDefaults.standard.removeObject(forKey: "expenses")
+        UserDefaults.standard.removeObject(forKey: "recurringExpenses")
+        
+        // Save the reset settings
+        if let encoded = try? JSONEncoder().encode(dataManager.settings) {
+            UserDefaults.standard.set(encoded, forKey: "settings")
+        }
+        
+        // Show success message
+        showDeleteSuccess = true
     }
 }
 
