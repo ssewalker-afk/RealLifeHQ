@@ -18,7 +18,7 @@ struct PrivacyPolicyView: View {
                         .font(.largeTitle)
                         .fontWeight(.bold)
                     
-                    Text("Last Updated: January 29, 2026")
+                    Text("Last Updated: March 4, 2026")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -219,7 +219,7 @@ struct PrivacyPolicyView: View {
                 )
                 
                 // Footer
-                Text("Effective Date: This privacy policy is effective as of January 29, 2026 and applies to all users of RealLifeHQ.")
+                Text("Effective Date: This privacy policy is effective as of March 4, 2026 and applies to all users of RealLifeHQ.")
                     .font(.caption)
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)

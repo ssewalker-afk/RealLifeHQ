@@ -5,6 +5,15 @@
       location = "self:">
    </FileRef>
    <FileRef
-      location = "group:PAYWALL_TAP_FIX.md">
+      location = "group:KEEPING_GOOGLE_SYNC_CONNECTED.md">
+   </FileRef>
+   <FileRef
+      location = "group:GOOGLE_SYNC_TROUBLESHOOTING_CHECKLIST.md">
+   </FileRef>
+   <FileRef
+      location = "group:GOOGLE_VERIFICATION_FIX.md">
+   </FileRef>
+   <FileRef
+      location = "group:GOOGLE_TESTING_MODE_SETUP.md">
    </FileRef>
 </Workspace>

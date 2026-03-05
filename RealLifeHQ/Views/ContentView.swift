@@ -57,6 +57,9 @@ struct ContentView: View {
                     NavigationLink(destination: HabitsView()) {
                         Label("Habits", systemImage: "target")
                     }
+                    NavigationLink(destination: CleaningTrackerView()) {
+                        Label("Cleaning", systemImage: "sparkles")
+                    }
                 }
                 
                 Section("Productivity") {
@@ -69,10 +72,9 @@ struct ContentView: View {
                 }
                 
                 Section("Lifestyle") {
-                    // Recipes temporarily hidden - work in progress
-                    // NavigationLink(destination: RecipesView()) {
-                    //     Label("Recipes", systemImage: "fork.knife")
-                    // }
+                    NavigationLink(destination: RecipesView()) {
+                        Label("Recipes", systemImage: "fork.knife")
+                    }
                     NavigationLink(destination: VaultView()) {
                         Label("Vault", systemImage: "lock.shield.fill")
                     }
@@ -102,20 +104,6 @@ struct ContentView: View {
                     Label("Home", systemImage: "house.fill")
                 }
             
-            // Calendar Tab
-            NavigationStack {
-                CalendarView()
-            }
-            .tabItem {
-                Label("Calendar", systemImage: "calendar")
-            }
-            
-            // Habits Tab
-            HabitsView()
-                .tabItem {
-                    Label("Habits", systemImage: "target")
-                }
-            
             // Budget Tab
             NavigationStack {
                 BudgetView()
@@ -124,21 +112,23 @@ struct ContentView: View {
                 Label("Budget", systemImage: "dollarsign.circle.fill")
             }
             
-            // Journal Tab
-            NavigationStack {
-                JournalView()
-            }
-            .tabItem {
-                Label("Journal", systemImage: "book.fill")
-            }
+            // Habits Tab
+            HabitsView()
+                .tabItem {
+                    Label("Habits", systemImage: "target")
+                }
             
-            // Vault Tab
-            NavigationStack {
-                VaultView()
-            }
-            .tabItem {
-                Label("Vault", systemImage: "lock.shield.fill")
-            }
+            // Cleaning Tracker Tab
+            CleaningTrackerView()
+                .tabItem {
+                    Label("Cleaning", systemImage: "sparkles")
+                }
+            
+            // More Tab
+            MoreView()
+                .tabItem {
+                    Label("More", systemImage: "ellipsis.circle.fill")
+                }
         }
         .accentColor(themeManager.currentTheme.primaryColor)
     }
@@ -193,7 +183,9 @@ struct HomeView: View {
         VStack(spacing: 20) {
             greetingHeader
             todaysEventsWidget
+            cleaningWidget
             habitsWidget
+            recipesWidget
             journalPromptWidget
             budgetWidget
             
@@ -213,7 +205,9 @@ struct HomeView: View {
                 GridItem(.flexible(), spacing: 20)
             ], spacing: 20) {
                 todaysEventsWidget
+                cleaningWidget
                 habitsWidget
+                recipesWidget
                 journalPromptWidget
                 budgetWidget
             }
@@ -516,6 +510,195 @@ struct HomeView: View {
         } else {
             return .red
         }
+    }
+    
+    // MARK: - Cleaning Widget
+    
+    private var cleaningWidget: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Image(systemName: "sparkles")
+                    .foregroundColor(themeManager.currentTheme.accentColor)
+                Text("Cleaning")
+                    .font(.headline)
+                    .foregroundColor(themeManager.currentTheme.accentColor)
+                Spacer()
+                NavigationLink(destination: CleaningTrackerView()) {
+                    Text("View All")
+                        .font(.caption)
+                        .foregroundColor(themeManager.currentTheme.accentColor)
+                }
+            }
+            
+            if let todaySession = dataManager.getTodaySession() {
+                // Today's cleaning task
+                NavigationLink(destination: CleaningTrackerView()) {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Today's Task")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .textCase(.uppercase)
+                            
+                            Text(todaySession.taskTitle)
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.primary)
+                            
+                            HStack(spacing: 4) {
+                                Image(systemName: "clock")
+                                    .font(.caption2)
+                                if let task = dataManager.cleaningTasks.first(where: { $0.id == todaySession.taskId }) {
+                                    Text("\(task.estimatedDuration) min")
+                                        .font(.caption)
+                                }
+                            }
+                            .foregroundColor(.secondary)
+                        }
+                        
+                        Spacer()
+                        
+                        Image(systemName: "chevron.right")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding()
+                    .background(themeManager.currentTheme.accentColor.opacity(0.1))
+                    .cornerRadius(8)
+                }
+                .buttonStyle(PlainButtonStyle())
+            } else {
+                // No task today
+                NavigationLink(destination: CleaningTrackerView()) {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("✨ All caught up!")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                                .foregroundColor(.primary)
+                            
+                            Text("No cleaning scheduled for today")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        Spacer()
+                        
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(.green)
+                    }
+                    .padding()
+                    .background(Color.green.opacity(0.1))
+                    .cornerRadius(8)
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+            
+            // Streak info
+            if dataManager.cleaningStatistics.currentStreak > 0 {
+                HStack {
+                    Image(systemName: "flame.fill")
+                        .foregroundColor(.orange)
+                        .font(.caption)
+                    Text("\(dataManager.cleaningStatistics.currentStreak) day streak")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+        }
+        .padding()
+        .background(themeManager.currentTheme.cardColor)
+        .cornerRadius(12)
+    }
+    
+    // MARK: - Recipes Widget
+    
+    private var recipesWidget: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Image(systemName: "fork.knife")
+                    .foregroundColor(themeManager.currentTheme.primaryColor)
+                Text("Recipes")
+                    .font(.headline)
+                    .foregroundColor(themeManager.currentTheme.primaryColor)
+                Spacer()
+                NavigationLink(destination: RecipesView()) {
+                    Text("View All")
+                        .font(.caption)
+                        .foregroundColor(themeManager.currentTheme.primaryColor)
+                }
+            }
+            
+            if dataManager.recipes.isEmpty {
+                // No recipes yet
+                NavigationLink(destination: RecipesView()) {
+                    VStack(spacing: 8) {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.title2)
+                            .foregroundColor(themeManager.currentTheme.primaryColor)
+                        Text("Add your first recipe")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                }
+                .buttonStyle(PlainButtonStyle())
+            } else {
+                // Show recipe count and quick actions
+                VStack(spacing: 8) {
+                    HStack(spacing: 16) {
+                        // Recipe count
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("\(dataManager.recipes.count)")
+                                .font(.title2)
+                                .fontWeight(.bold)
+                                .foregroundColor(themeManager.currentTheme.primaryColor)
+                            Text("Recipes")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        Divider()
+                            .frame(height: 30)
+                        
+                        // Meal plan count
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("\(dataManager.mealPlans.count)")
+                                .font(.title2)
+                                .fontWeight(.bold)
+                                .foregroundColor(themeManager.currentTheme.accentColor)
+                            Text("Planned")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        Spacer()
+                        
+                        NavigationLink(destination: RecipesView()) {
+                            Image(systemName: "arrow.right.circle.fill")
+                                .font(.title2)
+                                .foregroundColor(themeManager.currentTheme.primaryColor)
+                        }
+                    }
+                    
+                    // Shopping list indicator
+                    if !dataManager.shoppingItems.isEmpty {
+                        HStack {
+                            Image(systemName: "cart.fill")
+                                .font(.caption)
+                                .foregroundColor(themeManager.currentTheme.accentColor)
+                            Text("\(dataManager.shoppingItems.filter { !$0.isChecked }.count) items on shopping list")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                }
+            }
+        }
+        .padding()
+        .background(themeManager.currentTheme.cardColor)
+        .cornerRadius(12)
     }
     
     // Generate a journal prompt based on the day of the year

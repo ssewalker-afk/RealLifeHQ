@@ -10,6 +10,15 @@ struct SettingsView: View {
     @State private var showDeleteConfirmation = false
     @State private var showDeleteSuccess = false
     
+    // App version and build number from Info.plist
+    private var appVersion: String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
+    }
+    
+    private var buildNumber: String {
+        Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown"
+    }
+    
     var body: some View {
         Form {
             Section("Appearance") {
@@ -42,18 +51,6 @@ struct SettingsView: View {
             Section("Integrations") {
                 NavigationLink(destination: CalendarSyncSettingsView()) {
                     Label("Apple Calendar Sync", systemImage: "calendar.badge.clock")
-                }
-                
-                NavigationLink(destination: GoogleCalendarSyncSettingsView()) {
-                    HStack {
-                        Label("Google Calendar Sync", systemImage: "g.circle.fill")
-                        Spacer()
-                        if GoogleCalendarManager.shared.isAuthenticated {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.green)
-                                .font(.caption)
-                        }
-                    }
                 }
             }
             
@@ -95,14 +92,14 @@ struct SettingsView: View {
                 HStack {
                     Text("App Version")
                     Spacer()
-                    Text("1.0.0")
+                    Text(appVersion)
                         .foregroundColor(.secondary)
                 }
                 
                 HStack {
                     Text("Build")
                     Spacer()
-                    Text("1")
+                    Text(buildNumber)
                         .foregroundColor(.secondary)
                 }
             }

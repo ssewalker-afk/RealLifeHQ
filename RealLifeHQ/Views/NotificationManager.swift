@@ -196,4 +196,49 @@ class NotificationManager {
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
         print("🗑️ Cancelled \(identifiers.count) habit reminders")
     }
+    
+    // MARK: - General Notification Methods
+    
+    func scheduleNotification(identifier: String, title: String, body: String, date: Date, subtitle: String? = nil) async {
+        // Don't schedule notifications in the past
+        guard date > Date() else {
+            print("⚠️ Skipping past notification for: \(title)")
+            return
+        }
+        
+        let content = UNMutableNotificationContent()
+        content.title = title
+        content.body = body
+        if let subtitle = subtitle {
+            content.subtitle = subtitle
+        }
+        content.sound = .default
+        
+        let calendar = Calendar.current
+        let triggerComponents = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: date)
+        let trigger = UNCalendarNotificationTrigger(dateMatching: triggerComponents, repeats: false)
+        
+        let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
+        
+        do {
+            try await UNUserNotificationCenter.current().add(request)
+            print("✅ Scheduled notification '\(title)' for \(date)")
+        } catch {
+            print("❌ Failed to schedule notification: \(error)")
+        }
+    }
+    
+    func cancelNotifications(withPrefix prefix: String) {
+        Task {
+            let pending = await UNUserNotificationCenter.current().pendingNotificationRequests()
+            let identifiersToCancel = pending
+                .filter { $0.identifier.hasPrefix(prefix) }
+                .map { $0.identifier }
+            
+            if !identifiersToCancel.isEmpty {
+                UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiersToCancel)
+                print("🗑️ Cancelled \(identifiersToCancel.count) notifications with prefix '\(prefix)'")
+            }
+        }
+    }
 }

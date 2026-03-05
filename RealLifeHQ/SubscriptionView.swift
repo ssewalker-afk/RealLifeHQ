@@ -121,14 +121,26 @@ struct SubscriptionView: View {
         VStack(alignment: .leading, spacing: 16) {
             FeatureRow(
                 icon: "calendar.circle.fill",
-                title: "Smart Calendar",
-                description: "Sync with Apple & Google Calendar, set reminders"
+                title: "Smart Calendar & Events",
+                description: "Sync with Apple Calendar, set reminders"
             )
             
             FeatureRow(
-                icon: "chart.line.uptrend.xyaxis.circle.fill",
+                icon: "wand.and.stars",
+                title: "Life Reminder Wizard",
+                description: "Auto-create important life reminders"
+            )
+            
+            FeatureRow(
+                icon: "target",
                 title: "Habit Tracker",
                 description: "Build streaks and stay consistent"
+            )
+            
+            FeatureRow(
+                icon: "sparkles",
+                title: "Cleaning Tracker",
+                description: "Rotating schedule & streak tracking"
             )
             
             FeatureRow(
@@ -139,26 +151,44 @@ struct SubscriptionView: View {
             
             FeatureRow(
                 icon: "dollarsign.circle.fill",
-                title: "Budget Tracker",
-                description: "Track expenses and stay on budget"
+                title: "Budget & Expenses",
+                description: "Track spending, set category limits"
+            )
+            
+            FeatureRow(
+                icon: "fork.knife.circle.fill",
+                title: "Recipes & Meal Planning",
+                description: "Plan meals, auto-generate shopping lists"
             )
             
             FeatureRow(
                 icon: "lock.shield.fill",
                 title: "Secure Vault",
-                description: "Encrypted storage with Face ID protection"
+                description: "iOS Keychain encryption + Face ID"
             )
             
             FeatureRow(
-                icon: "sparkles",
-                title: "Life Reminder Wizard",
-                description: "Never forget important tasks"
+                icon: "house.circle.fill",
+                title: "Home Dashboard",
+                description: "See everything at a glance"
             )
             
             FeatureRow(
-                icon: "icloud.fill",
-                title: "Cloud Sync",
-                description: "Access your data on all devices"
+                icon: "paintbrush.fill",
+                title: "Custom Themes",
+                description: "Personalize with color themes"
+            )
+            
+            FeatureRow(
+                icon: "shield.checkmark.fill",
+                title: "Complete Privacy",
+                description: "All data stays on your device"
+            )
+            
+            FeatureRow(
+                icon: "ipad.and.iphone",
+                title: "iPhone & iPad Optimized",
+                description: "Beautiful on all screen sizes"
             )
         }
         .padding()
