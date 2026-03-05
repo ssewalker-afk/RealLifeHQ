@@ -1,7 +1,7 @@
 import SwiftUI
 
 // MARK: - More View
-// Access Journal, Budget, Recipes, Vault, and Settings
+// Access Calendar, Recipes, Journal, Vault, and Settings
 
 struct MoreView: View {
     @EnvironmentObject var themeManager: ThemeManager
@@ -10,31 +10,32 @@ struct MoreView: View {
         NavigationStack {
             List {
                 Section("Features") {
-                    NavigationLink(destination: JournalView()) {
-                        Label("Journal", systemImage: "book.fill")
+                    NavigationLink(destination: CalendarView()) {
+                        Label("Calendar", systemImage: "calendar")
                             .foregroundColor(themeManager.currentTheme.primaryColor)
                     }
                     
-                    NavigationLink(destination: BudgetView()) {
-                        Label("Budget", systemImage: "dollarsign.circle.fill")
-                            .foregroundColor(themeManager.currentTheme.primaryColor)
-                    }
-                    
-                    // Recipes temporarily hidden - work in progress
+                    // HIDDEN - Recipes are a whole separate app's worth of features (8+ files)
                     // NavigationLink(destination: RecipesView()) {
                     //     Label("Recipes", systemImage: "fork.knife")
                     //         .foregroundColor(themeManager.currentTheme.primaryColor)
                     // }
                     
-                    NavigationLink(destination: VaultView()) {
-                        Label("Vault", systemImage: "lock.shield.fill")
-                            .foregroundColor(themeManager.currentTheme.primaryColor)
-                    }
+                    // HIDDEN - Password management should be a separate app or use iCloud Keychain
+                    // NavigationLink(destination: VaultView()) {
+                    //     Label("Vault", systemImage: "lock.shield.fill")
+                    //         .foregroundColor(themeManager.currentTheme.primaryColor)
+                    // }
                 }
                 
                 Section("App") {
                     NavigationLink(destination: SettingsView()) {
                         Label("Settings", systemImage: "gear")
+                            .foregroundColor(themeManager.currentTheme.primaryColor)
+                    }
+                    
+                    NavigationLink(destination: SupportView()) {
+                        Label("Support & Help", systemImage: "lifepreserver.fill")
                             .foregroundColor(themeManager.currentTheme.primaryColor)
                     }
                 }
@@ -65,5 +66,6 @@ struct MoreView: View {
         }
     }
 }
+
 
 

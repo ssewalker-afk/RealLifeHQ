@@ -4,7 +4,4 @@
    <FileRef
       location = "self:">
    </FileRef>
-   <FileRef
-      location = "group:PAYWALL_TAP_FIX.md">
-   </FileRef>
 </Workspace>

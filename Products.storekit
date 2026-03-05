@@ -14,7 +14,21 @@
 
   ],
   "products" : [
-
+    {
+      "displayPrice" : "24.99",
+      "familyShareable" : false,
+      "internalID" : "F4E7D8C9",
+      "localizations" : [
+        {
+          "description" : "Lifetime access to all RealLife HQ premium features.",
+          "displayName" : "Lifetime Access",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.reallifehq.lifetime",
+      "referenceName" : "Lifetime Access - $24.99",
+      "type" : "NonConsumable"
+    }
   ],
   "settings" : {
     "_askToBuyEnabled" : false,

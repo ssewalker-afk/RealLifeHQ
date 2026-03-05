@@ -6,9 +6,16 @@ import SwiftUI
 struct HabitsView: View {
     @EnvironmentObject var dataManager: DataManager
     @EnvironmentObject var themeManager: ThemeManager
+    @Environment(SubscriptionManager.self) private var subscriptionManager
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @State private var showingAddHabit = false
-    
+    @State private var showingSetupWizard = false
+    @State private var showingPaywall = false
+    @AppStorage("habitWizardCompleted") private var habitWizardCompleted = false
+
+    // Free tier allows up to 3 habits.
+    private static let freeHabitLimit = 3
+
     var body: some View {
         NavigationView {
             ZStack {
@@ -18,7 +25,7 @@ struct HabitsView: View {
                     VStack(spacing: 0) {
                         // Instructions banner
                         instructionsBanner
-                        
+
                         if horizontalSizeClass == .regular {
                             // iPad: Grid layout
                             iPadGridLayout
@@ -33,16 +40,39 @@ struct HabitsView: View {
             .navigationTitle("Habits")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        showingAddHabit = true
-                    } label: {
-                        Image(systemName: "plus.circle.fill")
-                            .foregroundColor(themeManager.currentTheme.primaryColor)
+                    HStack(spacing: 4) {
+                        if dataManager.habits.isEmpty {
+                            Button {
+                                showingSetupWizard = true
+                            } label: {
+                                Image(systemName: "wand.and.stars")
+                                    .foregroundColor(themeManager.currentTheme.primaryColor)
+                            }
+                        }
+                        Button {
+                            requestAddHabit()
+                        } label: {
+                            Image(systemName: "plus.circle.fill")
+                                .foregroundColor(themeManager.currentTheme.primaryColor)
+                        }
                     }
                 }
             }
             .sheet(isPresented: $showingAddHabit) {
                 AddHabitView()
+            }
+            .sheet(isPresented: $showingPaywall) {
+                PaywallView()
+            }
+            .fullScreenCover(isPresented: $showingSetupWizard) {
+                HabitSetupWizard()
+                    .environmentObject(dataManager)
+                    .environmentObject(themeManager)
+            }
+            .onAppear {
+                if dataManager.habits.isEmpty && !habitWizardCompleted {
+                    showingSetupWizard = true
+                }
             }
         }
         .navigationViewStyle(.stack)
@@ -103,24 +133,44 @@ struct HabitsView: View {
         }
     }
     
+    // Gate habit creation behind the free tier limit.
+    // Premium users can add unlimited habits; free users are capped at 3.
+    private func requestAddHabit() {
+        if subscriptionManager.isPremium || dataManager.habits.count < Self.freeHabitLimit {
+            showingAddHabit = true
+        } else {
+            showingPaywall = true
+        }
+    }
+
     private var emptyStateView: some View {
         VStack(spacing: 20) {
             Image(systemName: "target")
                 .font(.system(size: 60))
                 .foregroundColor(themeManager.currentTheme.primaryColor.opacity(0.5))
-            
+
             Text("No Habits Yet")
                 .font(.title2)
                 .fontWeight(.semibold)
-            
+
             Text("Start building better habits today")
                 .foregroundColor(.secondary)
-            
-            Button("Add Your First Habit") {
-                showingAddHabit = true
+
+            Button {
+                showingSetupWizard = true
+            } label: {
+                Label("Get Started with the Wizard", systemImage: "wand.and.stars")
+                    .font(.headline)
+                    .frame(maxWidth: 280)
             }
             .buttonStyle(.borderedProminent)
             .tint(themeManager.currentTheme.primaryColor)
+
+            Button("Add a Habit Manually") {
+                requestAddHabit()
+            }
+            .font(.subheadline)
+            .foregroundColor(themeManager.currentTheme.primaryColor)
         }
     }
     
@@ -338,9 +388,10 @@ struct HabitDetailRow: View {
 
 struct AddHabitView: View {
     @Environment(\.dismiss) var dismiss
+    @Environment(SubscriptionManager.self) private var subscriptionManager
     @EnvironmentObject var dataManager: DataManager
     @EnvironmentObject var themeManager: ThemeManager
-    
+
     @State private var name = ""
     @State private var selectedIcon = "figure.walk"
     @State private var frequency: Habit.Frequency = .daily
@@ -352,6 +403,7 @@ struct AddHabitView: View {
     @State private var addToCalendar = false
     @State private var calendarDuration = 30
     @State private var showingCalendarPermissionAlert = false
+    @State private var showingPaywall = false
     
     // Available icons organized by category
     let iconCategories: [(String, [String])] = [
@@ -428,8 +480,17 @@ struct AddHabitView: View {
                 
                 // Reminder section
                 Section {
-                    Toggle("Daily Reminder", isOn: $reminderEnabled)
-                    
+                    Toggle("Daily Reminder", isOn: Binding(
+                        get: { reminderEnabled },
+                        set: { newValue in
+                            if newValue && !subscriptionManager.isPremium {
+                                showingPaywall = true
+                            } else {
+                                reminderEnabled = newValue
+                            }
+                        }
+                    ))
+
                     if reminderEnabled {
                         DatePicker("Reminder Time", selection: $reminderTime, displayedComponents: .hourAndMinute)
                     }
@@ -438,15 +499,26 @@ struct AddHabitView: View {
                 } footer: {
                     if reminderEnabled {
                         Text("You'll receive a reminder at this time on the days you've selected for this habit")
-                    } else {
+                    } else if subscriptionManager.isPremium {
                         Text("Enable to get reminded to complete this habit")
+                    } else {
+                        Text("Premium feature — upgrade to enable reminders")
                     }
                 }
-                
+
                 // Calendar Integration section
                 Section {
-                    Toggle("Add to Calendar", isOn: $addToCalendar)
-                    
+                    Toggle("Add to Calendar", isOn: Binding(
+                        get: { addToCalendar },
+                        set: { newValue in
+                            if newValue && !subscriptionManager.isPremium {
+                                showingPaywall = true
+                            } else {
+                                addToCalendar = newValue
+                            }
+                        }
+                    ))
+
                     if addToCalendar {
                         if reminderEnabled {
                             Picker("Duration", selection: $calendarDuration) {
@@ -494,6 +566,9 @@ struct AddHabitView: View {
             .sheet(isPresented: $showingIconPicker) {
                 IconPickerView(selectedIcon: $selectedIcon)
             }
+            .sheet(isPresented: $showingPaywall) {
+                PaywallView()
+            }
             .alert("Notifications Permission Required", isPresented: $showingPermissionAlert) {
                 Button("Cancel", role: .cancel) {
                     reminderEnabled = false
@@ -520,7 +595,7 @@ struct AddHabitView: View {
             }
         }
     }
-    
+
     private func saveHabit() {
         // Check notification permission if reminder is enabled
         if reminderEnabled {
@@ -587,12 +662,13 @@ struct AddHabitView: View {
     }
     
     private func colorToString(_ color: Color) -> String {
-        // Extract color based on theme
         switch themeManager.currentTheme {
-        case .tealAmber: return "teal"
-        case .purplePink: return "purple"
-        case .blueGreen: return "blue"
-        case .emeraldViolet: return "green"
+        case .emeraldViolet, .forestSage:          return "green"
+        case .oceanBreeze, .midnightBlue, .electricNight: return "blue"
+        case .rosePetal, .midnightRose:            return "red"
+        case .lavenderMist, .cosmicPurple:         return "purple"
+        case .sunsetCoral:                         return "orange"
+        case .obsidian, .tropicalVibes:            return "teal"
         }
     }
 }
@@ -602,9 +678,10 @@ struct AddHabitView: View {
 struct EditHabitView: View {
     let habit: Habit
     @Environment(\.dismiss) var dismiss
+    @Environment(SubscriptionManager.self) private var subscriptionManager
     @EnvironmentObject var dataManager: DataManager
     @EnvironmentObject var themeManager: ThemeManager
-    
+
     @State private var name = ""
     @State private var selectedIcon = "figure.walk"
     @State private var frequency: Habit.Frequency = .daily
@@ -617,6 +694,7 @@ struct EditHabitView: View {
     @State private var addToCalendar = false
     @State private var calendarDuration = 30
     @State private var showingCalendarPermissionAlert = false
+    @State private var showingPaywall = false
     
     let iconCategories: [(String, [String])] = [
         ("Fitness", ["figure.walk", "figure.run", "figure.yoga", "dumbbell.fill", "bicycle", "figure.swimming", "figure.climbing", "sportscourt.fill"]),
@@ -687,8 +765,17 @@ struct EditHabitView: View {
             }
             
             Section {
-                Toggle("Daily Reminder", isOn: $reminderEnabled)
-                
+                Toggle("Daily Reminder", isOn: Binding(
+                    get: { reminderEnabled },
+                    set: { newValue in
+                        if newValue && !subscriptionManager.isPremium {
+                            showingPaywall = true
+                        } else {
+                            reminderEnabled = newValue
+                        }
+                    }
+                ))
+
                 if reminderEnabled {
                     DatePicker("Reminder Time", selection: $reminderTime, displayedComponents: .hourAndMinute)
                 }
@@ -697,19 +784,25 @@ struct EditHabitView: View {
             } footer: {
                 if reminderEnabled {
                     Text("You'll receive a reminder at this time on the days you've selected for this habit")
-                } else {
+                } else if subscriptionManager.isPremium {
                     Text("Enable to get reminded to complete this habit")
+                } else {
+                    Text("Premium feature — upgrade to enable reminders")
                 }
             }
-            
+
             // Calendar Integration section
             Section {
-                Toggle("Add to Calendar", isOn: $addToCalendar)
-                    .onChange(of: addToCalendar) { oldValue, newValue in
-                        if !newValue && !habit.calendarEventIdentifiers.isEmpty {
-                            // User is disabling calendar - will remove events on save
+                Toggle("Add to Calendar", isOn: Binding(
+                    get: { addToCalendar },
+                    set: { newValue in
+                        if newValue && !subscriptionManager.isPremium {
+                            showingPaywall = true
+                        } else {
+                            addToCalendar = newValue
                         }
                     }
+                ))
                 
                 if addToCalendar {
                     if reminderEnabled {
@@ -765,6 +858,9 @@ struct EditHabitView: View {
         }
         .sheet(isPresented: $showingIconPicker) {
             IconPickerView(selectedIcon: $selectedIcon)
+        }
+        .sheet(isPresented: $showingPaywall) {
+            PaywallView()
         }
         .alert("Notifications Permission Required", isPresented: $showingPermissionAlert) {
             Button("Cancel", role: .cancel) {

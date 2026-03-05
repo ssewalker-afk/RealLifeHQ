@@ -24,7 +24,14 @@
 		9C723E712F417A8100A7110B /* docssupport.html in Resources */ = {isa = PBXBuildFile; fileRef = 9C723E702F417A8100A7110B /* docssupport.html */; };
 		9C723E852F42C9B600A7110B /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = 9C723E842F42C9B600A7110B /* index.html */; };
 		9C85B6E12F491DEB00D124DE /* terms-of-service.html in Resources */ = {isa = PBXBuildFile; fileRef = 9C723E822F42C9A000A7110B /* terms-of-service.html */; };
-		9C85B72C2F49719700D124DE /* SETTINGS_DATA_MANAGEMENT_UPDATES.md in Resources */ = {isa = PBXBuildFile; fileRef = 9C85B72B2F49719700D124DE /* SETTINGS_DATA_MANAGEMENT_UPDATES.md */; };
+		9CB2FC752F59092000644929 /* CleaningModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CB2FC742F59092000644929 /* CleaningModels.swift */; };
+		9CB2FC772F59095A00644929 /* CleaningTaskTemplates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CB2FC762F59095A00644929 /* CleaningTaskTemplates.swift */; };
+		9CB2FC792F5909C600644929 /* CleaningSetupWizard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CB2FC782F5909C600644929 /* CleaningSetupWizard.swift */; };
+		9CB2FC7D2F590A8600644929 /* CleaningSetupWizardSteps.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CB2FC7C2F590A8600644929 /* CleaningSetupWizardSteps.swift */; };
+		9CB2FC812F590BA800644929 /* CleaningTrackerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CB2FC802F590BA800644929 /* CleaningTrackerView.swift */; };
+		9CB2FC852F59109200644929 /* CleaningTaskDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CB2FC842F59109200644929 /* CleaningTaskDetailView.swift */; };
+		9CB2FC872F5910D300644929 /* CleaningScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CB2FC862F5910D300644929 /* CleaningScheduleView.swift */; };
+		9CB2FC892F59110D00644929 /* CleaningStatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CB2FC882F59110D00644929 /* CleaningStatisticsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,7 +53,14 @@
 		9C723E702F417A8100A7110B /* docssupport.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = docssupport.html; sourceTree = "<group>"; };
 		9C723E822F42C9A000A7110B /* terms-of-service.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = "terms-of-service.html"; sourceTree = "<group>"; };
 		9C723E842F42C9B600A7110B /* index.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
-		9C85B72B2F49719700D124DE /* SETTINGS_DATA_MANAGEMENT_UPDATES.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = SETTINGS_DATA_MANAGEMENT_UPDATES.md; sourceTree = "<group>"; };
+		9CB2FC742F59092000644929 /* CleaningModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleaningModels.swift; sourceTree = "<group>"; };
+		9CB2FC762F59095A00644929 /* CleaningTaskTemplates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleaningTaskTemplates.swift; sourceTree = "<group>"; };
+		9CB2FC782F5909C600644929 /* CleaningSetupWizard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleaningSetupWizard.swift; sourceTree = "<group>"; };
+		9CB2FC7C2F590A8600644929 /* CleaningSetupWizardSteps.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleaningSetupWizardSteps.swift; sourceTree = "<group>"; };
+		9CB2FC802F590BA800644929 /* CleaningTrackerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleaningTrackerView.swift; sourceTree = "<group>"; };
+		9CB2FC842F59109200644929 /* CleaningTaskDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleaningTaskDetailView.swift; sourceTree = "<group>"; };
+		9CB2FC862F5910D300644929 /* CleaningScheduleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleaningScheduleView.swift; sourceTree = "<group>"; };
+		9CB2FC882F59110D00644929 /* CleaningStatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleaningStatisticsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -54,8 +68,6 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
-				Views/AIMealPlanGeneratorView.swift,
-				Views/AIRecipeGeneratorView.swift,
 				Views/AIServiceManager.swift,
 				Views/AISettingsView.swift,
 			);
@@ -107,8 +119,15 @@
 				9C723E6E2F417A4000A7110B /* docsprivacy-policy.html */,
 				9C723E702F417A8100A7110B /* docssupport.html */,
 				9C723E822F42C9A000A7110B /* terms-of-service.html */,
+				9CB2FC742F59092000644929 /* CleaningModels.swift */,
 				9C723E842F42C9B600A7110B /* index.html */,
-				9C85B72B2F49719700D124DE /* SETTINGS_DATA_MANAGEMENT_UPDATES.md */,
+				9CB2FC762F59095A00644929 /* CleaningTaskTemplates.swift */,
+				9CB2FC782F5909C600644929 /* CleaningSetupWizard.swift */,
+				9CB2FC7C2F590A8600644929 /* CleaningSetupWizardSteps.swift */,
+				9CB2FC802F590BA800644929 /* CleaningTrackerView.swift */,
+				9CB2FC842F59109200644929 /* CleaningTaskDetailView.swift */,
+				9CB2FC862F5910D300644929 /* CleaningScheduleView.swift */,
+				9CB2FC882F59110D00644929 /* CleaningStatisticsView.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -196,7 +215,6 @@
 				9C723E6F2F417A4000A7110B /* docsprivacy-policy.html in Resources */,
 				9C723E712F417A8100A7110B /* docssupport.html in Resources */,
 				9C723E852F42C9B600A7110B /* index.html in Resources */,
-				9C85B72C2F49719700D124DE /* SETTINGS_DATA_MANAGEMENT_UPDATES.md in Resources */,
 				9C334B742F26A83D00A503AF /* Products.storekit in Resources */,
 				9C334B822F284CC300A503AF /* Launch Screen.storyboard in Resources */,
 			);
@@ -211,13 +229,21 @@
 			files = (
 				9C723E492F40435A00A7110B /* CalendarSyncSettingsView.swift in Sources */,
 				9C723E512F4043FC00A7110B /* CalendarSyncPromptBanner.swift in Sources */,
+				9CB2FC792F5909C600644929 /* CleaningSetupWizard.swift in Sources */,
+				9CB2FC812F590BA800644929 /* CleaningTrackerView.swift in Sources */,
+				9CB2FC852F59109200644929 /* CleaningTaskDetailView.swift in Sources */,
+				9CB2FC772F59095A00644929 /* CleaningTaskTemplates.swift in Sources */,
+				9CB2FC7D2F590A8600644929 /* CleaningSetupWizardSteps.swift in Sources */,
 				9C723E612F41206400A7110B /* LaunchScreenView.swift in Sources */,
 				9C723E472F40433500A7110B /* AppleCalendarManager.swift in Sources */,
 				9C723E532F4112CC00A7110B /* GoogleCalendarManager.swift in Sources */,
 				9C723E6D2F4175B200A7110B /* SupportView.swift in Sources */,
+				9CB2FC872F5910D300644929 /* CleaningScheduleView.swift in Sources */,
+				9CB2FC892F59110D00644929 /* CleaningStatisticsView.swift in Sources */,
 				9C723E6A2F415B2F00A7110B /* ReminderWizardView.swift in Sources */,
 				9C723E6B2F415B2F00A7110B /* ReminderWizardModels.swift in Sources */,
 				9C723E652F412E6800A7110B /* HabitCalendarManager.swift in Sources */,
+				9CB2FC752F59092000644929 /* CleaningModels.swift in Sources */,
 				9C723E552F4112E500A7110B /* GoogleCalendarSyncSettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -353,7 +379,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = Q79FHUWC44;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -362,10 +388,7 @@
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "RealLifeHQ needs full calendar access to create, edit, and delete synced events";
-				INFOPLIST_KEY_NSCameraUsageDescription = "RealLife HQ needs access to your camera to capture receipts and photos. ";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "We use Face ID to protect your sensitive information in the Vault";
-				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "This app needs to save photos to your library.";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app needs access to upload photos.\nThis app needs access to upload photos.\n";
 				INFOPLIST_KEY_NSRemindersUsageDescription = "RealLife HQ needs access to reminders to help you manage tasks. ";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UIRequiredDeviceCapabilities = armv7;
@@ -378,7 +401,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 6;
+				MARKETING_VERSION = 8;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sarahwalker.reallifehq.RealLifeHQ;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -398,7 +421,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = Q79FHUWC44;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -407,10 +430,7 @@
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "RealLifeHQ needs full calendar access to create, edit, and delete synced events";
-				INFOPLIST_KEY_NSCameraUsageDescription = "RealLife HQ needs access to your camera to capture receipts and photos. ";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "We use Face ID to protect your sensitive information in the Vault";
-				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "This app needs to save photos to your library.";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app needs access to upload photos.\nThis app needs access to upload photos.\n";
 				INFOPLIST_KEY_NSRemindersUsageDescription = "RealLife HQ needs access to reminders to help you manage tasks. ";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UIRequiredDeviceCapabilities = armv7;
@@ -423,7 +443,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 6;
+				MARKETING_VERSION = 8;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sarahwalker.reallifehq.RealLifeHQ;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;

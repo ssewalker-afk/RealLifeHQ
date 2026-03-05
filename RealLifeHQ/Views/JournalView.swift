@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 // MARK: - Journal View
 // Write and reflect on your day with Apple Intelligence writing assistance
@@ -7,8 +8,43 @@ struct JournalView: View {
     @EnvironmentObject var dataManager: DataManager
     @EnvironmentObject var themeManager: ThemeManager
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
-    @State private var showingAddEntry = false
-    
+    // Check whether the user has an active premium subscription
+    @Environment(SubscriptionManager.self) private var subscriptionManager
+    // A single enum that describes every sheet JournalView can present.
+    // Using one sheet(item:) is far more reliable than chaining multiple
+    // sheet(isPresented:) modifiers — chaining caused export to show a blank screen
+    // because SwiftUI only reliably activates the *last* modifier in the chain.
+    private enum ActiveSheet: Identifiable {
+        case addEntry
+        case export(URL)
+        case paywall
+
+        var id: String {
+            switch self {
+            case .addEntry:        return "addEntry"
+            case .export(let url): return "export-\(url.path)"
+            case .paywall:         return "paywall"
+            }
+        }
+    }
+    @State private var activeSheet: ActiveSheet?
+
+    // Free users can create up to this many entries before hitting the paywall
+    private static let freeEntryLimit = 3
+
+    // MARK: - Entry limit helper
+
+    // Call this instead of setting showingAddEntry directly.
+    // It checks whether the user is allowed to add another entry first.
+    private func requestAddEntry() {
+        if subscriptionManager.isPremium || dataManager.journalEntries.count < Self.freeEntryLimit {
+            activeSheet = .addEntry
+        } else {
+            // Free user is at the limit — show the upgrade screen instead
+            activeSheet = .paywall
+        }
+    }
+
     var body: some View {
         NavigationView {
             ZStack {
@@ -27,17 +63,54 @@ struct JournalView: View {
             .background(themeManager.currentTheme.backgroundColor.ignoresSafeArea())
             .navigationTitle("Journal")
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    if !dataManager.journalEntries.isEmpty {
+                        Button {
+                            // Premium check: free users see the paywall instead of the export sheet
+                            if subscriptionManager.isPremium {
+                                // Embed the URL directly in the enum case so there's
+                                // no separate optional that could cause a blank sheet
+                                if let url = JournalPDFExporter.exportAll(entries: sortedEntries) {
+                                    activeSheet = .export(url)
+                                }
+                            } else {
+                                activeSheet = .paywall
+                            }
+                        } label: {
+                            // Show a small lock badge over the icon so free users know
+                            // this is a premium feature before they even tap it
+                            ZStack(alignment: .topTrailing) {
+                                Image(systemName: "square.and.arrow.up")
+                                    .foregroundColor(themeManager.currentTheme.primaryColor)
+                                if !subscriptionManager.isPremium {
+                                    Image(systemName: "lock.fill")
+                                        .font(.system(size: 8, weight: .bold))
+                                        .foregroundColor(.secondary)
+                                        .offset(x: 5, y: -5)
+                                }
+                            }
+                        }
+                    }
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
-                        showingAddEntry = true
+                        requestAddEntry()
                     } label: {
                         Image(systemName: "plus.circle.fill")
                             .foregroundColor(themeManager.currentTheme.primaryColor)
                     }
                 }
             }
-            .sheet(isPresented: $showingAddEntry) {
-                AddJournalEntryView()
+            // Single sheet modifier — drives all three possible sheets
+            .sheet(item: $activeSheet) { sheet in
+                switch sheet {
+                case .addEntry:
+                    AddJournalEntryView()
+                case .export(let url):
+                    ActivityViewController(items: [url])
+                case .paywall:
+                    PaywallView()
+                }
             }
         }
         .navigationViewStyle(.stack)
@@ -58,6 +131,13 @@ struct JournalView: View {
                 }
             }
             .padding()
+
+            // Same usage banner shown below the grid on iPad
+            if !subscriptionManager.isPremium {
+                entryUsageBanner
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 16)
+            }
         }
     }
     
@@ -77,7 +157,7 @@ struct JournalView: View {
                 .padding(.horizontal)
             
             Button("Write Your First Entry") {
-                showingAddEntry = true
+                requestAddEntry()
             }
             .buttonStyle(.borderedProminent)
             .tint(themeManager.currentTheme.primaryColor)
@@ -98,13 +178,69 @@ struct JournalView: View {
                     }
                 }
             }
+
+            // Usage banner — only shown to free users so they know their limit.
+            // Premium users never see this section.
+            if !subscriptionManager.isPremium {
+                Section {
+                    entryUsageBanner
+                }
+            }
         }
         .listStyle(.insetGrouped)
+    }
+
+    // The banner that shows free entry usage.
+    // When the limit is reached it becomes a tappable upgrade prompt.
+    @ViewBuilder
+    private var entryUsageBanner: some View {
+        let count = dataManager.journalEntries.count
+        let atLimit = count >= Self.freeEntryLimit
+
+        if atLimit {
+            // At the limit — show a prominent upgrade call-to-action
+            Button {
+                activeSheet = .paywall
+            } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: "star.circle.fill")
+                        .foregroundColor(themeManager.currentTheme.primaryColor)
+                        .font(.title3)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Upgrade for unlimited entries")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundColor(themeManager.currentTheme.primaryColor)
+                        Text("You've used all \(Self.freeEntryLimit) free entries")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.vertical, 4)
+            }
+        } else {
+            // Under the limit — show a quiet progress note
+            HStack(spacing: 6) {
+                Image(systemName: "lock.fill")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+                Text("\(count) of \(Self.freeEntryLimit) free entries used")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .center)
+            .listRowBackground(Color.clear)
+        }
     }
     
     private var sortedEntries: [JournalEntry] {
         dataManager.journalEntries.sorted { $0.date > $1.date }
     }
+
 }
 
 // MARK: - Journal Card View (iPad Grid)
@@ -575,6 +711,22 @@ struct TopicSuggestionsView: View {
 struct JournalDetailView: View {
     let entry: JournalEntry
     @EnvironmentObject var themeManager: ThemeManager
+    // Check whether the user has an active premium subscription
+    @Environment(SubscriptionManager.self) private var subscriptionManager
+    // Single enum — same fix as JournalView, prevents blank screen from
+    // chaining two sheet(isPresented:) modifiers on the same view.
+    private enum ActiveSheet: Identifiable {
+        case export(URL)
+        case paywall
+
+        var id: String {
+            switch self {
+            case .export(let url): return "export-\(url.path)"
+            case .paywall:         return "paywall"
+            }
+        }
+    }
+    @State private var activeSheet: ActiveSheet?
     
     var body: some View {
         ScrollView {
@@ -641,6 +793,42 @@ struct JournalDetailView: View {
         .background(themeManager.currentTheme.backgroundColor.ignoresSafeArea())
         .navigationTitle("Journal Entry")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    // Premium check: free users see the paywall instead of the export sheet
+                    if subscriptionManager.isPremium {
+                        if let url = JournalPDFExporter.exportSingle(entry) {
+                            activeSheet = .export(url)
+                        }
+                    } else {
+                        activeSheet = .paywall
+                    }
+                } label: {
+                    // Lock badge over the icon lets free users know it's premium
+                    // before they tap — same pattern used throughout the app
+                    ZStack(alignment: .topTrailing) {
+                        Image(systemName: "square.and.arrow.up")
+                            .foregroundColor(themeManager.currentTheme.primaryColor)
+                        if !subscriptionManager.isPremium {
+                            Image(systemName: "lock.fill")
+                                .font(.system(size: 8, weight: .bold))
+                                .foregroundColor(.secondary)
+                                .offset(x: 5, y: -5)
+                        }
+                    }
+                }
+            }
+        }
+        // Single sheet modifier drives both possible sheets
+        .sheet(item: $activeSheet) { sheet in
+            switch sheet {
+            case .export(let url):
+                ActivityViewController(items: [url])
+            case .paywall:
+                PaywallView()
+            }
+        }
     }
 }
 
@@ -732,4 +920,150 @@ extension View {
 struct SizePreferenceKey: PreferenceKey {
     static var defaultValue: CGSize = .zero
     static func reduce(value: inout CGSize, nextValue: () -> CGSize) {}
+}
+
+// MARK: - Journal PDF Exporter
+// Renders journal entries to a printable PDF file using UIGraphicsPDFRenderer.
+// Returns a temp file URL that ActivityViewController passes to the iOS share sheet,
+// which gives the user options to Print, Mail, Message, AirDrop, or Save to Files.
+
+struct JournalPDFExporter {
+
+    private static let pageRect = CGRect(x: 0, y: 0, width: 612, height: 792) // US Letter
+    private static let margin: CGFloat = 56
+    private static let bottomPad: CGFloat = 56
+    private static var usableWidth: CGFloat { pageRect.width - margin * 2 }
+    private static var pageBottom: CGFloat { pageRect.height - bottomPad }
+
+    // Export all entries to a single PDF
+    static func exportAll(entries: [JournalEntry]) -> URL? {
+        let renderer = UIGraphicsPDFRenderer(bounds: pageRect)
+        let data = renderer.pdfData { ctx in
+            ctx.beginPage()
+            var y: CGFloat = margin
+            drawDocumentHeader(entryCount: entries.count, y: &y)
+            for (i, entry) in entries.enumerated() {
+                if i > 0 {
+                    if y + 30 > pageBottom { ctx.beginPage(); y = margin }
+                    UIColor.systemGray5.setFill()
+                    UIRectFill(CGRect(x: margin, y: y, width: usableWidth, height: 0.5))
+                    y += 20
+                }
+                drawEntry(entry, y: &y, ctx: ctx)
+            }
+        }
+        return writeTemp(data: data, name: "My-Journal-Export")
+    }
+
+    // Export a single entry to its own PDF
+    static func exportSingle(_ entry: JournalEntry) -> URL? {
+        let renderer = UIGraphicsPDFRenderer(bounds: pageRect)
+        let data = renderer.pdfData { ctx in
+            ctx.beginPage()
+            var y: CGFloat = margin
+            drawEntry(entry, y: &y, ctx: ctx)
+        }
+        return writeTemp(data: data, name: "Journal-Entry")
+    }
+
+    // MARK: - Section drawing
+
+    private static func drawDocumentHeader(entryCount: Int, y: inout CGFloat) {
+        y = drawText("RealLife HQ", y: y, font: .systemFont(ofSize: 10, weight: .medium), color: .darkGray)
+        y += 6
+        y = drawText("My Journal", y: y, font: .systemFont(ofSize: 28, weight: .bold), color: .black)
+        y += 4
+        let sub = "Exported \(Date().formatted(date: .long, time: .omitted))  ·  \(entryCount) \(entryCount == 1 ? "entry" : "entries")"
+        y = drawText(sub, y: y, font: .systemFont(ofSize: 11), color: .darkGray)
+        y += 16
+        UIColor.systemGray3.setFill()
+        UIRectFill(CGRect(x: margin, y: y, width: usableWidth, height: 1.5))
+        y += 20
+    }
+
+    private static func drawEntry(_ entry: JournalEntry, y: inout CGFloat, ctx: UIGraphicsPDFRendererContext) {
+        // Ensure enough room for at least the date header before drawing
+        if y + 50 > pageBottom { ctx.beginPage(); y = margin }
+
+        y = drawText(entry.date.formatted(date: .long, time: .omitted),
+                     y: y, font: .systemFont(ofSize: 16, weight: .semibold), color: .black)
+        y += 2
+
+        if let mood = entry.mood {
+            y = drawText("\(mood.rawValue)  \(mood.displayName)",
+                         y: y, font: .systemFont(ofSize: 12), color: .darkGray)
+            y += 2
+        }
+
+        if !entry.tags.isEmpty {
+            let tagStr = entry.tags.map { "#\($0)" }.joined(separator: "  ")
+            y = drawText(tagStr, y: y, font: .italicSystemFont(ofSize: 11), color: .systemBlue)
+            y += 2
+        }
+
+        y += 8
+        drawContent(entry.content, y: &y, ctx: ctx)
+    }
+
+    // Draws body text, inserting page breaks when a paragraph would overflow
+    private static func drawContent(_ text: String, y: inout CGFloat, ctx: UIGraphicsPDFRendererContext) {
+        let font = UIFont.systemFont(ofSize: 13)
+        let attrs: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: UIColor.black]
+
+        let totalH = ceil((text as NSString).boundingRect(
+            with: CGSize(width: usableWidth, height: .greatestFiniteMagnitude),
+            options: .usesLineFragmentOrigin, attributes: attrs, context: nil).height)
+
+        if y + totalH <= pageBottom {
+            // Entire content fits — draw in one shot
+            (text as NSString).draw(
+                in: CGRect(x: margin, y: y, width: usableWidth, height: totalH),
+                withAttributes: attrs)
+            y += totalH
+            return
+        }
+
+        // Content is long — draw paragraph by paragraph so we can add page breaks
+        for paragraph in text.components(separatedBy: "\n") {
+            let line = paragraph.isEmpty ? " " : paragraph
+            let lineH = ceil((line as NSString).boundingRect(
+                with: CGSize(width: usableWidth, height: .greatestFiniteMagnitude),
+                options: .usesLineFragmentOrigin, attributes: attrs, context: nil).height)
+            if y + lineH > pageBottom { ctx.beginPage(); y = margin }
+            (line as NSString).draw(
+                in: CGRect(x: margin, y: y, width: usableWidth, height: lineH),
+                withAttributes: attrs)
+            y += lineH + 2
+        }
+    }
+
+    // MARK: - Primitives
+
+    @discardableResult
+    private static func drawText(_ text: String, y: CGFloat, font: UIFont, color: UIColor) -> CGFloat {
+        let attrs: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: color]
+        let h = ceil((text as NSString).boundingRect(
+            with: CGSize(width: usableWidth, height: .greatestFiniteMagnitude),
+            options: .usesLineFragmentOrigin, attributes: attrs, context: nil).height)
+        (text as NSString).draw(in: CGRect(x: margin, y: y, width: usableWidth, height: h), withAttributes: attrs)
+        return y + h
+    }
+
+    private static func writeTemp(data: Data, name: String) -> URL? {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("\(name).pdf")
+        try? data.write(to: url)
+        return url
+    }
+}
+
+// MARK: - Share Sheet
+
+struct ActivityViewController: UIViewControllerRepresentable {
+    let items: [Any]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: items, applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }

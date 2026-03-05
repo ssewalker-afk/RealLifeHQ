@@ -8,14 +8,17 @@ struct RealLifeHQApp: App {
     // StateObject keeps your data alive for the entire app
     @StateObject private var themeManager = ThemeManager()
     @StateObject private var dataManager = DataManager()
+    // @Observable class — use @State, not @StateObject
+    @State private var subscriptionManager = SubscriptionManager()
     @State private var showLaunchScreen = true
-    
+
     var body: some Scene {
         WindowGroup {
             ZStack {
                 ContentView()
                     .environmentObject(themeManager)  // Makes theme available everywhere
                     .environmentObject(dataManager)   // Makes data available everywhere
+                    .environment(subscriptionManager) // Makes subscription state available everywhere
                     .task {
                         // Request notification permissions when app launches
                         _ = await NotificationManager.shared.requestAuthorization()

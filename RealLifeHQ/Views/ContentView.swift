@@ -6,42 +6,21 @@ import SwiftUI
 struct ContentView: View {
     @EnvironmentObject var themeManager: ThemeManager
     @EnvironmentObject var dataManager: DataManager
-    @State private var storeManager = StoreManager.shared
-    @State private var showPaywall = false
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
-    
+
     var body: some View {
         Group {
-            if shouldShowPaywall {
-                // Show paywall if not subscribed or first launch
-                SubscriptionView()
+            if horizontalSizeClass == .regular {
+                iPadLayout
             } else {
-                // Show main app content - different layout for iPad vs iPhone
-                if horizontalSizeClass == .regular {
-                    // iPad: Use sidebar navigation
-                    iPadLayout
-                } else {
-                    // iPhone: Use tab bar
-                    mainAppContent
-                }
+                mainAppContent
             }
         }
-        .onAppear {
-            checkSubscriptionStatus()
-        }
+        .preferredColorScheme(themeManager.currentTheme.colorScheme)
+        .fontDesign(themeManager.currentTheme.fontDesign)
     }
-    
-    private var shouldShowPaywall: Bool {
-        // Show paywall if not onboarded OR not subscribed
-        return !dataManager.settings.hasCompletedOnboarding || !storeManager.isSubscribed
-    }
-    
-    private func checkSubscriptionStatus() {
-        Task {
-            await storeManager.updateSubscriptionStatus()
-        }
-    }
-    
+
+
     // iPad Layout with Sidebar Navigation
     private var iPadLayout: some View {
         NavigationSplitView {
@@ -57,26 +36,29 @@ struct ContentView: View {
                     NavigationLink(destination: HabitsView()) {
                         Label("Habits", systemImage: "target")
                     }
+                    NavigationLink(destination: CleaningTrackerView()) {
+                        Label("Cleaning", systemImage: "sparkles")
+                    }
                 }
                 
                 Section("Productivity") {
-                    NavigationLink(destination: JournalView()) {
-                        Label("Journal", systemImage: "book.closed.fill")
-                    }
                     NavigationLink(destination: BudgetView()) {
                         Label("Budget", systemImage: "dollarsign.circle.fill")
                     }
                 }
                 
-                Section("Lifestyle") {
-                    // Recipes temporarily hidden - work in progress
-                    // NavigationLink(destination: RecipesView()) {
-                    //     Label("Recipes", systemImage: "fork.knife")
-                    // }
-                    NavigationLink(destination: VaultView()) {
-                        Label("Vault", systemImage: "lock.shield.fill")
-                    }
-                }
+                // MARK: - HIDDEN FEATURES
+                // Recipes, Meal Plans, Shopping List - hidden (too complex for multi-feature app)
+                // Vault - hidden (password management should be separate app/use iCloud Keychain)
+                
+                // Section("Lifestyle") {
+                //     NavigationLink(destination: RecipesView()) {
+                //         Label("Recipes", systemImage: "fork.knife")
+                //     }
+                //     NavigationLink(destination: VaultView()) {
+                //         Label("Vault", systemImage: "lock.shield.fill")
+                //     }
+                // }
                 
                 Section {
                     NavigationLink(destination: SettingsView()) {
@@ -101,7 +83,7 @@ struct ContentView: View {
                 .tabItem {
                     Label("Home", systemImage: "house.fill")
                 }
-            
+
             // Calendar Tab
             NavigationStack {
                 CalendarView()
@@ -109,35 +91,25 @@ struct ContentView: View {
             .tabItem {
                 Label("Calendar", systemImage: "calendar")
             }
-            
+
             // Habits Tab
             HabitsView()
                 .tabItem {
                     Label("Habits", systemImage: "target")
                 }
-            
+
+            // Cleaning Tracker Tab
+            CleaningTrackerView()
+                .tabItem {
+                    Label("Cleaning", systemImage: "sparkles")
+                }
+
             // Budget Tab
             NavigationStack {
                 BudgetView()
             }
             .tabItem {
                 Label("Budget", systemImage: "dollarsign.circle.fill")
-            }
-            
-            // Journal Tab
-            NavigationStack {
-                JournalView()
-            }
-            .tabItem {
-                Label("Journal", systemImage: "book.fill")
-            }
-            
-            // Vault Tab
-            NavigationStack {
-                VaultView()
-            }
-            .tabItem {
-                Label("Vault", systemImage: "lock.shield.fill")
             }
         }
         .accentColor(themeManager.currentTheme.primaryColor)
@@ -195,19 +167,20 @@ struct HomeView: View {
             todaysEventsWidget
             habitsWidget
             journalPromptWidget
+            cleaningWidget
             budgetWidget
-            
+
             // Vault Quick Link at bottom
-            vaultQuickLink
+            // vaultQuickLink // HIDDEN - password management should be separate
         }
     }
-    
+
     // iPad Layout - Two-Column Grid
     private var iPadLayout: some View {
         VStack(spacing: 20) {
             greetingHeader
                 .padding(.horizontal)
-            
+
             LazyVGrid(columns: [
                 GridItem(.flexible(), spacing: 20),
                 GridItem(.flexible(), spacing: 20)
@@ -215,11 +188,12 @@ struct HomeView: View {
                 todaysEventsWidget
                 habitsWidget
                 journalPromptWidget
+                cleaningWidget
                 budgetWidget
             }
-            
+
             // Vault Quick Link at bottom
-            vaultQuickLink
+            // vaultQuickLink // HIDDEN - password management should be separate
         }
     }
     
@@ -380,11 +354,16 @@ struct HomeView: View {
             }
             
             if dataManager.habits.isEmpty {
-                Text("No habits yet")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding()
+                NavigationLink(destination: HabitsView()) {
+                    HomeSetupPrompt(
+                        emoji: "🌱",
+                        headline: "Your habit journey starts here!",
+                        subtext: "Build powerful routines, one day at a time.",
+                        cta: "Create Your First Habit",
+                        color: themeManager.currentTheme.accentColor
+                    )
+                }
+                .buttonStyle(PlainButtonStyle())
             } else {
                 ForEach(dataManager.habits.prefix(3)) { habit in
                     HabitRow(habit: habit)
@@ -397,7 +376,11 @@ struct HomeView: View {
     }
     
     // MARK: - Journal Prompt Widget
-    
+
+    private var hasTodaysJournalEntry: Bool {
+        dataManager.journalEntries.contains { Calendar.current.isDateInToday($0.date) }
+    }
+
     private var journalPromptWidget: some View {
         Button {
             showingAddJournalEntry = true
@@ -410,31 +393,63 @@ struct HomeView: View {
                         .font(.headline)
                         .foregroundColor(themeManager.currentTheme.primaryColor)
                     Spacer()
+                    if hasTodaysJournalEntry {
+                        Image(systemName: "checkmark.seal.fill")
+                            .foregroundColor(.green)
+                            .font(.subheadline)
+                    }
                 }
-                
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Today's Prompt")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .textCase(.uppercase)
-                    
-                    Text(todaysJournalPrompt)
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                        .foregroundColor(.primary)
-                        .lineLimit(2)
-                        .multilineTextAlignment(.leading)
-                }
-                .padding(.top, 4)
-                
-                HStack {
-                    Spacer()
-                    Text("Tap to write")
-                        .font(.caption)
-                        .foregroundColor(themeManager.currentTheme.primaryColor)
-                    Image(systemName: "arrow.right.circle.fill")
-                        .font(.caption)
-                        .foregroundColor(themeManager.currentTheme.primaryColor)
+
+                if hasTodaysJournalEntry {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Today's Entry: Done!")
+                            .font(.caption)
+                            .foregroundColor(.green)
+                            .textCase(.uppercase)
+                            .fontWeight(.semibold)
+
+                        Text("You showed up for yourself today. That's worth celebrating! 🎉")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundColor(.primary)
+                            .multilineTextAlignment(.leading)
+                    }
+                    .padding(.top, 4)
+
+                    HStack {
+                        Spacer()
+                        Text("Tap to read")
+                            .font(.caption)
+                            .foregroundColor(themeManager.currentTheme.primaryColor)
+                        Image(systemName: "arrow.right.circle.fill")
+                            .font(.caption)
+                            .foregroundColor(themeManager.currentTheme.primaryColor)
+                    }
+                } else {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Today's Prompt")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .textCase(.uppercase)
+
+                        Text(todaysJournalPrompt)
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundColor(.primary)
+                            .lineLimit(2)
+                            .multilineTextAlignment(.leading)
+                    }
+                    .padding(.top, 4)
+
+                    HStack {
+                        Spacer()
+                        Text("Tap to write")
+                            .font(.caption)
+                            .foregroundColor(themeManager.currentTheme.primaryColor)
+                        Image(systemName: "arrow.right.circle.fill")
+                            .font(.caption)
+                            .foregroundColor(themeManager.currentTheme.primaryColor)
+                    }
                 }
             }
             .padding()
@@ -448,57 +463,83 @@ struct HomeView: View {
     }
     
     // MARK: - Budget Widget
-    
+
     private var budgetWidget: some View {
-        Button {
-            showingAddExpense = true
-        } label: {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack {
-                    Image(systemName: "dollarsign.circle.fill")
-                        .foregroundColor(themeManager.currentTheme.accentColor)
-                    Text("Budget")
-                        .font(.headline)
-                        .foregroundColor(themeManager.currentTheme.accentColor)
-                    Spacer()
-                }
-                
-                HStack(spacing: 20) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Remaining This Month")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                            .textCase(.uppercase)
-                        
-                        Text(budgetRemainingText)
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .foregroundColor(budgetRemainingColor)
+        Group {
+            if dataManager.budgetSetup.monthlyIncome == 0 {
+                NavigationLink(destination: BudgetView()) {
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            Image(systemName: "dollarsign.circle.fill")
+                                .foregroundColor(themeManager.currentTheme.accentColor)
+                            Text("Budget")
+                                .font(.headline)
+                                .foregroundColor(themeManager.currentTheme.accentColor)
+                            Spacer()
+                        }
+                        HomeSetupPrompt(
+                            emoji: "💰",
+                            headline: "Take charge of your finances!",
+                            subtext: "Set your income, plan your spending, and keep more of what you earn.",
+                            cta: "Set Up Budget",
+                            color: themeManager.currentTheme.accentColor
+                        )
                     }
-                    
-                    Spacer()
-                    
-                    VStack(alignment: .trailing, spacing: 4) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "plus.circle.fill")
-                                .font(.title3)
+                    .padding()
+                    .background(themeManager.currentTheme.cardColor)
+                    .cornerRadius(12)
+                }
+                .buttonStyle(PlainButtonStyle())
+            } else {
+                Button {
+                    showingAddExpense = true
+                } label: {
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            Image(systemName: "dollarsign.circle.fill")
                                 .foregroundColor(themeManager.currentTheme.accentColor)
-                            Text("Add Expense")
-                                .font(.caption)
+                            Text("Budget")
+                                .font(.headline)
                                 .foregroundColor(themeManager.currentTheme.accentColor)
-                                .fontWeight(.medium)
+                            Spacer()
+                        }
+
+                        HStack(spacing: 20) {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Remaining This Month")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                    .textCase(.uppercase)
+
+                                Text(budgetRemainingText)
+                                    .font(.title2)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(budgetRemainingColor)
+                            }
+
+                            Spacer()
+
+                            HStack(spacing: 4) {
+                                Image(systemName: "plus.circle.fill")
+                                    .font(.title3)
+                                    .foregroundColor(themeManager.currentTheme.accentColor)
+                                Text("Add Expense")
+                                    .font(.caption)
+                                    .foregroundColor(themeManager.currentTheme.accentColor)
+                                    .fontWeight(.medium)
+                            }
                         }
                     }
+                    .padding()
+                    .background(themeManager.currentTheme.cardColor)
+                    .cornerRadius(12)
                 }
-            }
-            .padding()
-            .background(themeManager.currentTheme.cardColor)
-            .cornerRadius(12)
-        }
-        .buttonStyle(PlainButtonStyle())
-        .sheet(isPresented: $showingAddExpense) {
-            NavigationStack {
-                AddExpenseView()
+                .buttonStyle(PlainButtonStyle())
+                .sheet(isPresented: $showingAddExpense) {
+                    NavigationStack {
+                        AddExpenseView()
+                    }
+                }
             }
         }
     }
@@ -517,6 +558,209 @@ struct HomeView: View {
             return .red
         }
     }
+    
+    // MARK: - Cleaning Widget
+    
+    private var cleaningWidget: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Image(systemName: "sparkles")
+                    .foregroundColor(themeManager.currentTheme.accentColor)
+                Text("Cleaning")
+                    .font(.headline)
+                    .foregroundColor(themeManager.currentTheme.accentColor)
+                Spacer()
+                NavigationLink(destination: CleaningTrackerView()) {
+                    Text("View All")
+                        .font(.caption)
+                        .foregroundColor(themeManager.currentTheme.accentColor)
+                }
+            }
+            
+            if dataManager.cleaningProfile == nil {
+                NavigationLink(destination: CleaningTrackerView()) {
+                    HomeSetupPrompt(
+                        emoji: "🧹",
+                        headline: "A tidy home, a clear mind!",
+                        subtext: "Set up your cleaning schedule and make sparkling easy.",
+                        cta: "Set Up Cleaning",
+                        color: themeManager.currentTheme.accentColor
+                    )
+                }
+                .buttonStyle(PlainButtonStyle())
+            } else if let todaySession = dataManager.getTodaySession() {
+                // Today's cleaning task
+                NavigationLink(destination: CleaningTrackerView()) {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Today's Task")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .textCase(.uppercase)
+                            
+                            Text(todaySession.taskTitle)
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.primary)
+                            
+                            HStack(spacing: 4) {
+                                Image(systemName: "clock")
+                                    .font(.caption2)
+                                if let task = dataManager.cleaningTasks.first(where: { $0.id == todaySession.taskId }) {
+                                    Text("\(task.estimatedDuration) min")
+                                        .font(.caption)
+                                }
+                            }
+                            .foregroundColor(.secondary)
+                        }
+                        
+                        Spacer()
+                        
+                        Image(systemName: "chevron.right")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding()
+                    .background(themeManager.currentTheme.accentColor.opacity(0.1))
+                    .cornerRadius(8)
+                }
+                .buttonStyle(PlainButtonStyle())
+            } else {
+                // No task today
+                NavigationLink(destination: CleaningTrackerView()) {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("✨ All caught up!")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                                .foregroundColor(.primary)
+                            
+                            Text("No cleaning scheduled for today")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        Spacer()
+                        
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(.green)
+                    }
+                    .padding()
+                    .background(Color.green.opacity(0.1))
+                    .cornerRadius(8)
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+            
+            // Streak info
+            if dataManager.cleaningProfile != nil && dataManager.cleaningStatistics.currentStreak > 0 {
+                HStack {
+                    Image(systemName: "flame.fill")
+                        .foregroundColor(.orange)
+                        .font(.caption)
+                    Text("\(dataManager.cleaningStatistics.currentStreak) day streak")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+        }
+        .padding()
+        .background(themeManager.currentTheme.cardColor)
+        .cornerRadius(12)
+    }
+    
+    // MARK: - Recipes Widget (HIDDEN)
+    
+    // Recipes are hidden - they're a whole separate app's worth of features
+    /*
+    private var recipesWidget: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Image(systemName: "fork.knife")
+                    .foregroundColor(themeManager.currentTheme.primaryColor)
+                Text("Recipes")
+                    .font(.headline)
+                    .foregroundColor(themeManager.currentTheme.primaryColor)
+                Spacer()
+                NavigationLink(destination: RecipesView()) {
+                    Text("View All")
+                        .font(.caption)
+                        .foregroundColor(themeManager.currentTheme.primaryColor)
+                }
+            }
+            
+            if dataManager.recipes.isEmpty {
+                // No recipes yet
+                NavigationLink(destination: RecipesView()) {
+                    VStack(spacing: 8) {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.title2)
+                            .foregroundColor(themeManager.currentTheme.primaryColor)
+                        Text("Add your first recipe")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                }
+                .buttonStyle(PlainButtonStyle())
+            } else {
+                // Show recipe count and quick actions
+                VStack(spacing: 8) {
+                    HStack(spacing: 16) {
+                        // Recipe count
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("\(dataManager.recipes.count)")
+                                .font(.title2)
+                                .fontWeight(.bold)
+                                .foregroundColor(themeManager.currentTheme.primaryColor)
+                            Text("Recipes")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        Divider()
+                            .frame(height: 30)
+                        
+                        // Meal plan count
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("\(dataManager.mealPlans.count)")
+                                .font(.title2)
+                                .fontWeight(.bold)
+                                .foregroundColor(themeManager.currentTheme.accentColor)
+                            Text("Planned")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        Spacer()
+                        
+                        NavigationLink(destination: RecipesView()) {
+                            Image(systemName: "arrow.right.circle.fill")
+                                .font(.title2)
+                                .foregroundColor(themeManager.currentTheme.primaryColor)
+                        }
+                    }
+                    
+                    // Shopping list indicator
+                    if !dataManager.shoppingItems.isEmpty {
+                        HStack {
+                            Image(systemName: "cart.fill")
+                                .font(.caption)
+                                .foregroundColor(themeManager.currentTheme.accentColor)
+                            Text("\(dataManager.shoppingItems.filter { !$0.isChecked }.count) items on shopping list")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                }
+            }
+        }
+        .padding()
+        .background(themeManager.currentTheme.cardColor)
+        .cornerRadius(12)
+    }
+    */
     
     // Generate a journal prompt based on the day of the year
     private var todaysJournalPrompt: String {
@@ -558,8 +802,10 @@ struct HomeView: View {
         return prompts[dayOfYear % prompts.count]
     }
     
-    // MARK: - Vault Quick Link
+    // MARK: - Vault Quick Link (HIDDEN)
     
+    // Vault is hidden - password management should be a separate app or use iCloud Keychain
+    /*
     private var vaultQuickLink: some View {
         NavigationLink(destination: VaultView()) {
             HStack {
@@ -585,6 +831,7 @@ struct HomeView: View {
         }
         .buttonStyle(PlainButtonStyle())
     }
+    */
     
     // Calculate budget remaining for current month
     private var budgetRemainingText: String {
@@ -719,6 +966,39 @@ struct StatCard: View {
         .cornerRadius(10)
     }
 }
+// MARK: - Home Setup Prompt
+
+struct HomeSetupPrompt: View {
+    let emoji: String
+    let headline: String
+    let subtext: String
+    let cta: String
+    let color: Color
+
+    var body: some View {
+        VStack(spacing: 10) {
+            Text(emoji)
+                .font(.largeTitle)
+            Text(headline)
+                .font(.subheadline)
+                .fontWeight(.semibold)
+                .foregroundColor(.primary)
+                .multilineTextAlignment(.center)
+            Text(subtext)
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+            Text("\(cta) →")
+                .font(.caption)
+                .fontWeight(.semibold)
+                .foregroundColor(color)
+                .padding(.top, 2)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 8)
+    }
+}
+
 // MARK: - Action Card (for Quick Actions)
 
 struct ActionCard: View {

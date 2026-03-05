@@ -3,148 +3,478 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terms of Service - RealLifeHQ</title>
+    <title>Terms of Service - RealLife HQ</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             line-height: 1.6;
             color: #333;
-            background: #f5f5f7;
+            background-color: #f5f5f7;
             padding: 20px;
         }
-        
+
         .container {
             max-width: 800px;
             margin: 0 auto;
             background: white;
             padding: 40px;
             border-radius: 12px;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        
+
         h1 {
-            color: #10b981;
             font-size: 2.5em;
+            font-weight: 700;
+            color: #1d1d1f;
             margin-bottom: 10px;
         }
-        
+
         .last-updated {
-            color: #666;
+            color: #86868b;
             font-size: 0.9em;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
-        
+
         h2 {
-            color: #10b981;
-            font-size: 1.5em;
-            margin-top: 30px;
-            margin-bottom: 15px;
+            font-size: 1.6em;
+            font-weight: 600;
+            color: #007AFF;
+            margin-top: 40px;
+            margin-bottom: 14px;
         }
-        
+
+        h3 {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-top: 22px;
+            margin-bottom: 10px;
+        }
+
         p {
-            margin-bottom: 15px;
-            color: #444;
+            margin-bottom: 14px;
+            color: #1d1d1f;
         }
-        
+
         ul, ol {
-            margin-left: 20px;
-            margin-bottom: 15px;
+            margin-left: 22px;
+            margin-bottom: 14px;
         }
-        
+
         li {
             margin-bottom: 8px;
-            color: #444;
+            color: #1d1d1f;
         }
-        
-        .important {
-            background: #fef3c7;
-            padding: 20px;
+
+        .highlight-box {
+            background-color: rgba(0, 122, 255, 0.08);
+            border: 2px solid #007AFF;
             border-radius: 8px;
-            border-left: 4px solid #f59e0b;
+            padding: 20px;
             margin: 20px 0;
         }
-        
+
+        .highlight-box p {
+            margin-bottom: 0;
+            font-weight: 600;
+        }
+
+        .warning-box {
+            background-color: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .warning-box p {
+            margin-bottom: 0;
+        }
+
+        .card {
+            background-color: #f5f5f7;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 16px 0;
+        }
+
+        .card h3 {
+            color: #007AFF;
+            margin-top: 0;
+        }
+
+        .pricing-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+        }
+
+        .pricing-table th {
+            background-color: #007AFF;
+            color: white;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .pricing-table th:first-child {
+            border-radius: 8px 0 0 0;
+        }
+
+        .pricing-table th:last-child {
+            border-radius: 0 8px 0 0;
+        }
+
+        .pricing-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e5e5ea;
+            font-size: 0.95em;
+            color: #1d1d1f;
+        }
+
+        .pricing-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .pricing-table tr:nth-child(even) td {
+            background-color: #f9f9fb;
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: 0.72em;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 6px;
+            margin-left: 6px;
+            vertical-align: middle;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-free {
+            background-color: rgba(142, 142, 147, 0.15);
+            color: #636366;
+        }
+
+        .badge-premium {
+            background-color: rgba(0, 122, 255, 0.12);
+            color: #007AFF;
+        }
+
+        .badge-lifetime {
+            background-color: rgba(255, 149, 0, 0.12);
+            color: #c47200;
+        }
+
+        .summary-box {
+            background-color: rgba(0, 122, 255, 0.08);
+            border: 2px solid #007AFF;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 30px 0;
+        }
+
+        .summary-box h2 {
+            margin-top: 0;
+        }
+
+        .contact-box {
+            background-color: #f5f5f7;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .contact-box p {
+            margin-bottom: 8px;
+        }
+
+        .contact-box strong {
+            color: #007AFF;
+        }
+
         a {
-            color: #10b981;
+            color: #007AFF;
             text-decoration: none;
         }
-        
+
         a:hover {
             text-decoration: underline;
         }
-        
+
         .footer {
+            text-align: center;
+            color: #86868b;
+            font-size: 0.9em;
             margin-top: 40px;
             padding-top: 20px;
-            border-top: 1px solid #e5e5e5;
-            text-align: center;
-            color: #666;
+            border-top: 1px solid #d2d2d7;
+        }
+
+        .footer a {
+            color: #86868b;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            h2 {
+                font-size: 1.4em;
+            }
+
+            .pricing-table th,
+            .pricing-table td {
+                padding: 10px 12px;
+                font-size: 0.88em;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Terms of Service</h1>
-        <p class="last-updated">Last Updated: February 14, 2026</p>
-        
-        <h2>1. Agreement to Terms</h2>
-        <p>By downloading, installing, or using RealLifeHQ (the "App"), you agree to be bound by these Terms of Service. If you do not agree, do not use the App.</p>
-        
-        <h2>2. Subscription Terms</h2>
-        <p><strong>Pricing:</strong></p>
-        <ul>
-            <li>Monthly: $1.99/month</li>
-            <li>Annual: $19.99/year (save 17%)</li>
-            <li>7-day free trial for new users</li>
-        </ul>
-        
-        <div class="important">
-            <p><strong>Auto-Renewal:</strong> Subscriptions automatically renew unless canceled at least 24 hours before the end of the current period. You can manage subscriptions in your Apple ID Account Settings.</p>
+        <p class="last-updated">Last Updated: May 18, 2026</p>
+
+        <div class="highlight-box">
+            <p>Please read these Terms of Service carefully before using RealLife HQ. By downloading, installing, or using the App, you agree to be bound by these terms. If you do not agree, do not download or use the App.</p>
         </div>
-        
-        <h2>3. Description of Service</h2>
-        <p>RealLifeHQ provides:</p>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <h2>1. Agreement to Terms</h2>
+        <p>These Terms of Service ("Terms") constitute a legally binding agreement between you ("User," "you," or "your") and the developer of RealLife HQ ("we," "us," or "our") governing your use of the RealLife HQ iOS application (the "App").</p>
+        <p>By accessing or using the App, you confirm that you are at least 13 years of age (or the minimum age of digital consent in your jurisdiction), that you have read and understood these Terms, and that you agree to be bound by them.</p>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <h2>2. Description of the App</h2>
+        <p>RealLife HQ is a personal productivity and life organization app for iOS. It offers the following features:</p>
+
+        <div class="card">
+            <h3>Available on All Plans <span class="badge badge-free">FREE</span></h3>
+            <ul>
+                <li>Calendar and event management (one-time and recurring events)</li>
+                <li>Habit tracking — up to 3 habits with streak tracking</li>
+                <li>Journal — up to 3 entries with mood tracking and daily prompts</li>
+                <li>Budget and expense tracking with category management</li>
+                <li>Meal planning and recipe management</li>
+                <li>Cleaning schedule and tracker</li>
+                <li>Secure Vault (password and note storage via iOS Keychain)</li>
+                <li>12 customizable themes</li>
+                <li>Home Dashboard with daily overview</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h3>Premium Features <span class="badge badge-premium">PREMIUM</span></h3>
+            <ul>
+                <li>Unlimited habits with custom reminders</li>
+                <li>Unlimited journal entries</li>
+                <li>Journal PDF export (shareable via print, email, Files, and more)</li>
+                <li>Life Reminders — automated recurring reminder notifications</li>
+                <li>Apple Calendar Sync (bidirectional sync via EventKit)</li>
+                <li>Cleaning task reminders and Apple Calendar sync for cleaning tasks</li>
+                <li>Habit reminders and notifications</li>
+            </ul>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <h2>3. Subscription and Purchase Terms</h2>
+        <p>Premium features are available through two purchase options offered via Apple's App Store using StoreKit. All payments are processed by Apple.</p>
+
+        <h3>3.1 Available Plans</h3>
+
+        <table class="pricing-table">
+            <tr>
+                <th>Plan</th>
+                <th>Price</th>
+                <th>Billing</th>
+                <th>Free Trial</th>
+            </tr>
+            <tr>
+                <td><strong>Monthly</strong> <span class="badge badge-premium">PREMIUM</span></td>
+                <td>$1.99</td>
+                <td>Per month, auto-renews</td>
+                <td>7 days free</td>
+            </tr>
+            <tr>
+                <td><strong>Lifetime Access</strong> <span class="badge badge-lifetime">LIFETIME</span></td>
+                <td>$24.99</td>
+                <td>One-time purchase, no renewal</td>
+                <td>N/A</td>
+            </tr>
+        </table>
+
+        <p>All prices are in US Dollars (USD). Prices in other regions are set by Apple and may vary based on local currency and applicable taxes.</p>
+
+        <h3>3.2 Free Trial (Monthly Plan)</h3>
+        <p>New subscribers to the Monthly plan receive a <strong>7-day free trial</strong>. The free trial begins on the date of purchase confirmation. If you do not cancel before the trial period ends, your Apple ID will be charged the monthly subscription price at the end of the trial.</p>
+        <p>Free trials are offered to new subscribers only. If you have previously subscribed to RealLife HQ, you may not be eligible for a free trial.</p>
+
+        <h3>3.3 Auto-Renewal (Monthly Plan)</h3>
+        <div class="warning-box">
+            <p><strong>Auto-Renewal Disclosure:</strong> The Monthly subscription automatically renews each month at $1.99 unless you cancel at least 24 hours before the end of the current billing period. Your Apple ID will be charged within 24 hours prior to the end of each billing period. Subscription management and cancellation are handled through your Apple ID Account Settings — the App cannot process cancellations directly.</p>
+        </div>
+
+        <h3>3.4 Lifetime Access</h3>
+        <p>Lifetime Access is a one-time, non-consumable in-app purchase of <strong>$24.99</strong>. It grants permanent access to all current Premium features with no recurring charges and no expiration date. Lifetime Access does not auto-renew.</p>
+        <p>Lifetime Access is tied to your Apple ID and can be restored on any device signed in with the same Apple ID using the "Restore Purchases" button in the App.</p>
+
+        <h3>3.5 Payment Processing</h3>
+        <p>All payments are processed by Apple through the App Store. We do not collect, store, or have access to your payment information. Payment will be charged to your Apple ID at confirmation of purchase. By making a purchase, you also agree to Apple's Terms of Sale.</p>
+
+        <h3>3.6 Cancellation</h3>
+        <p>To cancel a Monthly subscription:</p>
+        <ol>
+            <li>Open the iOS Settings app</li>
+            <li>Tap your name at the top</li>
+            <li>Tap <strong>Subscriptions</strong></li>
+            <li>Select <strong>RealLife HQ</strong></li>
+            <li>Tap <strong>Cancel Subscription</strong></li>
+        </ol>
+        <p>You may also manage your subscription via <strong>Settings &gt; My Plan &gt; Manage Subscription</strong> within the App, which links directly to Apple's subscription management page.</p>
+        <p>Cancellation takes effect at the end of the current billing period. You retain Premium access until that date. Lifetime Access cannot be canceled as it is a one-time purchase.</p>
+
+        <h3>3.7 Refunds</h3>
+        <p>All refund requests must be submitted directly to Apple, as Apple processes all App Store transactions. We do not issue refunds directly. To request a refund, visit <a href="https://reportaproblem.apple.com" target="_blank">reportaproblem.apple.com</a> or contact Apple Support.</p>
+
+        <h3>3.8 Restore Purchases</h3>
+        <p>If you reinstall the App, upgrade to a new device, or lose access to Premium features you have paid for, use the <strong>Restore Purchases</strong> button available on the paywall screen. This syncs your purchase history with Apple's App Store and restores your Premium or Lifetime Access at no charge.</p>
+
+        <h3>3.9 Price Changes</h3>
+        <p>We reserve the right to modify subscription pricing. You will be notified of any price changes in advance through the App Store. Continued use of the subscription after a price change constitutes your acceptance of the new price.</p>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <h2>4. Free Plan Limitations</h2>
+        <p>The free version of RealLife HQ is fully functional for core features. The following limits apply to free users:</p>
         <ul>
-            <li>Calendar and event management</li>
-            <li>Habit tracking with streaks</li>
-            <li>Personal journal with prompts</li>
-            <li>Budget and expense tracking</li>
-            <li>Secure vault with encryption</li>
-            <li>Life Reminder Wizard</li>
+            <li><strong>Habits:</strong> Maximum of 3 habits. Habit reminders are not available on the free plan.</li>
+            <li><strong>Journal Entries:</strong> Maximum of 3 entries. PDF export is not available on the free plan.</li>
+            <li><strong>Notifications &amp; Reminders:</strong> Life Reminders, cleaning reminders, and habit reminders require Premium.</li>
+            <li><strong>Apple Calendar Sync:</strong> Requires Premium.</li>
         </ul>
-        
-        <h2>4. Data and Privacy</h2>
-        <p>All data is stored locally on your device. We do not collect, track, or sell your personal information. See our <a href="privacy-policy.html">Privacy Policy</a> for details.</p>
-        
-        <h2>5. User Responsibilities</h2>
-        <p>You are responsible for:</p>
+        <p>Upgrading to Premium unlocks all limits immediately and permanently (or for the duration of your active subscription).</p>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <h2>5. Data and Privacy</h2>
+        <p>All data you create in RealLife HQ is stored locally on your device. We do not collect, transmit, store, or share your personal data with any server or third party.</p>
+        <p>When you enable optional features:</p>
         <ul>
-            <li>Maintaining device security</li>
-            <li>Backing up your data</li>
-            <li>Using the App lawfully</li>
-            <li>Protecting your account credentials</li>
+            <li><strong>Apple Calendar Sync</strong> — exchanges data only between the App and your on-device Apple Calendar via EventKit. No calendar data is sent to our servers.</li>
+            <li><strong>Notifications</strong> — scheduled locally on your device using Apple's UserNotifications framework. No notification content is transmitted externally.</li>
+            <li><strong>Journal PDF Export</strong> — the PDF is generated on your device. You control where it goes via the iOS Share Sheet. We do not receive or store the exported file.</li>
         </ul>
-        
-        <h2>6. Disclaimers</h2>
-        <p>THE APP IS PROVIDED "AS IS" WITHOUT WARRANTIES. We do not guarantee uninterrupted or error-free service.</p>
-        
-        <h2>7. Limitation of Liability</h2>
-        <p>We are not liable for any indirect, incidental, or consequential damages arising from your use of the App.</p>
-        
-        <h2>8. Contact</h2>
-        <p>Questions about these terms? Contact us:</p>
-        <p>Email: <a href="mailto:sarah@thereallifehq.com">sarah@thereallifehq.com</a><br>
-        Website: <a href="https://www.thereallifehq.com">www.thereallifehq.com</a></p>
-        
+        <p>For complete details, please review our <a href="docsprivacy-policy.html">Privacy Policy</a>.</p>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <h2>6. User Responsibilities</h2>
+        <p>By using RealLife HQ, you agree to:</p>
+        <ul>
+            <li>Use the App only for lawful personal purposes</li>
+            <li>Maintain the security of your device and any biometric or passcode protections you configure</li>
+            <li>Keep your own backups of important data — we recommend enabling iCloud Backup</li>
+            <li>Not attempt to reverse-engineer, decompile, or tamper with the App</li>
+            <li>Not use the App in any manner that could damage, disable, or impair the App or interfere with any other user's use</li>
+            <li>Not attempt to gain unauthorized access to any part of the App's systems</li>
+        </ul>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <h2>7. Intellectual Property</h2>
+        <p>RealLife HQ and all content, design, code, trademarks, logos, and features within the App are the exclusive property of the developer and are protected by applicable intellectual property laws.</p>
+        <p>You are granted a limited, non-exclusive, non-transferable, revocable license to use the App on Apple devices you own or control, subject to these Terms and the Apple Media Services Terms and Conditions.</p>
+        <p>You may not copy, reproduce, modify, distribute, sell, or create derivative works from any part of the App without our express written permission.</p>
+        <p><strong>Your Content:</strong> You retain full ownership of all data and content you create within the App (journal entries, habit data, budget data, etc.). We claim no rights to your content.</p>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <h2>8. Third-Party Services</h2>
+        <p>RealLife HQ integrates with the following Apple-provided services. Use of these services is subject to Apple's own terms and policies:</p>
+        <ul>
+            <li><strong>App Store / StoreKit</strong> — all in-app purchases are governed by <a href="https://www.apple.com/legal/internet-services/itunes/" target="_blank">Apple's Media Services Terms and Conditions</a>.</li>
+            <li><strong>EventKit (Apple Calendar)</strong> — calendar sync reads and writes events to your on-device Apple Calendar when you grant permission.</li>
+            <li><strong>UserNotifications</strong> — local notification scheduling; all data remains on your device.</li>
+            <li><strong>iOS Keychain</strong> — secure on-device storage for Vault passwords and secure notes.</li>
+            <li><strong>LocalAuthentication</strong> — Face ID / Touch ID for Vault access; processed entirely by iOS Secure Enclave.</li>
+        </ul>
+        <p>We are not responsible for any third-party services, including their availability, terms, or privacy practices.</p>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <h2>9. Disclaimers and Limitation of Liability</h2>
+
+        <h3>9.1 Disclaimer of Warranties</h3>
+        <p>THE APP IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. WE DO NOT WARRANT THAT THE APP WILL BE UNINTERRUPTED, ERROR-FREE, OR FREE OF VIRUSES OR OTHER HARMFUL COMPONENTS.</p>
+
+        <h3>9.2 Financial and Health Disclaimer</h3>
+        <p>The budget and expense tracking features are tools to help you organize your personal finances and are provided for informational purposes only. They do not constitute financial, investment, or accounting advice. The habit and wellness tracking features are not medical advice. Always consult qualified professionals for financial, legal, or medical decisions.</p>
+
+        <h3>9.3 Data Loss</h3>
+        <p>Because all data is stored locally on your device, we are not responsible for data loss due to device failure, damage, theft, software malfunction, or accidental deletion. You are responsible for maintaining your own backups through iCloud Backup or other means.</p>
+
+        <h3>9.4 Limitation of Liability</h3>
+        <p>TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, WE SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES — INCLUDING BUT NOT LIMITED TO LOSS OF DATA, LOSS OF PROFITS, OR BUSINESS INTERRUPTION — ARISING FROM YOUR USE OF OR INABILITY TO USE THE APP, EVEN IF WE HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.</p>
+        <p>OUR TOTAL LIABILITY TO YOU FOR ALL CLAIMS ARISING FROM THESE TERMS OR YOUR USE OF THE APP SHALL NOT EXCEED THE AMOUNT YOU PAID TO US IN THE TWELVE (12) MONTHS PRECEDING THE CLAIM.</p>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <h2>10. Termination</h2>
+        <p>We reserve the right to terminate or suspend your access to Premium features if you violate these Terms. Termination does not entitle you to a refund; refund requests must be submitted to Apple.</p>
+        <p>You may terminate these Terms at any time by uninstalling the App and canceling any active subscription. Upon uninstallation, all locally stored app data is removed from your device (with the exception of Vault items stored in iOS Keychain, which may persist until manually cleared or your Apple ID data is reset).</p>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <h2>11. Changes to These Terms</h2>
+        <p>We may update these Terms from time to time to reflect changes in the App, applicable law, or our business practices. When we make material changes, we will update the "Last Updated" date at the top of this document.</p>
+        <p>Your continued use of the App after changes are posted constitutes your acceptance of the revised Terms. If you do not agree to the updated Terms, you should stop using the App and cancel any active subscription.</p>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <h2>12. Governing Law</h2>
+        <p>These Terms are governed by and construed in accordance with the laws of the United States, without regard to its conflict of law principles. Any disputes arising under these Terms shall be subject to the exclusive jurisdiction of the courts located in the United States.</p>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <h2>13. Apple as Third-Party Beneficiary</h2>
+        <p>You acknowledge and agree that Apple Inc. and its subsidiaries are a third-party beneficiary of these Terms, and that upon your acceptance of these Terms, Apple will have the right (and will be deemed to have accepted the right) to enforce these Terms against you as a third-party beneficiary thereof.</p>
+        <p>You also acknowledge that your use of the App is subject to Apple's <a href="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/" target="_blank">Standard End User License Agreement (EULA)</a> and that Apple is not responsible for the App or its content, and has no obligation whatsoever to furnish any maintenance or support services with respect to the App.</p>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <h2>14. Miscellaneous</h2>
+        <ul>
+            <li><strong>Entire Agreement:</strong> These Terms, together with our Privacy Policy, constitute the entire agreement between you and us regarding the App.</li>
+            <li><strong>Severability:</strong> If any provision of these Terms is found to be unenforceable, the remaining provisions will continue in full force and effect.</li>
+            <li><strong>No Waiver:</strong> Our failure to enforce any right or provision of these Terms does not constitute a waiver of that right or provision.</li>
+            <li><strong>Assignment:</strong> You may not assign your rights under these Terms without our prior written consent. We may assign our rights freely.</li>
+        </ul>
+
+        <!-- ═══════════════════════════════════════════════════════════ -->
+        <h2>15. Contact Us</h2>
+        <p>If you have questions, concerns, or requests regarding these Terms of Service:</p>
+
+        <div class="contact-box">
+            <p><strong>Email:</strong> sarah@thereallifehq.com</p>
+            <p><strong>Website:</strong> www.thereallifehq.com</p>
+            <p style="margin-top: 12px; color: #86868b; font-size: 0.9em;">Response Time: We aim to respond to all inquiries within 48 hours.</p>
+        </div>
+
+        <div class="summary-box">
+            <h2>Summary</h2>
+            <p>RealLife HQ is free to download with optional Premium features ($1.99/month with a 7-day free trial, or $24.99 for Lifetime Access). All purchases go through Apple. Your data stays on your device. You own your content. Cancel your subscription anytime through iOS Settings.</p>
+        </div>
+
         <div class="footer">
-            <p>&copy; 2026 RealLifeHQ. All rights reserved.</p>
-            <p><a href="index.html">Home</a> | <a href="privacy-policy.html">Privacy</a> | <a href="support.html">Support</a></p>
+            <p>&copy; 2026 RealLife HQ. All rights reserved.</p>
+            <p style="margin-top: 8px;">
+                <a href="index.html">Home</a> &nbsp;|&nbsp;
+                <a href="docsprivacy-policy.html">Privacy Policy</a> &nbsp;|&nbsp;
+                <a href="docssupport.html">Support</a>
+            </p>
+            <p style="margin-top: 12px; font-size: 0.85em;">These Terms of Service are effective as of May 18, 2026.</p>
         </div>
     </div>
 </body>

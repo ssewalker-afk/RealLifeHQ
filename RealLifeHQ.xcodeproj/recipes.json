@@ -1,0 +1,247 @@
+{
+  "recipes": [
+    {
+      "id": "b001",
+      "title": "Greek Yogurt Parfait",
+      "mealType": "breakfast",
+      "prepTimeMinutes": 5,
+      "cookTimeMinutes": 0,
+      "servings": 1,
+      "calories": 320,
+      "dietaryTags": ["vegetarian", "gluten-free", "high-protein", "nut-free"],
+      "ingredients": [
+        { "name": "plain Greek yogurt", "amount": 1, "unit": "cup" },
+        { "name": "mixed berries", "amount": 0.5, "unit": "cup" },
+        { "name": "honey", "amount": 1, "unit": "tbsp" },
+        { "name": "granola", "amount": 0.25, "unit": "cup" },
+        { "name": "chia seeds", "amount": 1, "unit": "tsp" }
+      ],
+      "steps": [
+        "Add half the yogurt to a glass or bowl.",
+        "Layer half the berries and a sprinkle of granola on top.",
+        "Add the remaining yogurt, then top with the rest of the berries, granola, chia seeds, and a drizzle of honey.",
+        "Serve immediately or refrigerate overnight for overnight parfait."
+      ]
+    },
+    {
+      "id": "b002",
+      "title": "Veggie Egg Scramble",
+      "mealType": "breakfast",
+      "prepTimeMinutes": 5,
+      "cookTimeMinutes": 8,
+      "servings": 2,
+      "calories": 280,
+      "dietaryTags": ["vegetarian", "gluten-free", "dairy-free", "low-carb", "high-protein", "nut-free"],
+      "ingredients": [
+        { "name": "eggs", "amount": 4, "unit": "whole" },
+        { "name": "bell pepper, diced", "amount": 0.5, "unit": "cup" },
+        { "name": "baby spinach", "amount": 1, "unit": "cup" },
+        { "name": "cherry tomatoes, halved", "amount": 0.5, "unit": "cup" },
+        { "name": "olive oil", "amount": 1, "unit": "tsp" },
+        { "name": "salt", "amount": 0.25, "unit": "tsp" },
+        { "name": "black pepper", "amount": 0.125, "unit": "tsp" }
+      ],
+      "steps": [
+        "Heat olive oil in a non-stick skillet over medium heat.",
+        "Sauté bell pepper for 2 minutes until slightly softened.",
+        "Add spinach and tomatoes, cook 1 minute until spinach wilts.",
+        "Whisk eggs with salt and pepper, pour into the skillet.",
+        "Gently stir with a spatula, folding the eggs until just set, about 3 minutes.",
+        "Serve immediately."
+      ]
+    },
+    {
+      "id": "b003",
+      "title": "Overnight Oats with Banana",
+      "mealType": "breakfast",
+      "prepTimeMinutes": 5,
+      "cookTimeMinutes": 0,
+      "servings": 1,
+      "calories": 350,
+      "dietaryTags": ["vegetarian", "vegan", "dairy-free", "nut-free", "high-fiber"],
+      "ingredients": [
+        { "name": "rolled oats", "amount": 0.5, "unit": "cup" },
+        { "name": "oat milk", "amount": 0.5, "unit": "cup" },
+        { "name": "banana, sliced", "amount": 1, "unit": "whole" },
+        { "name": "maple syrup", "amount": 1, "unit": "tsp" },
+        { "name": "cinnamon", "amount": 0.25, "unit": "tsp" },
+        { "name": "chia seeds", "amount": 1, "unit": "tbsp" }
+      ],
+      "steps": [
+        "Combine oats, oat milk, chia seeds, maple syrup, and cinnamon in a jar or container.",
+        "Stir well, then top with banana slices.",
+        "Cover and refrigerate for at least 4 hours or overnight.",
+        "Stir before eating. Enjoy cold or microwave for 1-2 minutes if you prefer warm."
+      ]
+    },
+    {
+      "id": "b004",
+      "title": "Avocado Toast with Egg",
+      "mealType": "breakfast",
+      "prepTimeMinutes": 5,
+      "cookTimeMinutes": 5,
+      "servings": 1,
+      "calories": 380,
+      "dietaryTags": ["vegetarian", "dairy-free", "high-fiber", "high-protein", "nut-free"],
+      "ingredients": [
+        { "name": "whole wheat bread", "amount": 2, "unit": "slices" },
+        { "name": "ripe avocado", "amount": 0.5, "unit": "whole" },
+        { "name": "egg", "amount": 1, "unit": "whole" },
+        { "name": "lemon juice", "amount": 1, "unit": "tsp" },
+        { "name": "red pepper flakes", "amount": 0.125, "unit": "tsp" },
+        { "name": "salt", "amount": 0.125, "unit": "tsp" }
+      ],
+      "steps": [
+        "Toast the bread until golden and firm.",
+        "Mash avocado with lemon juice and salt in a small bowl.",
+        "Fry or poach the egg to your preference.",
+        "Spread mashed avocado on both slices of toast.",
+        "Top one slice with the egg, sprinkle red pepper flakes, and serve."
+      ]
+    },
+    {
+      "id": "b005",
+      "title": "Banana Peanut Butter Smoothie",
+      "mealType": "breakfast",
+      "prepTimeMinutes": 5,
+      "cookTimeMinutes": 0,
+      "servings": 1,
+      "calories": 340,
+      "dietaryTags": ["vegetarian", "vegan", "dairy-free", "gluten-free", "high-protein"],
+      "ingredients": [
+        { "name": "banana, frozen", "amount": 1, "unit": "whole" },
+        { "name": "peanut butter", "amount": 2, "unit": "tbsp" },
+        { "name": "oat milk", "amount": 1, "unit": "cup" },
+        { "name": "honey or maple syrup", "amount": 1, "unit": "tsp" },
+        { "name": "ice cubes", "amount": 0.5, "unit": "cup" }
+      ],
+      "steps": [
+        "Add banana, peanut butter, oat milk, sweetener, and ice to a blender.",
+        "Blend on high for 60 seconds until smooth and creamy.",
+        "Pour into a glass and serve immediately."
+      ]
+    },
+    {
+      "id": "b006",
+      "title": "Sweet Potato Breakfast Hash",
+      "mealType": "breakfast",
+      "prepTimeMinutes": 10,
+      "cookTimeMinutes": 15,
+      "servings": 2,
+      "calories": 310,
+      "dietaryTags": ["gluten-free", "dairy-free", "high-fiber", "nut-free", "paleo"],
+      "ingredients": [
+        { "name": "sweet potato, diced small", "amount": 1, "unit": "whole" },
+        { "name": "turkey sausage, sliced", "amount": 4, "unit": "oz" },
+        { "name": "bell pepper, diced", "amount": 0.5, "unit": "cup" },
+        { "name": "onion, diced", "amount": 0.25, "unit": "cup" },
+        { "name": "olive oil", "amount": 1, "unit": "tbsp" },
+        { "name": "smoked paprika", "amount": 0.5, "unit": "tsp" },
+        { "name": "salt", "amount": 0.25, "unit": "tsp" }
+      ],
+      "steps": [
+        "Heat olive oil in a large skillet over medium-high heat.",
+        "Add diced sweet potato and cook for 8 minutes, stirring occasionally, until tender.",
+        "Add sausage, bell pepper, and onion. Cook 5 more minutes until sausage is browned.",
+        "Season with smoked paprika and salt, stir to combine.",
+        "Serve hot, optionally topped with a fried egg."
+      ]
+    },
+    {
+      "id": "b007",
+      "title": "Spinach and Feta Egg Muffins",
+      "mealType": "breakfast",
+      "prepTimeMinutes": 10,
+      "cookTimeMinutes": 20,
+      "servings": 6,
+      "calories": 130,
+      "dietaryTags": ["vegetarian", "gluten-free", "low-carb", "high-protein", "nut-free"],
+      "ingredients": [
+        { "name": "eggs", "amount": 6, "unit": "whole" },
+        { "name": "baby spinach, chopped", "amount": 1, "unit": "cup" },
+        { "name": "feta cheese, crumbled", "amount": 0.25, "unit": "cup" },
+        { "name": "sun-dried tomatoes, chopped", "amount": 2, "unit": "tbsp" },
+        { "name": "salt", "amount": 0.25, "unit": "tsp" },
+        { "name": "black pepper", "amount": 0.125, "unit": "tsp" },
+        { "name": "cooking spray", "amount": 1, "unit": "spray" }
+      ],
+      "steps": [
+        "Preheat oven to 375°F. Spray a 6-cup muffin tin with cooking spray.",
+        "Whisk eggs, salt, and pepper in a bowl.",
+        "Stir in spinach, feta, and sun-dried tomatoes.",
+        "Pour mixture evenly into muffin cups.",
+        "Bake for 18-20 minutes until set and lightly golden.",
+        "Let cool 2 minutes, then remove. Store extras in the fridge for up to 4 days."
+      ]
+    },
+    {
+      "id": "b008",
+      "title": "Berry Oatmeal Bowl",
+      "mealType": "breakfast",
+      "prepTimeMinutes": 2,
+      "cookTimeMinutes": 5,
+      "servings": 1,
+      "calories": 290,
+      "dietaryTags": ["vegetarian", "vegan", "dairy-free", "nut-free", "high-fiber"],
+      "ingredients": [
+        { "name": "rolled oats", "amount": 0.5, "unit": "cup" },
+        { "name": "water", "amount": 1, "unit": "cup" },
+        { "name": "mixed berries", "amount": 0.5, "unit": "cup" },
+        { "name": "flaxseed meal", "amount": 1, "unit": "tbsp" },
+        { "name": "maple syrup", "amount": 1, "unit": "tsp" },
+        { "name": "cinnamon", "amount": 0.25, "unit": "tsp" }
+      ],
+      "steps": [
+        "Bring water to a boil in a small pot.",
+        "Stir in oats and reduce heat to medium-low.",
+        "Cook 4-5 minutes, stirring occasionally, until creamy.",
+        "Transfer to a bowl and top with berries, flaxseed, cinnamon, and maple syrup."
+      ]
+    },
+    {
+      "id": "b009",
+      "title": "Turkey Breakfast Wrap",
+      "mealType": "breakfast",
+      "prepTimeMinutes": 5,
+      "cookTimeMinutes": 5,
+      "servings": 1,
+      "calories": 360,
+      "dietaryTags": ["high-protein", "nut-free", "dairy-free"],
+      "ingredients": [
+        { "name": "whole wheat tortilla", "amount": 1, "unit": "whole" },
+        { "name": "deli turkey slices", "amount": 3, "unit": "oz" },
+        { "name": "egg, scrambled", "amount": 1, "unit": "whole" },
+        { "name": "baby spinach", "amount": 0.5, "unit": "cup" },
+        { "name": "salsa", "amount": 2, "unit": "tbsp" }
+      ],
+      "steps": [
+        "Scramble the egg in a small non-stick pan over medium heat.",
+        "Warm the tortilla in a dry skillet or microwave for 15 seconds.",
+        "Layer turkey, scrambled egg, spinach, and salsa on the tortilla.",
+        "Fold in the sides and roll up tightly. Serve warm."
+      ]
+    },
+    {
+      "id": "b010",
+      "title": "Cottage Cheese Fruit Bowl",
+      "mealType": "breakfast",
+      "prepTimeMinutes": 5,
+      "cookTimeMinutes": 0,
+      "servings": 1,
+      "calories": 260,
+      "dietaryTags": ["vegetarian", "gluten-free", "high-protein", "nut-free"],
+      "ingredients": [
+        { "name": "cottage cheese", "amount": 1, "unit": "cup" },
+        { "name": "peach, diced", "amount": 0.5, "unit": "cup" },
+        { "name": "blueberries", "amount": 0.25, "unit": "cup" },
+        { "name": "honey", "amount": 1, "unit": "tsp" },
+        { "name": "pumpkin seeds", "amount": 1, "unit": "tbsp" }
+      ],
+      "steps": [
+        "Scoop cottage cheese into a bowl.",
+        "Top with diced peach, blueberries, and pumpkin seeds.",
+        "Drizzle honey over the top and serve."
+      ]
+    }
+  ]
+}

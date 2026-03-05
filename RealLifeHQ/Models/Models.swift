@@ -18,7 +18,6 @@ struct Event: Identifiable, Codable {
     var notificationIdentifier: String? // For canceling notifications
     var recurrenceRule: RecurrenceRule? // Recurring event pattern
     var recurrenceEndDate: Date? // When to stop recurring (nil = forever)
-    var googleCalendarEventId: String? // Google Calendar event ID for syncing
     
     enum RecurrenceRule: String, Codable, CaseIterable {
         case daily = "Daily"
@@ -228,24 +227,204 @@ struct Transaction: Identifiable, Codable {
 }
 
 // Recipe
-struct Recipe: Identifiable, Codable {
+struct Recipe: Identifiable, Codable, Hashable {
     var id = UUID()
     var name: String
-    var category: String
+    var mealType: MealType = .lunch
     var prepTime: Int        // In minutes
     var cookTime: Int        // In minutes
     var servings: Int
-    var ingredients: [String]
+    var ingredients: [Ingredient]  // Changed to support measurements
     var instructions: [String]
+    var recipeDescription: String?  // How to prepare
     var notes: String?
     var isFavorite: Bool = false
+    var imageData: Data?  // Optional recipe image
+    var createdDate: Date = Date()
+    
+    // New properties for enhanced recipe features
+    var calories: Int?       // Calories per serving
+    var protein: Int?        // Protein in grams
+    var carbs: Int?          // Carbs in grams
+    var fat: Int?            // Fat in grams
+    var fiber: Int?          // Fiber in grams
+    var dietaryTags: [DietaryTag] = []  // Dietary requirements/tags
+    var isPrebuilt: Bool = false  // Whether this is a pre-built recipe from the library
+    
+    enum MealType: String, Codable, CaseIterable {
+        case breakfast = "Breakfast"
+        case lunch = "Lunch"
+        case dinner = "Dinner"
+        case dessert = "Dessert"
+        case snack = "Snack"
+        case slowCooker = "Slow Cooker"
+        case airFryer = "Air Fryer"
+        
+        var icon: String {
+            switch self {
+            case .breakfast: return "sunrise.fill"
+            case .lunch: return "sun.max.fill"
+            case .dinner: return "moon.stars.fill"
+            case .dessert: return "birthday.cake.fill"
+            case .snack: return "carrot.fill"
+            case .slowCooker: return "timer"
+            case .airFryer: return "wind"
+            }
+        }
+    }
+    
+    enum DietaryTag: String, Codable, CaseIterable, Hashable {
+        case vegetarian = "Vegetarian"
+        case vegan = "Vegan"
+        case glutenFree = "Gluten-Free"
+        case dairyFree = "Dairy-Free"
+        case lowCarb = "Low-Carb"
+        case highProtein = "High-Protein"
+        case pescatarian = "Pescatarian"
+        case keto = "Keto"
+        case paleo = "Paleo"
+        case nutFree = "Nut-Free"
+        case highFiber = "High-Fiber"
+        case quickPrep = "Quick (<30 min)"
+        
+        var icon: String {
+            switch self {
+            case .vegetarian: return "leaf.fill"
+            case .vegan: return "leaf.circle.fill"
+            case .glutenFree: return "g.circle.fill"
+            case .dairyFree: return "drop.circle.fill"
+            case .lowCarb: return "c.circle.fill"
+            case .highProtein: return "p.circle.fill"
+            case .pescatarian: return "fish.fill"
+            case .keto: return "k.circle.fill"
+            case .paleo: return "figure.walk"
+            case .nutFree: return "allergens"
+            case .highFiber: return "f.circle.fill"
+            case .quickPrep: return "clock.fill"
+            }
+        }
+        
+        var color: String {
+            switch self {
+            case .vegetarian: return "green"
+            case .vegan: return "green"
+            case .glutenFree: return "orange"
+            case .dairyFree: return "blue"
+            case .lowCarb: return "purple"
+            case .highProtein: return "red"
+            case .pescatarian: return "blue"
+            case .keto: return "purple"
+            case .paleo: return "brown"
+            case .nutFree: return "yellow"
+            case .highFiber: return "brown"
+            case .quickPrep: return "teal"
+            }
+        }
+    }
+    
+    struct Ingredient: Identifiable, Codable, Hashable {
+        var id = UUID()
+        var name: String
+        var amount: String  // e.g., "2", "1/2", "1.5"
+        var unit: String    // e.g., "cups", "tbsp", "oz"
+        
+        var displayText: String {
+            if amount.isEmpty && unit.isEmpty {
+                return name
+            } else if amount.isEmpty {
+                return "\(unit) \(name)"
+            } else if unit.isEmpty {
+                return "\(amount) \(name)"
+            } else {
+                return "\(amount) \(unit) \(name)"
+            }
+        }
+        
+        // Scale ingredient for different serving sizes
+        func scaled(by factor: Double) -> Ingredient {
+            guard let amountValue = parseAmount(amount) else {
+                return self
+            }
+            let scaledAmount = amountValue * factor
+            return Ingredient(
+                id: id,
+                name: name,
+                amount: formatAmount(scaledAmount),
+                unit: unit
+            )
+        }
+        
+        private func parseAmount(_ str: String) -> Double? {
+            // Handle fractions like "1/2", "1/4"
+            if str.contains("/") {
+                let parts = str.split(separator: "/")
+                if parts.count == 2,
+                   let numerator = Double(parts[0]),
+                   let denominator = Double(parts[1]),
+                   denominator != 0 {
+                    return numerator / denominator
+                }
+            }
+            // Handle decimals and whole numbers
+            return Double(str)
+        }
+        
+        private func formatAmount(_ value: Double) -> String {
+            // Round to 2 decimal places
+            let rounded = round(value * 100) / 100
+            
+            // If it's a whole number, show it without decimals
+            if rounded.truncatingRemainder(dividingBy: 1) == 0 {
+                return String(Int(rounded))
+            }
+            
+            // Otherwise show with up to 2 decimal places
+            return String(format: "%.2f", rounded).replacingOccurrences(of: #"\.?0+$"#, with: "", options: .regularExpression)
+        }
+    }
     
     var totalTime: Int {
         prepTime + cookTime
     }
     
     var totalTimeString: String {
-        "\(totalTime) min"
+        if totalTime < 60 {
+            return "\(totalTime) min"
+        } else {
+            let hours = totalTime / 60
+            let minutes = totalTime % 60
+            if minutes == 0 {
+                return "\(hours)h"
+            }
+            return "\(hours)h \(minutes)m"
+        }
+    }
+    
+    // Formatted nutrition string
+    var nutritionSummary: String? {
+        guard let calories = calories else { return nil }
+        var summary = "\(calories) cal"
+        
+        if let protein = protein, let carbs = carbs, let fat = fat {
+            summary += " • P: \(protein)g • C: \(carbs)g • F: \(fat)g"
+        }
+        
+        return summary
+    }
+    
+    // Check if recipe matches dietary requirements
+    func matchesDietaryRequirements(_ requirements: Set<DietaryTag>) -> Bool {
+        guard !requirements.isEmpty else { return true }
+        return requirements.isSubset(of: Set(dietaryTags))
+    }
+    
+    // Get scaled recipe for different serving size
+    func scaled(toServings newServings: Int) -> Recipe {
+        let factor = Double(newServings) / Double(servings)
+        var scaledRecipe = self
+        scaledRecipe.servings = newServings
+        scaledRecipe.ingredients = ingredients.map { $0.scaled(by: factor) }
+        return scaledRecipe
     }
 }
 
@@ -255,13 +434,25 @@ struct MealPlan: Identifiable, Codable {
     var name: String
     var startDate: Date
     var numberOfDays: Int
+    var includeMeals: IncludedMeals  // Which meals to include
     var meals: [Date: DayMeals]  // Meals for each day
     var createdDate: Date
     
-    struct DayMeals: Codable {
-        var breakfast: Recipe?
-        var lunch: Recipe?
-        var dinner: Recipe?
+    struct IncludedMeals: Codable {
+        var breakfast: Bool = true
+        var lunch: Bool = true
+        var dinner: Bool = true
+    }
+    
+    struct DayMeals: Codable, Hashable {
+        var breakfast: RecipeServingPair?
+        var lunch: RecipeServingPair?
+        var dinner: RecipeServingPair?
+    }
+    
+    struct RecipeServingPair: Codable, Hashable {
+        var recipe: Recipe
+        var servings: Int  // Custom serving size for this meal
     }
     
     var dateRange: String {
@@ -271,16 +462,78 @@ struct MealPlan: Identifiable, Codable {
         return "\(formatter.string(from: startDate)) - \(formatter.string(from: endDate))"
     }
     
-    // MARK: - Custom Codable Implementation
-    enum CodingKeys: String, CodingKey {
-        case id, name, startDate, numberOfDays, meals, createdDate
+    var endDate: Date {
+        Calendar.current.date(byAdding: .day, value: numberOfDays - 1, to: startDate) ?? startDate
     }
     
-    init(id: UUID = UUID(), name: String, startDate: Date, numberOfDays: Int, meals: [Date: DayMeals], createdDate: Date) {
+    // Get all unique ingredients from the meal plan
+    func getAllIngredients() -> [Recipe.Ingredient] {
+        var ingredientsMap: [String: Recipe.Ingredient] = [:]
+        
+        for (_, dayMeals) in meals {
+            let recipePairs: [RecipeServingPair?] = [
+                dayMeals.breakfast,
+                dayMeals.lunch,
+                dayMeals.dinner
+            ]
+            
+            for pair in recipePairs.compactMap({ $0 }) {
+                let scaledRecipe = pair.recipe.scaled(toServings: pair.servings)
+                for ingredient in scaledRecipe.ingredients {
+                    let key = "\(ingredient.name)|\(ingredient.unit)"
+                    
+                    if let existing = ingredientsMap[key] {
+                        // Combine amounts if same ingredient and unit
+                        let existingAmount = parseAmount(existing.amount) ?? 0
+                        let newAmount = parseAmount(ingredient.amount) ?? 0
+                        let combined = existingAmount + newAmount
+                        ingredientsMap[key] = Recipe.Ingredient(
+                            name: ingredient.name,
+                            amount: formatAmount(combined),
+                            unit: ingredient.unit
+                        )
+                    } else {
+                        ingredientsMap[key] = ingredient
+                    }
+                }
+            }
+        }
+        
+        return Array(ingredientsMap.values).sorted { $0.name < $1.name }
+    }
+    
+    private func parseAmount(_ str: String) -> Double? {
+        if str.contains("/") {
+            let parts = str.split(separator: "/")
+            if parts.count == 2,
+               let numerator = Double(parts[0]),
+               let denominator = Double(parts[1]),
+               denominator != 0 {
+                return numerator / denominator
+            }
+        }
+        return Double(str)
+    }
+    
+    private func formatAmount(_ value: Double) -> String {
+        let rounded = round(value * 100) / 100
+        if rounded.truncatingRemainder(dividingBy: 1) == 0 {
+            return String(Int(rounded))
+        }
+        return String(format: "%.2f", rounded).replacingOccurrences(of: #"\.?0+$"#, with: "", options: .regularExpression)
+    }
+    
+    // MARK: - Custom Codable Implementation
+    enum CodingKeys: String, CodingKey {
+        case id, name, startDate, numberOfDays, includeMeals, meals, createdDate
+    }
+    
+    init(id: UUID = UUID(), name: String, startDate: Date, numberOfDays: Int, includeMeals: IncludedMeals = IncludedMeals(), meals: [Date: DayMeals] = [:], createdDate: Date = Date()) {
         self.id = id
         self.name = name
         self.startDate = startDate
         self.numberOfDays = numberOfDays
+        self.includeMeals = includeMeals
         self.meals = meals
         self.createdDate = createdDate
     }
@@ -291,6 +544,7 @@ struct MealPlan: Identifiable, Codable {
         name = try container.decode(String.self, forKey: .name)
         startDate = try container.decode(Date.self, forKey: .startDate)
         numberOfDays = try container.decode(Int.self, forKey: .numberOfDays)
+        includeMeals = (try? container.decode(IncludedMeals.self, forKey: .includeMeals)) ?? IncludedMeals()
         createdDate = try container.decode(Date.self, forKey: .createdDate)
         
         // Decode meals dictionary with Date keys
@@ -311,6 +565,7 @@ struct MealPlan: Identifiable, Codable {
         try container.encode(name, forKey: .name)
         try container.encode(startDate, forKey: .startDate)
         try container.encode(numberOfDays, forKey: .numberOfDays)
+        try container.encode(includeMeals, forKey: .includeMeals)
         try container.encode(createdDate, forKey: .createdDate)
         
         // Encode meals dictionary with Date keys as strings

@@ -14,6 +14,7 @@ class GoogleCalendarManager: NSObject, ObservableObject {
     private let baseURL = "https://www.googleapis.com/calendar/v3"
     private var accessToken: String?
     private var refreshToken: String?
+    private var tokenExpirationDate: Date?
     
     // Google OAuth Configuration
     // NOTE: You'll need to set these up in Google Cloud Console
@@ -23,15 +24,24 @@ class GoogleCalendarManager: NSObject, ObservableObject {
     private let clientID = "657493089268-qmc643b5jlhet355mg2ktnu0o6b0a404.apps.googleusercontent.com"
     private let redirectURI = "com.googleusercontent.apps.657493089268-qmc643b5jlhet355mg2ktnu0o6b0a404:/oauth2redirect"
     
-    // Key for storing tokens
+    // Key for storing tokens (consider moving to Keychain for better security)
     private let accessTokenKey = "googleCalendarAccessToken"
     private let refreshTokenKey = "googleCalendarRefreshToken"
+    private let tokenExpirationKey = "googleCalendarTokenExpiration"
     private let userEmailKey = "googleCalendarUserEmail"
     private let syncEnabledKey = "googleCalendarSyncEnabled"
+    
+    // Token refresh task
+    private var tokenRefreshTask: Task<Void, Never>?
     
     private override init() {
         super.init()
         loadStoredCredentials()
+        scheduleTokenRefreshIfNeeded()
+    }
+    
+    deinit {
+        tokenRefreshTask?.cancel()
     }
     
     // MARK: - Authentication
@@ -42,14 +52,65 @@ class GoogleCalendarManager: NSObject, ObservableObject {
         refreshToken = UserDefaults.standard.string(forKey: refreshTokenKey)
         userEmail = UserDefaults.standard.string(forKey: userEmailKey)
         syncEnabled = UserDefaults.standard.bool(forKey: syncEnabledKey)
-        isAuthenticated = accessToken != nil
+        
+        if let expirationTimestamp = UserDefaults.standard.object(forKey: tokenExpirationKey) as? TimeInterval {
+            tokenExpirationDate = Date(timeIntervalSince1970: expirationTimestamp)
+        }
+        
+        isAuthenticated = accessToken != nil && refreshToken != nil
+        
+        // Check if token is expired or about to expire
+        if isAuthenticated && isTokenExpiredOrExpiring() {
+            Task {
+                try? await refreshAccessToken()
+            }
+        }
+    }
+    
+    /// Check if token is expired or expiring soon (within 5 minutes)
+    private func isTokenExpiredOrExpiring() -> Bool {
+        guard let expirationDate = tokenExpirationDate else {
+            return true // No expiration date means we should refresh
+        }
+        
+        let bufferTime: TimeInterval = 5 * 60 // 5 minutes
+        return Date().addingTimeInterval(bufferTime) >= expirationDate
+    }
+    
+    /// Schedule automatic token refresh before expiration
+    private func scheduleTokenRefreshIfNeeded() {
+        tokenRefreshTask?.cancel()
+        
+        guard isAuthenticated, let expirationDate = tokenExpirationDate else {
+            return
+        }
+        
+        tokenRefreshTask = Task { @MainActor in
+            // Calculate time until we should refresh (5 minutes before expiration)
+            let refreshTime = expirationDate.addingTimeInterval(-5 * 60)
+            let delay = refreshTime.timeIntervalSinceNow
+            
+            if delay > 0 {
+                try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+                
+                // Check if task was cancelled
+                if !Task.isCancelled {
+                    try? await refreshAccessToken()
+                    scheduleTokenRefreshIfNeeded() // Schedule next refresh
+                }
+            }
+        }
     }
     
     /// Save credentials to UserDefaults
-    private func saveCredentials(accessToken: String, refreshToken: String?, email: String?) {
+    private func saveCredentials(accessToken: String, refreshToken: String?, email: String?, expiresIn: Int? = nil) {
         self.accessToken = accessToken
         self.refreshToken = refreshToken
         self.userEmail = email
+        
+        // Calculate expiration date (default to 1 hour if not provided)
+        let expirationSeconds = TimeInterval(expiresIn ?? 3600)
+        self.tokenExpirationDate = Date().addingTimeInterval(expirationSeconds)
         
         UserDefaults.standard.set(accessToken, forKey: accessTokenKey)
         if let refreshToken = refreshToken {
@@ -58,20 +119,30 @@ class GoogleCalendarManager: NSObject, ObservableObject {
         if let email = email {
             UserDefaults.standard.set(email, forKey: userEmailKey)
         }
+        if let expirationDate = tokenExpirationDate {
+            UserDefaults.standard.set(expirationDate.timeIntervalSince1970, forKey: tokenExpirationKey)
+        }
         
         isAuthenticated = true
+        
+        // Schedule automatic refresh
+        scheduleTokenRefreshIfNeeded()
     }
     
     /// Clear stored credentials
     func signOut() {
+        tokenRefreshTask?.cancel()
+        
         accessToken = nil
         refreshToken = nil
         userEmail = nil
+        tokenExpirationDate = nil
         isAuthenticated = false
         syncEnabled = false
         
         UserDefaults.standard.removeObject(forKey: accessTokenKey)
         UserDefaults.standard.removeObject(forKey: refreshTokenKey)
+        UserDefaults.standard.removeObject(forKey: tokenExpirationKey)
         UserDefaults.standard.removeObject(forKey: userEmailKey)
         UserDefaults.standard.set(false, forKey: syncEnabledKey)
     }
@@ -162,7 +233,8 @@ class GoogleCalendarManager: NSObject, ObservableObject {
         saveCredentials(
             accessToken: tokenResponse.accessToken,
             refreshToken: tokenResponse.refreshToken,
-            email: email
+            email: email,
+            expiresIn: tokenResponse.expiresIn
         )
     }
     
@@ -180,6 +252,8 @@ class GoogleCalendarManager: NSObject, ObservableObject {
     /// Refresh access token if expired
     private func refreshAccessToken() async throws {
         guard let refreshToken = refreshToken else {
+            // No refresh token available, need to re-authenticate
+            signOut()
             throw GoogleCalendarError.notAuthenticated
         }
         
@@ -194,11 +268,60 @@ class GoogleCalendarManager: NSObject, ObservableObject {
         
         request.httpBody = body.data(using: .utf8)
         
-        let (data, _) = try await URLSession.shared.data(for: request)
-        let tokenResponse = try JSONDecoder().decode(TokenResponse.self, from: data)
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw GoogleCalendarError.tokenExchangeFailed
+            }
+            
+            // Check if refresh token is invalid
+            if httpResponse.statusCode == 400 {
+                // Refresh token is invalid or revoked, need to re-authenticate
+                signOut()
+                throw GoogleCalendarError.refreshTokenInvalid
+            }
+            
+            guard httpResponse.statusCode == 200 else {
+                throw GoogleCalendarError.tokenExchangeFailed
+            }
+            
+            let tokenResponse = try JSONDecoder().decode(TokenResponse.self, from: data)
+            
+            // Update access token and expiration
+            self.accessToken = tokenResponse.accessToken
+            let expirationSeconds = TimeInterval(tokenResponse.expiresIn)
+            self.tokenExpirationDate = Date().addingTimeInterval(expirationSeconds)
+            
+            UserDefaults.standard.set(tokenResponse.accessToken, forKey: accessTokenKey)
+            if let expirationDate = tokenExpirationDate {
+                UserDefaults.standard.set(expirationDate.timeIntervalSince1970, forKey: tokenExpirationKey)
+            }
+            
+            // If a new refresh token is provided, update it
+            if let newRefreshToken = tokenResponse.refreshToken {
+                self.refreshToken = newRefreshToken
+                UserDefaults.standard.set(newRefreshToken, forKey: refreshTokenKey)
+            }
+            
+            // Schedule next refresh
+            scheduleTokenRefreshIfNeeded()
+            
+        } catch {
+            signOut()
+            throw error
+        }
+    }
+    
+    /// Ensure we have a valid access token before making API calls
+    private func ensureValidToken() async throws {
+        guard isAuthenticated else {
+            throw GoogleCalendarError.notAuthenticated
+        }
         
-        self.accessToken = tokenResponse.accessToken
-        UserDefaults.standard.set(tokenResponse.accessToken, forKey: accessTokenKey)
+        if isTokenExpiredOrExpiring() {
+            try await refreshAccessToken()
+        }
     }
     
     // MARK: - Calendar Operations
@@ -221,6 +344,9 @@ class GoogleCalendarManager: NSObject, ObservableObject {
         guard syncEnabled else {
             return []
         }
+        
+        // Ensure token is valid before making the request
+        try await ensureValidToken()
         
         let formatter = ISO8601DateFormatter()
         let timeMin = formatter.string(from: startDate)
@@ -263,6 +389,9 @@ class GoogleCalendarManager: NSObject, ObservableObject {
             throw GoogleCalendarError.notAuthenticated
         }
         
+        // Ensure token is valid before making the request
+        try await ensureValidToken()
+        
         let url = URL(string: "\(baseURL)/calendars/primary/events")!
         var request = createAuthenticatedRequest(url: url, method: "POST")
         
@@ -287,6 +416,9 @@ class GoogleCalendarManager: NSObject, ObservableObject {
             throw GoogleCalendarError.notAuthenticated
         }
         
+        // Ensure token is valid before making the request
+        try await ensureValidToken()
+        
         let url = URL(string: "\(baseURL)/calendars/primary/events/\(googleEventId)")!
         var request = createAuthenticatedRequest(url: url, method: "PUT")
         
@@ -307,6 +439,9 @@ class GoogleCalendarManager: NSObject, ObservableObject {
         guard isAuthenticated, syncEnabled else {
             throw GoogleCalendarError.notAuthenticated
         }
+        
+        // Ensure token is valid before making the request
+        try await ensureValidToken()
         
         let url = URL(string: "\(baseURL)/calendars/primary/events/\(googleEventId)")!
         let request = createAuthenticatedRequest(url: url, method: "DELETE")
@@ -537,6 +672,7 @@ enum GoogleCalendarError: LocalizedError {
     case invalidURL
     case authenticationFailed
     case tokenExchangeFailed
+    case refreshTokenInvalid
     case fetchFailed
     case createFailed
     case updateFailed
@@ -552,6 +688,8 @@ enum GoogleCalendarError: LocalizedError {
             return "Google authentication failed"
         case .tokenExchangeFailed:
             return "Failed to exchange authorization code for token"
+        case .refreshTokenInvalid:
+            return "Refresh token is invalid or expired. Please sign in again."
         case .fetchFailed:
             return "Failed to fetch events from Google Calendar"
         case .createFailed:
