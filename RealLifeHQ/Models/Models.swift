@@ -242,23 +242,12 @@ struct Recipe: Identifiable, Codable, Hashable {
     var imageData: Data?  // Optional recipe image
     var createdDate: Date = Date()
     
-    // New properties for enhanced recipe features
-    var calories: Int?       // Calories per serving
-    var protein: Int?        // Protein in grams
-    var carbs: Int?          // Carbs in grams
-    var fat: Int?            // Fat in grams
-    var fiber: Int?          // Fiber in grams
-    var dietaryTags: [DietaryTag] = []  // Dietary requirements/tags
-    var isPrebuilt: Bool = false  // Whether this is a pre-built recipe from the library
-    
     enum MealType: String, Codable, CaseIterable {
         case breakfast = "Breakfast"
         case lunch = "Lunch"
         case dinner = "Dinner"
         case dessert = "Dessert"
         case snack = "Snack"
-        case slowCooker = "Slow Cooker"
-        case airFryer = "Air Fryer"
         
         var icon: String {
             switch self {
@@ -267,57 +256,6 @@ struct Recipe: Identifiable, Codable, Hashable {
             case .dinner: return "moon.stars.fill"
             case .dessert: return "birthday.cake.fill"
             case .snack: return "carrot.fill"
-            case .slowCooker: return "timer"
-            case .airFryer: return "wind"
-            }
-        }
-    }
-    
-    enum DietaryTag: String, Codable, CaseIterable, Hashable {
-        case vegetarian = "Vegetarian"
-        case vegan = "Vegan"
-        case glutenFree = "Gluten-Free"
-        case dairyFree = "Dairy-Free"
-        case lowCarb = "Low-Carb"
-        case highProtein = "High-Protein"
-        case pescatarian = "Pescatarian"
-        case keto = "Keto"
-        case paleo = "Paleo"
-        case nutFree = "Nut-Free"
-        case highFiber = "High-Fiber"
-        case quickPrep = "Quick (<30 min)"
-        
-        var icon: String {
-            switch self {
-            case .vegetarian: return "leaf.fill"
-            case .vegan: return "leaf.circle.fill"
-            case .glutenFree: return "g.circle.fill"
-            case .dairyFree: return "drop.circle.fill"
-            case .lowCarb: return "c.circle.fill"
-            case .highProtein: return "p.circle.fill"
-            case .pescatarian: return "fish.fill"
-            case .keto: return "k.circle.fill"
-            case .paleo: return "figure.walk"
-            case .nutFree: return "allergens"
-            case .highFiber: return "f.circle.fill"
-            case .quickPrep: return "clock.fill"
-            }
-        }
-        
-        var color: String {
-            switch self {
-            case .vegetarian: return "green"
-            case .vegan: return "green"
-            case .glutenFree: return "orange"
-            case .dairyFree: return "blue"
-            case .lowCarb: return "purple"
-            case .highProtein: return "red"
-            case .pescatarian: return "blue"
-            case .keto: return "purple"
-            case .paleo: return "brown"
-            case .nutFree: return "yellow"
-            case .highFiber: return "brown"
-            case .quickPrep: return "teal"
             }
         }
     }
@@ -398,24 +336,6 @@ struct Recipe: Identifiable, Codable, Hashable {
             }
             return "\(hours)h \(minutes)m"
         }
-    }
-    
-    // Formatted nutrition string
-    var nutritionSummary: String? {
-        guard let calories = calories else { return nil }
-        var summary = "\(calories) cal"
-        
-        if let protein = protein, let carbs = carbs, let fat = fat {
-            summary += " • P: \(protein)g • C: \(carbs)g • F: \(fat)g"
-        }
-        
-        return summary
-    }
-    
-    // Check if recipe matches dietary requirements
-    func matchesDietaryRequirements(_ requirements: Set<DietaryTag>) -> Bool {
-        guard !requirements.isEmpty else { return true }
-        return requirements.isSubset(of: Set(dietaryTags))
     }
     
     // Get scaled recipe for different serving size

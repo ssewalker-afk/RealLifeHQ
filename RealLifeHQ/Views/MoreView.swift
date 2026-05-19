@@ -15,27 +15,25 @@ struct MoreView: View {
                             .foregroundColor(themeManager.currentTheme.primaryColor)
                     }
                     
-                    // HIDDEN - Recipes are a whole separate app's worth of features (8+ files)
-                    // NavigationLink(destination: RecipesView()) {
-                    //     Label("Recipes", systemImage: "fork.knife")
-                    //         .foregroundColor(themeManager.currentTheme.primaryColor)
-                    // }
+                    NavigationLink(destination: RecipesView()) {
+                        Label("Recipes", systemImage: "fork.knife")
+                            .foregroundColor(themeManager.currentTheme.primaryColor)
+                    }
                     
-                    // HIDDEN - Password management should be a separate app or use iCloud Keychain
-                    // NavigationLink(destination: VaultView()) {
-                    //     Label("Vault", systemImage: "lock.shield.fill")
-                    //         .foregroundColor(themeManager.currentTheme.primaryColor)
-                    // }
+                    NavigationLink(destination: JournalView()) {
+                        Label("Journal", systemImage: "book.fill")
+                            .foregroundColor(themeManager.currentTheme.primaryColor)
+                    }
+                    
+                    NavigationLink(destination: VaultView()) {
+                        Label("Vault", systemImage: "lock.shield.fill")
+                            .foregroundColor(themeManager.currentTheme.primaryColor)
+                    }
                 }
                 
                 Section("App") {
                     NavigationLink(destination: SettingsView()) {
                         Label("Settings", systemImage: "gear")
-                            .foregroundColor(themeManager.currentTheme.primaryColor)
-                    }
-                    
-                    NavigationLink(destination: SupportView()) {
-                        Label("Support & Help", systemImage: "lifepreserver.fill")
                             .foregroundColor(themeManager.currentTheme.primaryColor)
                     }
                 }

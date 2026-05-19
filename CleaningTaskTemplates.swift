@@ -203,56 +203,37 @@ class CleaningTaskTemplates {
         )
     }
     
-    // MARK: - Area to Daily Task Mapping
-
-    static func dailyTask(for area: CleaningArea) -> CleaningTask {
-        switch area {
-        case .kitchen:    return kitchenFocus()
-        case .bathroom:   return bathroomRefresh()
-        case .livingRoom: return livingRoomTidy()
-        case .bedroom:    return bedroomLaundry()
-        case .entryway:   return quickEntryway()
-        default:          return kitchenFocus()
-        }
-    }
-
     // MARK: - Generate Weekly Schedule
-
+    
     static func generateWeeklySchedule(profile: CleaningProfile) -> [Int: CleaningTask] {
         var schedule: [Int: CleaningTask] = [:]
         let sortedDays = profile.preferredCleaningDays.sorted()
-
-        if !profile.dayAreaAssignments.isEmpty {
-            // Use the user's custom day→area assignments
-            for day in sortedDays {
-                if let area = profile.dayAreaAssignments[day] {
-                    var task = dailyTask(for: area)
-                    task.dayOfWeek = day
-                    schedule[day] = task
-                }
-            }
-        } else {
-            // Fallback: standard rotation
-            let fallbackTasks: [CleaningTask] = [
-                kitchenFocus(), bathroomRefresh(), livingRoomTidy(),
-                bedroomLaundry(), dustingVacuuming()
-            ]
-            for (index, day) in sortedDays.enumerated() {
-                if index < fallbackTasks.count {
-                    var task = fallbackTasks[index]
-                    task.dayOfWeek = day
-                    schedule[day] = task
-                }
+        
+        // Standard rotation for 5-day schedule
+        let dailyTasks: [CleaningTask] = [
+            kitchenFocus(),
+            bathroomRefresh(),
+            livingRoomTidy(),
+            bedroomLaundry(),
+            dustingVacuuming()
+        ]
+        
+        // Assign daily tasks to preferred days
+        for (index, day) in sortedDays.enumerated() {
+            if index < dailyTasks.count {
+                var task = dailyTasks[index]
+                task.dayOfWeek = day
+                schedule[day] = task
             }
         }
-
+        
         // Add deep cleaning on the designated day
         if let deepDay = profile.deepCleaningDay {
             var deepTask = selectDeepCleanTask(for: profile)
             deepTask.dayOfWeek = deepDay
             schedule[deepDay] = deepTask
         }
-
+        
         return schedule
     }
     

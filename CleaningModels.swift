@@ -5,23 +5,40 @@ import Foundation
 
 struct CleaningProfile: Codable, Identifiable {
     var id = UUID()
+    var homeType: HomeType
+    var bedrooms: Int
+    var bathrooms: Int
+    var hasPets: Bool
+    var petTypes: String?
+    var householdSize: Int
     var dailyTimeCommitment: Int // minutes
     var preferredCleaningDays: Set<Int> // 1-7 (Sunday-Saturday)
     var deepCleaningDay: Int? // weekday
     var focusAreas: [CleaningArea]
-    var dayAreaAssignments: [Int: CleaningArea] // weekday (1-7) → area to clean
     var createdDate: Date
     var notificationTime: Date?
     var enableNotifications: Bool
     var syncToCalendar: Bool
-
+    
+    enum HomeType: String, Codable, CaseIterable {
+        case apartment = "Apartment"
+        case house = "House"
+        case condo = "Condo"
+        case studio = "Studio"
+        case other = "Other"
+    }
+    
     init() {
         self.id = UUID()
+        self.homeType = .apartment
+        self.bedrooms = 1
+        self.bathrooms = 1
+        self.hasPets = false
+        self.householdSize = 1
         self.dailyTimeCommitment = 30
         self.preferredCleaningDays = [2, 3, 4, 5, 6] // Mon-Fri
         self.deepCleaningDay = 7 // Saturday
         self.focusAreas = [.kitchen, .bathroom]
-        self.dayAreaAssignments = [:]
         self.createdDate = Date()
         self.enableNotifications = true
         self.syncToCalendar = true

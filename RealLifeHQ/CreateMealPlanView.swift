@@ -14,9 +14,6 @@ struct CreateMealPlanView: View {
     @State private var includeMeals = MealPlan.IncludedMeals()
     @State private var currentStep: CreationStep = .setup
     @State private var mealPlanDays: [MealPlanDay] = []
-    @State private var showingAutoGenerateOptions = false
-    @State private var autoGenPrioritizeFavorites = true
-    @State private var autoGenAllowRepetition = true
     
     enum CreationStep {
         case setup
@@ -202,40 +199,10 @@ struct CreateMealPlanView: View {
     
     private var selectMealsStep: some View {
         VStack(spacing: 0) {
-            // Header with Auto-Generate button
-            HStack {
-                Text("Select Recipes")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                
-                Spacer()
-                
-                Button {
-                    showingAutoGenerateOptions = true
-                } label: {
-                    HStack(spacing: 6) {
-                        Image(systemName: "wand.and.stars")
-                        Text("Auto")
-                    }
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 8)
-                    .background(
-                        LinearGradient(
-                            colors: [
-                                themeManager.currentTheme.primaryColor,
-                                themeManager.currentTheme.accentColor
-                            ],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .cornerRadius(20)
-                }
-            }
-            .padding()
+            Text("Select Recipes")
+                .font(.title2)
+                .fontWeight(.bold)
+                .padding()
             
             ScrollView {
                 LazyVStack(spacing: 16) {
@@ -279,14 +246,6 @@ struct CreateMealPlanView: View {
             }
             .padding()
             .background(themeManager.currentTheme.cardColor)
-        }
-        .sheet(isPresented: $showingAutoGenerateOptions) {
-            AutoGenerateOptionsView(
-                prioritizeFavorites: $autoGenPrioritizeFavorites,
-                allowRepetition: $autoGenAllowRepetition,
-                onGenerate: { autoGenerateMeals() }
-            )
-            .presentationDetents([.height(350)])
         }
     }
     
@@ -403,33 +362,6 @@ struct CreateMealPlanView: View {
         }
     }
     
-    private func autoGenerateMeals() {
-        // Check if auto-generation is possible
-        let validation = dataManager.canAutoGenerateMealPlan(includeMeals: includeMeals)
-        guard validation.canGenerate else {
-            // Could show an alert here, but for now we'll just return
-            return
-        }
-        
-        // Generate meals using DataManager
-        let generatedMeals = dataManager.generateAutoMealPlan(
-            numberOfDays: numberOfDays,
-            startDate: startDate,
-            includeMeals: includeMeals,
-            prioritizeFavorites: autoGenPrioritizeFavorites,
-            allowRepetition: autoGenAllowRepetition
-        )
-        
-        // Update mealPlanDays with generated meals
-        for (index, day) in mealPlanDays.enumerated() {
-            if let dayMeals = generatedMeals[day.date] {
-                mealPlanDays[index].breakfast = dayMeals.breakfast
-                mealPlanDays[index].lunch = dayMeals.lunch
-                mealPlanDays[index].dinner = dayMeals.dinner
-            }
-        }
-    }
-    
     private func saveMealPlan() {
         var meals: [Date: MealPlan.DayMeals] = [:]
         
@@ -452,127 +384,6 @@ struct CreateMealPlanView: View {
         
         dataManager.addMealPlan(mealPlan)
         dismiss()
-    }
-}
-
-// MARK: - Auto Generate Options View
-
-struct AutoGenerateOptionsView: View {
-    @Environment(\.dismiss) var dismiss
-    @EnvironmentObject var themeManager: ThemeManager
-    @Binding var prioritizeFavorites: Bool
-    @Binding var allowRepetition: Bool
-    let onGenerate: () -> Void
-    
-    var body: some View {
-        NavigationStack {
-            VStack(spacing: 24) {
-                // Header
-                VStack(spacing: 8) {
-                    Image(systemName: "wand.and.stars.inverse")
-                        .font(.system(size: 50))
-                        .foregroundStyle(
-                            LinearGradient(
-                                colors: [
-                                    themeManager.currentTheme.primaryColor,
-                                    themeManager.currentTheme.accentColor
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                    
-                    Text("Auto-Generate Meal Plan")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                    
-                    Text("Let the app intelligently select recipes for you")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal)
-                }
-                .padding(.top)
-                
-                // Options
-                VStack(spacing: 0) {
-                    Toggle(isOn: $prioritizeFavorites) {
-                        VStack(alignment: .leading, spacing: 4) {
-                            HStack {
-                                Image(systemName: "heart.fill")
-                                    .foregroundColor(.red)
-                                Text("Prioritize Favorites")
-                                    .fontWeight(.medium)
-                            }
-                            Text("80% chance to select favorite recipes")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                    .padding()
-                    .background(themeManager.currentTheme.cardColor)
-                    
-                    Divider()
-                    
-                    Toggle(isOn: $allowRepetition) {
-                        VStack(alignment: .leading, spacing: 4) {
-                            HStack {
-                                Image(systemName: "repeat")
-                                    .foregroundColor(themeManager.currentTheme.primaryColor)
-                                Text("Allow Repetition")
-                                    .fontWeight(.medium)
-                            }
-                            Text("Same recipe can appear multiple times")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                    .padding()
-                    .background(themeManager.currentTheme.cardColor)
-                }
-                .cornerRadius(12)
-                .padding(.horizontal)
-                
-                Spacer()
-                
-                // Generate Button
-                Button {
-                    onGenerate()
-                    dismiss()
-                } label: {
-                    HStack {
-                        Image(systemName: "sparkles")
-                        Text("Generate Meal Plan")
-                    }
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(
-                        LinearGradient(
-                            colors: [
-                                themeManager.currentTheme.primaryColor,
-                                themeManager.currentTheme.accentColor
-                            ],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .cornerRadius(12)
-                }
-                .padding(.horizontal)
-                .padding(.bottom)
-            }
-            .background(themeManager.currentTheme.backgroundColor.ignoresSafeArea())
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                }
-            }
-        }
     }
 }
 
@@ -705,57 +516,72 @@ struct RecipePickerView: View {
     @EnvironmentObject var dataManager: DataManager
     @State private var selectedRecipe: Recipe?
     @State private var servings: Int = 4
-    @State private var searchText = ""
-    @State private var selectedMealTypeFilter: Recipe.MealType?
-    @State private var showFavoritesOnly = false
-    
-    var filteredRecipes: [Recipe] {
-        var recipes = dataManager.recipes
-        
-        // Filter by search text
-        if !searchText.isEmpty {
-            recipes = recipes.filter { recipe in
-                recipe.name.localizedCaseInsensitiveContains(searchText) ||
-                recipe.ingredients.contains { $0.name.localizedCaseInsensitiveContains(searchText) }
-            }
-        }
-        
-        // Filter by meal type
-        if let mealType = selectedMealTypeFilter {
-            recipes = recipes.filter { $0.mealType == mealType }
-        }
-        
-        // Filter by favorites
-        if showFavoritesOnly {
-            recipes = recipes.filter { $0.isFavorite }
-        }
-        
-        return recipes.sorted { $0.name < $1.name }
-    }
     
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
+            VStack {
                 if dataManager.recipes.isEmpty {
-                    emptyStateView
+                    VStack(spacing: 16) {
+                        Image(systemName: "book.closed")
+                            .font(.system(size: 60))
+                            .foregroundColor(.gray)
+                        Text("No recipes available")
+                            .font(.headline)
+                        Text("Add recipes first to include them in your meal plan")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding()
                 } else {
-                    // Search and Filters
-                    searchAndFiltersView
-                    
-                    if filteredRecipes.isEmpty {
-                        noResultsView
-                    } else {
-                        // Recipe List
-                        recipeListView
+                    List(dataManager.recipes) { recipe in
+                        Button {
+                            selectedRecipe = recipe
+                            servings = recipe.servings
+                        } label: {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(recipe.name)
+                                        .foregroundColor(.primary)
+                                    Text(recipe.mealType.rawValue)
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                                Spacer()
+                                if selectedRecipe?.id == recipe.id {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundColor(themeManager.currentTheme.primaryColor)
+                                }
+                            }
+                        }
                     }
                     
-                    // Bottom Selection Bar
                     if selectedRecipe != nil {
-                        selectionBarView
+                        VStack(spacing: 16) {
+                            Stepper("Servings: \(servings)", value: $servings, in: 1...20)
+                                .padding(.horizontal)
+                            
+                            Button {
+                                if let recipe = selectedRecipe {
+                                    selectedRecipePair = MealPlan.RecipeServingPair(recipe: recipe, servings: servings)
+                                }
+                                dismiss()
+                            } label: {
+                                Text("Add to Meal Plan")
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(themeManager.currentTheme.primaryColor)
+                                    .cornerRadius(12)
+                            }
+                            .padding(.horizontal)
+                        }
+                        .padding(.vertical)
+                        .background(themeManager.currentTheme.cardColor)
                     }
                 }
             }
-            .background(themeManager.currentTheme.backgroundColor.ignoresSafeArea())
             .navigationTitle("Select Recipe")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -766,272 +592,6 @@ struct RecipePickerView: View {
                 }
             }
         }
-    }
-    
-    // MARK: - Empty State
-    
-    private var emptyStateView: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "book.closed")
-                .font(.system(size: 60))
-                .foregroundColor(.gray)
-            Text("No recipes available")
-                .font(.headline)
-            Text("Add recipes first to include them in your meal plan")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
-        }
-        .frame(maxHeight: .infinity)
-    }
-    
-    // MARK: - Search and Filters
-    
-    private var searchAndFiltersView: some View {
-        VStack(spacing: 12) {
-            // Search Bar
-            HStack {
-                Image(systemName: "magnifyingglass")
-                    .foregroundColor(.gray)
-                
-                TextField("Search recipes or ingredients...", text: $searchText)
-                    .textFieldStyle(.plain)
-                
-                if !searchText.isEmpty {
-                    Button {
-                        searchText = ""
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(.gray)
-                    }
-                }
-            }
-            .padding(10)
-            .background(themeManager.currentTheme.cardColor)
-            .cornerRadius(10)
-            .padding(.horizontal)
-            
-            // Meal Type Filter & Favorites Toggle
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
-                    // Favorites toggle
-                    Button {
-                        withAnimation {
-                            showFavoritesOnly.toggle()
-                        }
-                    } label: {
-                        HStack(spacing: 6) {
-                            Image(systemName: showFavoritesOnly ? "heart.fill" : "heart")
-                            Text("Favorites")
-                                .font(.subheadline)
-                        }
-                        .foregroundColor(showFavoritesOnly ? .white : themeManager.currentTheme.primaryColor)
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 8)
-                        .background(
-                            showFavoritesOnly
-                            ? themeManager.currentTheme.primaryColor
-                            : themeManager.currentTheme.primaryColor.opacity(0.15)
-                        )
-                        .cornerRadius(20)
-                    }
-                    
-                    // All meals filter
-                    Button {
-                        withAnimation {
-                            selectedMealTypeFilter = nil
-                        }
-                    } label: {
-                        Text("All")
-                            .font(.subheadline)
-                            .foregroundColor(selectedMealTypeFilter == nil ? .white : themeManager.currentTheme.primaryColor)
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 8)
-                            .background(
-                                selectedMealTypeFilter == nil
-                                ? themeManager.currentTheme.primaryColor
-                                : themeManager.currentTheme.primaryColor.opacity(0.15)
-                            )
-                            .cornerRadius(20)
-                    }
-                    
-                    ForEach(Recipe.MealType.allCases, id: \.self) { mealType in
-                        Button {
-                            withAnimation {
-                                selectedMealTypeFilter = mealType
-                            }
-                        } label: {
-                            HStack(spacing: 6) {
-                                Image(systemName: mealType.icon)
-                                Text(mealType.rawValue)
-                                    .font(.subheadline)
-                            }
-                            .foregroundColor(selectedMealTypeFilter == mealType ? .white : themeManager.currentTheme.primaryColor)
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 8)
-                            .background(
-                                selectedMealTypeFilter == mealType
-                                ? themeManager.currentTheme.primaryColor
-                                : themeManager.currentTheme.primaryColor.opacity(0.15)
-                            )
-                            .cornerRadius(20)
-                        }
-                    }
-                }
-                .padding(.horizontal)
-            }
-        }
-        .padding(.vertical, 12)
-    }
-    
-    // MARK: - No Results View
-    
-    private var noResultsView: some View {
-        VStack(spacing: 16) {
-            Spacer()
-            
-            Image(systemName: "magnifyingglass")
-                .font(.system(size: 60))
-                .foregroundColor(.gray)
-            
-            Text("No Recipes Found")
-                .font(.title3)
-                .fontWeight(.semibold)
-            
-            Text("Try adjusting your filters or search terms")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
-            
-            Button {
-                searchText = ""
-                selectedMealTypeFilter = nil
-                showFavoritesOnly = false
-            } label: {
-                Text("Clear Filters")
-                    .font(.subheadline)
-                    .foregroundColor(themeManager.currentTheme.primaryColor)
-            }
-            .padding(.top, 8)
-            
-            Spacer()
-        }
-    }
-    
-    // MARK: - Recipe List
-    
-    private var recipeListView: some View {
-        List(filteredRecipes) { recipe in
-            Button {
-                selectedRecipe = recipe
-                servings = recipe.servings
-            } label: {
-                HStack {
-                    VStack(alignment: .leading, spacing: 6) {
-                        // Recipe name
-                        Text(recipe.name)
-                            .font(.body)
-                            .fontWeight(.medium)
-                            .foregroundColor(.primary)
-                        
-                        // Meal type and info
-                        HStack(spacing: 12) {
-                            HStack(spacing: 4) {
-                                Image(systemName: recipe.mealType.icon)
-                                    .font(.caption)
-                                Text(recipe.mealType.rawValue)
-                                    .font(.caption)
-                            }
-                            .foregroundColor(themeManager.currentTheme.primaryColor)
-                            
-                            HStack(spacing: 4) {
-                                Image(systemName: "clock")
-                                    .font(.caption)
-                                Text(recipe.totalTimeString)
-                                    .font(.caption)
-                            }
-                            .foregroundColor(.secondary)
-                            
-                            HStack(spacing: 4) {
-                                Image(systemName: "person.2")
-                                    .font(.caption)
-                                Text("\(recipe.servings)")
-                                    .font(.caption)
-                            }
-                            .foregroundColor(.secondary)
-                        }
-                    }
-                    
-                    Spacer()
-                    
-                    // Selection indicator and favorite
-                    HStack(spacing: 12) {
-                        if recipe.isFavorite {
-                            Image(systemName: "heart.fill")
-                                .font(.caption)
-                                .foregroundColor(.red)
-                        }
-                        
-                        if selectedRecipe?.id == recipe.id {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(themeManager.currentTheme.primaryColor)
-                        }
-                    }
-                }
-                .contentShape(Rectangle())
-            }
-            .listRowBackground(themeManager.currentTheme.cardColor)
-        }
-        .listStyle(.plain)
-        .scrollContentBackground(.hidden)
-    }
-    
-    // MARK: - Selection Bar
-    
-    private var selectionBarView: some View {
-        VStack(spacing: 16) {
-            Divider()
-            
-            if let recipe = selectedRecipe {
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Selected:")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        Text(recipe.name)
-                            .font(.subheadline)
-                            .fontWeight(.semibold)
-                            .lineLimit(1)
-                    }
-                    
-                    Spacer()
-                }
-                .padding(.horizontal)
-            }
-            
-            Stepper("Servings: \(servings)", value: $servings, in: 1...20)
-                .padding(.horizontal)
-            
-            Button {
-                if let recipe = selectedRecipe {
-                    selectedRecipePair = MealPlan.RecipeServingPair(recipe: recipe, servings: servings)
-                }
-                dismiss()
-            } label: {
-                Text("Add to Meal Plan")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(themeManager.currentTheme.primaryColor)
-                    .cornerRadius(12)
-            }
-            .padding(.horizontal)
-        }
-        .padding(.vertical)
-        .background(themeManager.currentTheme.cardColor)
     }
 }
 

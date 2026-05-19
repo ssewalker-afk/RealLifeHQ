@@ -119,8 +119,8 @@
 				9C723E6E2F417A4000A7110B /* docsprivacy-policy.html */,
 				9C723E702F417A8100A7110B /* docssupport.html */,
 				9C723E822F42C9A000A7110B /* terms-of-service.html */,
-				9CB2FC742F59092000644929 /* CleaningModels.swift */,
 				9C723E842F42C9B600A7110B /* index.html */,
+				9CB2FC742F59092000644929 /* CleaningModels.swift */,
 				9CB2FC762F59095A00644929 /* CleaningTaskTemplates.swift */,
 				9CB2FC782F5909C600644929 /* CleaningSetupWizard.swift */,
 				9CB2FC7C2F590A8600644929 /* CleaningSetupWizardSteps.swift */,
@@ -379,7 +379,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = Q79FHUWC44;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -388,7 +388,10 @@
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "RealLifeHQ needs full calendar access to create, edit, and delete synced events";
+				INFOPLIST_KEY_NSCameraUsageDescription = "RealLife HQ needs access to your camera to capture receipts and photos. ";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "We use Face ID to protect your sensitive information in the Vault";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "This app needs to save photos to your library.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app needs access to upload photos.\nThis app needs access to upload photos.\n";
 				INFOPLIST_KEY_NSRemindersUsageDescription = "RealLife HQ needs access to reminders to help you manage tasks. ";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UIRequiredDeviceCapabilities = armv7;
@@ -401,7 +404,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 8;
+				MARKETING_VERSION = 6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sarahwalker.reallifehq.RealLifeHQ;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -421,7 +424,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = Q79FHUWC44;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -430,7 +433,10 @@
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "RealLifeHQ needs full calendar access to create, edit, and delete synced events";
+				INFOPLIST_KEY_NSCameraUsageDescription = "RealLife HQ needs access to your camera to capture receipts and photos. ";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "We use Face ID to protect your sensitive information in the Vault";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "This app needs to save photos to your library.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app needs access to upload photos.\nThis app needs access to upload photos.\n";
 				INFOPLIST_KEY_NSRemindersUsageDescription = "RealLife HQ needs access to reminders to help you manage tasks. ";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UIRequiredDeviceCapabilities = armv7;
@@ -443,7 +449,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 8;
+				MARKETING_VERSION = 6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sarahwalker.reallifehq.RealLifeHQ;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;

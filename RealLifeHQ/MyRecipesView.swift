@@ -10,8 +10,6 @@ struct MyRecipesView: View {
     @State private var searchText = ""
     @State private var selectedMealTypeFilter: Recipe.MealType?
     @State private var showFavoritesOnly = false
-    // HIDDEN - Recipe feature disabled
-    // @State private var showingLoadPrebuilt = false
     
     var filteredRecipes: [Recipe] {
         var recipes = dataManager.recipes
@@ -203,62 +201,24 @@ struct MyRecipesView: View {
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
             
-            VStack(spacing: 12) {
-                Button {
-                    showingAddRecipe = true
-                } label: {
-                    HStack {
-                        Image(systemName: "plus.circle.fill")
-                        Text("Add Your First Recipe")
-                    }
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 14)
-                    .background(themeManager.currentTheme.primaryColor)
-                    .cornerRadius(12)
+            Button {
+                showingAddRecipe = true
+            } label: {
+                HStack {
+                    Image(systemName: "plus.circle.fill")
+                    Text("Add Your First Recipe")
                 }
-                .padding(.top, 8)
-                
-                // HIDDEN - Recipe feature disabled
-                /*
-                // Load Prebuilt Recipes Button
-                if !dataManager.hasPrebuiltRecipes() {
-                    Button {
-                        showingLoadPrebuilt = true
-                    } label: {
-                        HStack {
-                            Image(systemName: "books.vertical.fill")
-                            Text("Load 50 Sample Recipes")
-                        }
-                        .font(.headline)
-                        .foregroundColor(themeManager.currentTheme.primaryColor)
-                        .padding(.horizontal, 24)
-                        .padding(.vertical, 14)
-                        .background(themeManager.currentTheme.primaryColor.opacity(0.1))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(themeManager.currentTheme.primaryColor, lineWidth: 2)
-                        )
-                        .cornerRadius(12)
-                    }
-                }
-                */
+                .font(.headline)
+                .foregroundColor(.white)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 14)
+                .background(themeManager.currentTheme.primaryColor)
+                .cornerRadius(12)
             }
+            .padding(.top, 8)
             
             Spacer()
         }
-        // HIDDEN - Recipe feature disabled
-        /*
-        .alert("Load Sample Recipes?", isPresented: $showingLoadPrebuilt) {
-            Button("Cancel", role: .cancel) { }
-            Button("Load 50 Recipes") {
-                dataManager.loadPrebuiltRecipes()
-            }
-        } message: {
-            Text("This will add 50 healthy, nutritious recipes to your collection. These are pre-built recipes you can use right away!")
-        }
-        */
     }
     
     // MARK: - No Results State

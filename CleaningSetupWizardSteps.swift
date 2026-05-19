@@ -356,8 +356,7 @@ struct AreaSelectionRow: View {
 struct Step4Notifications: View {
     @Binding var profile: CleaningProfile
     @EnvironmentObject var themeManager: ThemeManager
-    @Environment(SubscriptionManager.self) private var subscriptionManager
-
+    
     @State private var selectedTime = Date()
     
     var body: some View {
@@ -375,12 +374,16 @@ struct Step4Notifications: View {
                 
                 // Enable Notifications
                 VStack(alignment: .leading, spacing: 12) {
-                    PremiumToggleRow(
-                        title: "Daily Cleaning Reminders",
-                        icon: "bell.fill",
-                        subtitle: "Get notified when it's time to clean",
-                        isOn: $profile.enableNotifications
-                    )
+                    Toggle(isOn: $profile.enableNotifications) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Daily Cleaning Reminders")
+                                .font(.headline)
+                            Text("Get notified when it's time to clean")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .tint(themeManager.currentTheme.primaryColor)
                     
                     if profile.enableNotifications {
                         VStack(alignment: .leading, spacing: 12) {
@@ -414,12 +417,16 @@ struct Step4Notifications: View {
                 
                 // Calendar Integration
                 VStack(alignment: .leading, spacing: 12) {
-                    PremiumToggleRow(
-                        title: "Add to Apple Calendar",
-                        icon: "calendar.badge.clock",
-                        subtitle: "Cleaning tasks appear in your calendar",
-                        isOn: $profile.syncToCalendar
-                    )
+                    Toggle(isOn: $profile.syncToCalendar) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Add to Apple Calendar")
+                                .font(.headline)
+                            Text("Cleaning tasks appear in your calendar")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .tint(themeManager.currentTheme.primaryColor)
                     
                     if profile.syncToCalendar {
                         HStack(spacing: 8) {
@@ -449,14 +456,6 @@ struct Step4Notifications: View {
                 }
             }
             .padding()
-        }
-        // Force both values off for free users — handles the downgrade case
-        // where someone had these enabled before canceling their subscription.
-        .onAppear {
-            if !subscriptionManager.isPremium {
-                profile.enableNotifications = false
-                profile.syncToCalendar = false
-            }
         }
     }
 }
@@ -510,22 +509,46 @@ struct Step5Review: View {
     @Binding var profile: CleaningProfile
     let onComplete: () -> Void
     @EnvironmentObject var themeManager: ThemeManager
-
-    private let dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-
+    
+    var weeklySchedule: [(day: String, task: String, duration: Int)] {
+        let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+        var schedule: [(day: String, task: String, duration: Int)] = []
+        
+        let sortedDays = profile.preferredCleaningDays.sorted()
+        let dailyTasks = ["Kitchen Focus", "Bathroom Refresh", "Living Room Tidy", "Bedroom & Laundry", "Dusting & Vacuuming"]
+        
+        for (index, dayNum) in sortedDays.enumerated() {
+            if index < dailyTasks.count {
+                schedule.append((day: days[dayNum - 1], task: dailyTasks[index], duration: profile.dailyTimeCommitment))
+            }
+        }
+        
+        if let deepDay = profile.deepCleaningDay {
+            // Replace or add deep clean
+            let deepDayName = days[deepDay - 1]
+            if let existingIndex = schedule.firstIndex(where: { $0.day == deepDayName }) {
+                schedule[existingIndex] = (day: deepDayName, task: "Deep Clean Day 🧽", duration: 90)
+            } else {
+                schedule.append((day: deepDayName, task: "Deep Clean Day 🧽", duration: 90))
+            }
+        }
+        
+        return schedule.sorted { days.firstIndex(of: $0.day)! < days.firstIndex(of: $1.day)! }
+    }
+    
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Customize your schedule")
+                    Text("Your personalized schedule")
                         .font(.title2)
                         .fontWeight(.bold)
-
-                    Text("Tap any cleaning day to change which room gets cleaned")
+                    
+                    Text("Review your weekly cleaning plan")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
-
+                
                 // Summary Cards
                 HStack(spacing: 12) {
                     SummaryCard(
@@ -534,14 +557,14 @@ struct Step5Review: View {
                         icon: "calendar",
                         color: themeManager.currentTheme.primaryColor
                     )
-
+                    
                     SummaryCard(
                         title: "\(profile.dailyTimeCommitment)",
                         subtitle: "Minutes/Day",
                         icon: "clock.fill",
                         color: themeManager.currentTheme.accentColor
                     )
-
+                    
                     SummaryCard(
                         title: "\(profile.focusAreas.count)",
                         subtitle: "Focus Areas",
@@ -549,38 +572,31 @@ struct Step5Review: View {
                         color: .orange
                     )
                 }
-
-                // Weekly Schedule — editable
-                VStack(alignment: .leading, spacing: 10) {
-                    HStack {
-                        Text("Weekly Schedule")
-                            .font(.headline)
-                        Spacer()
-                        Label("Tap to change", systemImage: "hand.tap")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                
+                // Weekly Schedule
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Weekly Schedule")
+                        .font(.headline)
+                    
+                    ForEach(weeklySchedule, id: \.day) { item in
+                        ScheduleRowCard(
+                            day: item.day,
+                            task: item.task,
+                            duration: item.duration,
+                            isDeepClean: item.task.contains("Deep Clean")
+                        )
                     }
-
-                    ForEach(1...7, id: \.self) { dayNum in
-                        let dayName = dayNames[dayNum - 1]
-
-                        if dayNum == profile.deepCleaningDay {
-                            DeepCleanDayRow(day: dayName)
-                        } else if profile.preferredCleaningDays.contains(dayNum) {
-                            EditableDayRow(
-                                dayName: dayName,
-                                assignment: Binding(
-                                    get: { profile.dayAreaAssignments[dayNum] },
-                                    set: { profile.dayAreaAssignments[dayNum] = $0 }
-                                ),
-                                focusAreas: profile.focusAreas
-                            )
-                        } else {
-                            RestDayCard(day: dayName)
+                    
+                    // Rest Days
+                    let restDays = (1...7).filter { !profile.preferredCleaningDays.contains($0) && profile.deepCleaningDay != $0 }
+                    if !restDays.isEmpty {
+                        ForEach(restDays, id: \.self) { dayNum in
+                            let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+                            RestDayCard(day: days[dayNum - 1])
                         }
                     }
                 }
-
+                
                 // Notification Summary
                 if profile.enableNotifications {
                     VStack(alignment: .leading, spacing: 8) {
@@ -591,7 +607,7 @@ struct Step5Review: View {
                                 .font(.subheadline)
                                 .fontWeight(.semibold)
                         }
-
+                        
                         if let time = profile.notificationTime {
                             Text("Daily reminders at \(time, style: .time)")
                                 .font(.caption)
@@ -602,7 +618,7 @@ struct Step5Review: View {
                     .background(themeManager.currentTheme.primaryColor.opacity(0.1))
                     .cornerRadius(12)
                 }
-
+                
                 // Calendar Integration
                 if profile.syncToCalendar {
                     HStack(spacing: 8) {
@@ -616,7 +632,7 @@ struct Step5Review: View {
                     .background(themeManager.currentTheme.accentColor.opacity(0.1))
                     .cornerRadius(8)
                 }
-
+                
                 // Start Button
                 Button {
                     onComplete()
@@ -647,107 +663,6 @@ struct Step5Review: View {
             }
             .padding()
         }
-        .onAppear {
-            seedAssignmentsIfNeeded()
-        }
-    }
-
-    private func seedAssignmentsIfNeeded() {
-        guard profile.dayAreaAssignments.isEmpty else { return }
-        let sortedDays = profile.preferredCleaningDays.sorted()
-            .filter { $0 != profile.deepCleaningDay }
-        let areas = profile.focusAreas.isEmpty
-            ? [CleaningArea.kitchen, .bathroom, .livingRoom, .bedroom, .livingRoom]
-            : profile.focusAreas
-        for (index, day) in sortedDays.enumerated() {
-            profile.dayAreaAssignments[day] = areas[index % areas.count]
-        }
-    }
-}
-
-// MARK: - Editable Day Row
-
-struct EditableDayRow: View {
-    let dayName: String
-    @Binding var assignment: CleaningArea?
-    let focusAreas: [CleaningArea]
-    @EnvironmentObject var themeManager: ThemeManager
-
-    var body: some View {
-        Menu {
-            ForEach(focusAreas) { area in
-                Button {
-                    assignment = area
-                } label: {
-                    Label(area.rawValue, systemImage: area.icon)
-                }
-            }
-        } label: {
-            HStack(spacing: 12) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(dayName)
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                        .foregroundColor(themeManager.currentTheme.primaryColor)
-
-                    if let area = assignment {
-                        Label(area.rawValue, systemImage: area.icon)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    } else {
-                        Text("Tap to assign a room")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                }
-
-                Spacer()
-
-                Image(systemName: "chevron.up.chevron.down")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-            .padding()
-            .background(themeManager.currentTheme.cardColor)
-            .cornerRadius(12)
-        }
-        .foregroundColor(.primary)
-    }
-}
-
-// MARK: - Deep Clean Day Row
-
-struct DeepCleanDayRow: View {
-    let day: String
-    @EnvironmentObject var themeManager: ThemeManager
-
-    var body: some View {
-        HStack(spacing: 12) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(day)
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(themeManager.currentTheme.accentColor)
-
-                Label("Deep Clean Day", systemImage: "sparkles")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-
-            Spacer()
-
-            Text("🧽 Deep")
-                .font(.caption)
-                .fontWeight(.medium)
-                .foregroundColor(.white)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
-                .background(themeManager.currentTheme.accentColor)
-                .cornerRadius(6)
-        }
-        .padding()
-        .background(themeManager.currentTheme.cardColor)
-        .cornerRadius(12)
     }
 }
 
