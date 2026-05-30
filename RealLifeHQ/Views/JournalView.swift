@@ -46,74 +46,64 @@ struct JournalView: View {
     }
 
     var body: some View {
-        NavigationView {
-            ZStack {
-                if dataManager.journalEntries.isEmpty {
-                    emptyStateView
+        Group {
+            if dataManager.journalEntries.isEmpty {
+                emptyStateView
+            } else {
+                if horizontalSizeClass == .regular {
+                    iPadGridLayout
                 } else {
-                    if horizontalSizeClass == .regular {
-                        // iPad: Grid layout
-                        iPadGridLayout
-                    } else {
-                        // iPhone: List layout
-                        journalList
-                    }
+                    journalList
                 }
             }
-            .background(themeManager.currentTheme.backgroundColor.ignoresSafeArea())
-            .navigationTitle("Journal")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    if !dataManager.journalEntries.isEmpty {
-                        Button {
-                            // Premium check: free users see the paywall instead of the export sheet
-                            if subscriptionManager.isPremium {
-                                // Embed the URL directly in the enum case so there's
-                                // no separate optional that could cause a blank sheet
-                                if let url = JournalPDFExporter.exportAll(entries: sortedEntries) {
-                                    activeSheet = .export(url)
-                                }
-                            } else {
-                                activeSheet = .paywall
+        }
+        .background(themeManager.currentTheme.backgroundColor.ignoresSafeArea())
+        .navigationTitle("Journal")
+        .navigationBarTitleDisplayMode(.large)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                if !dataManager.journalEntries.isEmpty {
+                    Button {
+                        if subscriptionManager.isPremium {
+                            if let url = JournalPDFExporter.exportAll(entries: sortedEntries) {
+                                activeSheet = .export(url)
                             }
-                        } label: {
-                            // Show a small lock badge over the icon so free users know
-                            // this is a premium feature before they even tap it
-                            ZStack(alignment: .topTrailing) {
-                                Image(systemName: "square.and.arrow.up")
-                                    .foregroundColor(themeManager.currentTheme.primaryColor)
-                                if !subscriptionManager.isPremium {
-                                    Image(systemName: "lock.fill")
-                                        .font(.system(size: 8, weight: .bold))
-                                        .foregroundColor(.secondary)
-                                        .offset(x: 5, y: -5)
-                                }
+                        } else {
+                            activeSheet = .paywall
+                        }
+                    } label: {
+                        ZStack(alignment: .topTrailing) {
+                            Image(systemName: "square.and.arrow.up")
+                                .foregroundColor(themeManager.currentTheme.primaryColor)
+                            if !subscriptionManager.isPremium {
+                                Image(systemName: "lock.fill")
+                                    .font(.system(size: 8, weight: .bold))
+                                    .foregroundColor(.secondary)
+                                    .offset(x: 5, y: -5)
                             }
                         }
                     }
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        requestAddEntry()
-                    } label: {
-                        Image(systemName: "plus.circle.fill")
-                            .foregroundColor(themeManager.currentTheme.primaryColor)
-                    }
-                }
             }
-            // Single sheet modifier — drives all three possible sheets
-            .sheet(item: $activeSheet) { sheet in
-                switch sheet {
-                case .addEntry:
-                    AddJournalEntryView()
-                case .export(let url):
-                    ActivityViewController(items: [url])
-                case .paywall:
-                    PaywallView()
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    requestAddEntry()
+                } label: {
+                    Image(systemName: "plus.circle.fill")
+                        .foregroundColor(themeManager.currentTheme.primaryColor)
                 }
             }
         }
-        .navigationViewStyle(.stack)
+        .sheet(item: $activeSheet) { sheet in
+            switch sheet {
+            case .addEntry:
+                AddJournalEntryView()
+            case .export(let url):
+                ActivityViewController(items: [url])
+            case .paywall:
+                PaywallView()
+            }
+        }
     }
     
     // iPad Grid Layout

@@ -51,10 +51,6 @@ class DataManager: ObservableObject {
     private let cleaningStatisticsKey = "cleaningStatistics"
     
     init() {
-        // Migrate existing vault data to Keychain if needed
-        VaultMigrationHelper.migrateVaultDataIfNeeded()
-        
-        // Load all data
         loadAllData()
     }
     

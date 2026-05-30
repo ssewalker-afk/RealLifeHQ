@@ -1,11 +1,11 @@
 import SwiftUI
 
 // MARK: - More View
-// Access Calendar, Recipes, Journal, Vault, and Settings
+// Access Calendar, Journal, and Settings
 
 struct MoreView: View {
     @EnvironmentObject var themeManager: ThemeManager
-    
+
     var body: some View {
         NavigationStack {
             List {
@@ -14,19 +14,9 @@ struct MoreView: View {
                         Label("Calendar", systemImage: "calendar")
                             .foregroundColor(themeManager.currentTheme.primaryColor)
                     }
-                    
-                    NavigationLink(destination: RecipesView()) {
-                        Label("Recipes", systemImage: "fork.knife")
-                            .foregroundColor(themeManager.currentTheme.primaryColor)
-                    }
-                    
+
                     NavigationLink(destination: JournalView()) {
                         Label("Journal", systemImage: "book.fill")
-                            .foregroundColor(themeManager.currentTheme.primaryColor)
-                    }
-                    
-                    NavigationLink(destination: VaultView()) {
-                        Label("Vault", systemImage: "lock.shield.fill")
                             .foregroundColor(themeManager.currentTheme.primaryColor)
                     }
                 }

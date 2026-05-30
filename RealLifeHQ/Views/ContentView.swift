@@ -6,42 +6,17 @@ import SwiftUI
 struct ContentView: View {
     @EnvironmentObject var themeManager: ThemeManager
     @EnvironmentObject var dataManager: DataManager
-    @State private var storeManager = StoreManager.shared
-    @State private var showPaywall = false
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
-    
+
     var body: some View {
-        Group {
-            if shouldShowPaywall {
-                // Show paywall if not subscribed or first launch
-                SubscriptionView()
-            } else {
-                // Show main app content - different layout for iPad vs iPhone
-                if horizontalSizeClass == .regular {
-                    // iPad: Use sidebar navigation
-                    iPadLayout
-                } else {
-                    // iPhone: Use tab bar
-                    mainAppContent
-                }
-            }
-        }
-        .onAppear {
-            checkSubscriptionStatus()
+        if horizontalSizeClass == .regular {
+            iPadLayout
+        } else {
+            mainAppContent
         }
     }
-    
-    private var shouldShowPaywall: Bool {
-        // Show paywall if not onboarded OR not subscribed
-        return !dataManager.settings.hasCompletedOnboarding || !storeManager.isSubscribed
-    }
-    
-    private func checkSubscriptionStatus() {
-        Task {
-            await storeManager.updateSubscriptionStatus()
-        }
-    }
-    
+
+
     // iPad Layout with Sidebar Navigation
     private var iPadLayout: some View {
         NavigationSplitView {
@@ -60,27 +35,15 @@ struct ContentView: View {
                     NavigationLink(destination: CleaningTrackerView()) {
                         Label("Cleaning", systemImage: "sparkles")
                     }
-                }
-                
-                Section("Productivity") {
-                    NavigationLink(destination: JournalView()) {
-                        Label("Journal", systemImage: "book.closed.fill")
-                    }
                     NavigationLink(destination: BudgetView()) {
                         Label("Budget", systemImage: "dollarsign.circle.fill")
                     }
                 }
-                
-                Section("Lifestyle") {
-                    NavigationLink(destination: RecipesView()) {
-                        Label("Recipes", systemImage: "fork.knife")
+
+                Section("More") {
+                    NavigationLink(destination: JournalView()) {
+                        Label("Journal", systemImage: "book.closed.fill")
                     }
-                    NavigationLink(destination: VaultView()) {
-                        Label("Vault", systemImage: "lock.shield.fill")
-                    }
-                }
-                
-                Section {
                     NavigationLink(destination: SettingsView()) {
                         Label("Settings", systemImage: "gear")
                     }
@@ -103,7 +66,27 @@ struct ContentView: View {
                 .tabItem {
                     Label("Home", systemImage: "house.fill")
                 }
-            
+
+            // Calendar Tab
+            NavigationStack {
+                CalendarView()
+            }
+            .tabItem {
+                Label("Calendar", systemImage: "calendar")
+            }
+
+            // Habits Tab
+            HabitsView()
+                .tabItem {
+                    Label("Habits", systemImage: "target")
+                }
+
+            // Cleaning Tracker Tab
+            CleaningTrackerView()
+                .tabItem {
+                    Label("Cleaning", systemImage: "sparkles")
+                }
+
             // Budget Tab
             NavigationStack {
                 BudgetView()
@@ -111,24 +94,6 @@ struct ContentView: View {
             .tabItem {
                 Label("Budget", systemImage: "dollarsign.circle.fill")
             }
-            
-            // Habits Tab
-            HabitsView()
-                .tabItem {
-                    Label("Habits", systemImage: "target")
-                }
-            
-            // Cleaning Tracker Tab
-            CleaningTrackerView()
-                .tabItem {
-                    Label("Cleaning", systemImage: "sparkles")
-                }
-            
-            // More Tab
-            MoreView()
-                .tabItem {
-                    Label("More", systemImage: "ellipsis.circle.fill")
-                }
         }
         .accentColor(themeManager.currentTheme.primaryColor)
     }
@@ -185,21 +150,17 @@ struct HomeView: View {
             todaysEventsWidget
             cleaningWidget
             habitsWidget
-            recipesWidget
             journalPromptWidget
             budgetWidget
-            
-            // Vault Quick Link at bottom
-            vaultQuickLink
         }
     }
-    
+
     // iPad Layout - Two-Column Grid
     private var iPadLayout: some View {
         VStack(spacing: 20) {
             greetingHeader
                 .padding(.horizontal)
-            
+
             LazyVGrid(columns: [
                 GridItem(.flexible(), spacing: 20),
                 GridItem(.flexible(), spacing: 20)
@@ -207,13 +168,9 @@ struct HomeView: View {
                 todaysEventsWidget
                 cleaningWidget
                 habitsWidget
-                recipesWidget
                 journalPromptWidget
                 budgetWidget
             }
-            
-            // Vault Quick Link at bottom
-            vaultQuickLink
         }
     }
     
@@ -611,95 +568,6 @@ struct HomeView: View {
         .cornerRadius(12)
     }
     
-    // MARK: - Recipes Widget
-    
-    private var recipesWidget: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Image(systemName: "fork.knife")
-                    .foregroundColor(themeManager.currentTheme.primaryColor)
-                Text("Recipes")
-                    .font(.headline)
-                    .foregroundColor(themeManager.currentTheme.primaryColor)
-                Spacer()
-                NavigationLink(destination: RecipesView()) {
-                    Text("View All")
-                        .font(.caption)
-                        .foregroundColor(themeManager.currentTheme.primaryColor)
-                }
-            }
-            
-            if dataManager.recipes.isEmpty {
-                // No recipes yet
-                NavigationLink(destination: RecipesView()) {
-                    VStack(spacing: 8) {
-                        Image(systemName: "plus.circle.fill")
-                            .font(.title2)
-                            .foregroundColor(themeManager.currentTheme.primaryColor)
-                        Text("Add your first recipe")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                }
-                .buttonStyle(PlainButtonStyle())
-            } else {
-                // Show recipe count and quick actions
-                VStack(spacing: 8) {
-                    HStack(spacing: 16) {
-                        // Recipe count
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("\(dataManager.recipes.count)")
-                                .font(.title2)
-                                .fontWeight(.bold)
-                                .foregroundColor(themeManager.currentTheme.primaryColor)
-                            Text("Recipes")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                        
-                        Divider()
-                            .frame(height: 30)
-                        
-                        // Meal plan count
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("\(dataManager.mealPlans.count)")
-                                .font(.title2)
-                                .fontWeight(.bold)
-                                .foregroundColor(themeManager.currentTheme.accentColor)
-                            Text("Planned")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                        
-                        Spacer()
-                        
-                        NavigationLink(destination: RecipesView()) {
-                            Image(systemName: "arrow.right.circle.fill")
-                                .font(.title2)
-                                .foregroundColor(themeManager.currentTheme.primaryColor)
-                        }
-                    }
-                    
-                    // Shopping list indicator
-                    if !dataManager.shoppingItems.isEmpty {
-                        HStack {
-                            Image(systemName: "cart.fill")
-                                .font(.caption)
-                                .foregroundColor(themeManager.currentTheme.accentColor)
-                            Text("\(dataManager.shoppingItems.filter { !$0.isChecked }.count) items on shopping list")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                }
-            }
-        }
-        .padding()
-        .background(themeManager.currentTheme.cardColor)
-        .cornerRadius(12)
-    }
     
     // Generate a journal prompt based on the day of the year
     private var todaysJournalPrompt: String {
@@ -739,34 +607,6 @@ struct HomeView: View {
         // Use day of year to get consistent prompt for the day
         let dayOfYear = Calendar.current.ordinality(of: .day, in: .year, for: Date()) ?? 1
         return prompts[dayOfYear % prompts.count]
-    }
-    
-    // MARK: - Vault Quick Link
-    
-    private var vaultQuickLink: some View {
-        NavigationLink(destination: VaultView()) {
-            HStack {
-                Spacer()
-                
-                VStack(spacing: 8) {
-                    Image(systemName: "lock.shield.fill")
-                        .font(.system(size: 32))
-                        .foregroundColor(themeManager.currentTheme.primaryColor)
-                    
-                    Text("Vault")
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                        .foregroundColor(themeManager.currentTheme.primaryColor)
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 20)
-                .background(themeManager.currentTheme.cardColor)
-                .cornerRadius(12)
-                
-                Spacer()
-            }
-        }
-        .buttonStyle(PlainButtonStyle())
     }
     
     // Calculate budget remaining for current month

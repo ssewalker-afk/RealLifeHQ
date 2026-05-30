@@ -1337,10 +1337,18 @@ struct AddCategoryView: View {
         }
     }
 
-    private var isValid: Bool { !name.isEmpty && !limit.isEmpty && Double(limit) != nil }
+    private var parsedLimit: Double? {
+        // Normalize locale-specific decimal separators (comma → period) before parsing
+        let normalized = limit
+            .replacingOccurrences(of: ",", with: ".")
+            .trimmingCharacters(in: .whitespaces)
+        return Double(normalized)
+    }
+
+    private var isValid: Bool { !name.isEmpty && !limit.isEmpty && parsedLimit != nil }
 
     private func saveCategory() {
-        guard let limitValue = Double(limit) else { return }
+        guard let limitValue = parsedLimit else { return }
         dataManager.addBudgetCategory(BudgetCategory(name: name, icon: icon, color: color, limit: limitValue, type: type))
         dismiss()
     }
